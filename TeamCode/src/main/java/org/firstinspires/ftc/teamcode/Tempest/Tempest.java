@@ -52,11 +52,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public class Tempest {
     //Drive Motors
-    public DcMotor fLeft;
-    public DcMotor fRight;
-    public DcMotor bLeft;
-    public DcMotor bRight;
+    public DcMotor FLeft;
+    public DcMotor FRight;
+    public DcMotor BLeft;
+    public DcMotor BRight;
 
+    //Ints
+    public double speedSet;
+
+    //Intake Motors;
+    public DcMotor lSlideLeft;
+    public DcMotor lSlideRight;
+    public DcMotor lSlideUp;
+
+    //Intake Motors & Servos
+    public DcMotor intake;
+    public Servo iRight;
+    public Servo iLeft;
     //imu
     public BNO055IMU imu;
     public Orientation angles;
@@ -67,6 +79,8 @@ public class Tempest {
     public HardwareMap hardwareMap;
     public LinearOpMode linearOpMode;
 
+    static double linearSlideValue = 0.7;
+
     public Tempest(HardwareMap hardwareMap, Telemetry telemetry,LinearOpMode linearOpMode){
 
         this.telemetry = telemetry;
@@ -74,16 +88,19 @@ public class Tempest {
         this.linearOpMode = linearOpMode;
 
         //Map drive motors
-        fLeft = hardwareMap.dcMotor.get("fLeft");
-        fRight = hardwareMap.dcMotor.get("fRight");
-        bLeft = hardwareMap.dcMotor.get("bLeft");
-        bRight = hardwareMap.dcMotor.get("bRight");
+        FLeft = hardwareMap.dcMotor.get("fLeft");
+        FRight = hardwareMap.dcMotor.get("fRight");
+        BLeft = hardwareMap.dcMotor.get("bLeft");
+        BRight = hardwareMap.dcMotor.get("bRight");
+
+        //Map LinearSlide Motors
+
 
         //Set direction of drive motors
-        fLeft.setDirection(DcMotor.Direction.FORWARD);
-        fRight.setDirection(DcMotor.Direction.REVERSE);
-        bLeft.setDirection(DcMotor.Direction.FORWARD);
-        bRight.setDirection(DcMotor.Direction.REVERSE);
+        FLeft.setDirection(DcMotor.Direction.FORWARD);
+        FRight.setDirection(DcMotor.Direction.REVERSE);
+        BLeft.setDirection(DcMotor.Direction.FORWARD);
+        BRight.setDirection(DcMotor.Direction.REVERSE);
     }
 
 
@@ -104,42 +121,42 @@ public class Tempest {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
     public void resetEncoders(){
-        fLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
 
     public void resumeEncoders(){
-        fLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        FLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        FRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        BLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        BRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void changeRunModeToUsingEncoder(){
-        fLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
 
     public void setMotorMode(DcMotor.RunMode runMode){
-        fLeft.setMode(runMode);
-        fRight.setMode(runMode);
-        bLeft.setMode(runMode);
-        bRight.setMode(runMode);
+        FLeft.setMode(runMode);
+        FRight.setMode(runMode);
+        BLeft.setMode(runMode);
+        BRight.setMode(runMode);
     }
 
 
 
     public void setDrivePower(double power){
-        fLeft.setPower(power);
-        fRight.setPower(power);
-        bLeft.setPower(power);
-        bRight.setPower(power);
+        FLeft.setPower(power);
+        FRight.setPower(power);
+        BLeft.setPower(power);
+        BRight.setPower(power);
     }
 
 
@@ -185,10 +202,10 @@ public class Tempest {
             if(scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)){
                 break;
             }
-            fLeft.setPower(-power);
-            fRight.setPower(power);
-            bLeft.setPower(-power);
-            bRight.setPower(power);
+            FLeft.setPower(-power);
+            FRight.setPower(power);
+            FLeft.setPower(-power);
+            BRight.setPower(power);
         }
 
         setDrivePower(0);
@@ -206,12 +223,43 @@ public class Tempest {
         brakeMotors();
     }
 
-
-
-
-
-
-    public void moveRobot(double speed, int targetPostition,long timeInMilli){
+    public void  moveLinearSlideUp() {
+        lSlideLeft.setPower(linearSlideValue);
+        lSlideRight.setPower(linearSlideValue);
+    }
+    public void  moveLinearSlideDown() {
+        lSlideLeft.setPower(-linearSlideValue);
+        lSlideRight.setPower(-linearSlideValue);
+    }
+    public void allWheelDrive(double fLeftPower, double bLeftPower, double fRightPower, double bRightPower) {
+        FLeft.setPower(fLeftPower);
+        FRight.setPower(fRightPower);
+        BRight.setPower(bRightPower);
+        BLeft.setPower(bLeftPower);
+    }
+    public void fLeft(double power) {
+        FLeft.setPower(power * speedSet);
+    }
+    public void fRight(double power) {
+        FLeft.setPower(power * speedSet);
+    }
+    public void bLeft(double power) {
+        BLeft.setPower(power * speedSet);
+    }
+    public void bRight(double power) {
+        BRight.setPower(power * speedSet);
+    }
+    public void OutTake() {
+        iRight.setPosition(1);
+        iLeft.setPosition(1);
+        intake.setPower(-1);
+    }
+    public void InTake() {
+        iRight.setPosition(-1);
+        iLeft.setPosition(-1);
+        intake.setPower(1);
+    }
+    public void moveRobot(double speed, int targetPostition, long timeInMilli){
 
         long startTime = SystemClock.elapsedRealtime();
 
@@ -224,19 +272,19 @@ public class Tempest {
             newSpeed = newSpeed * -1;
         }
 
-        fLeft.setPower(newSpeed);
-        fRight.setPower(newSpeed);
-        bLeft.setPower(newSpeed);
-        bRight.setPower(newSpeed);
+        FLeft.setPower(newSpeed);
+        FRight.setPower(newSpeed);
+        BLeft.setPower(newSpeed);
+        BRight.setPower(newSpeed);
 
 
-        fLeft.setTargetPosition(targetPostition);
-        fRight.setTargetPosition(targetPostition);
-        bLeft.setTargetPosition(targetPostition);
-        bRight.setTargetPosition(targetPostition);
+        FLeft.setTargetPosition(targetPostition);
+        FRight.setTargetPosition(targetPostition);
+        BLeft.setTargetPosition(targetPostition);
+        BRight.setTargetPosition(targetPostition);
 
 
-        while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
+        while(FLeft.isBusy() && FRight.isBusy() && BLeft.isBusy() && BRight.isBusy()
                 && (SystemClock.elapsedRealtime() - startTime < timeInMilli) && linearOpMode.opModeIsActive()){
         }
 
@@ -284,10 +332,10 @@ public class Tempest {
         telemetry.update();
         finalTurn(angle);
 
-        fLeft.setPower(speed);
-        fRight.setPower(speed);
-        bLeft.setPower(speed);
-        bRight.setPower(speed);
+        FLeft.setPower(speed);
+        FRight.setPower(speed);
+        BLeft.setPower(speed);
+        BRight.setPower(speed);
 
         moveRobotInches(speed,distanceToTravel*12);
 
@@ -329,10 +377,10 @@ public class Tempest {
             if (scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)) {
                 break;
             }
-            fLeft.setPower(-power);
-            fRight.setPower(power);
-            bLeft.setPower(-power);
-            bRight.setPower(power);
+            FLeft.setPower(-power);
+            FRight.setPower(power);
+            BLeft.setPower(-power);
+            BRight.setPower(power);
         }
 
         setDrivePower(0);

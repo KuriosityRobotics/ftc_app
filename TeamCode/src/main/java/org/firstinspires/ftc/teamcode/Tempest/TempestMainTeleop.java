@@ -4,18 +4,22 @@ package org.firstinspires.ftc.teamcode.Tempest;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name="Temepst: Main Teleop", group="Linear Opmode")
 //@Disabled
 public class TempestMainTeleop extends LinearOpMode
 {
-    double fLPower;
-    double fRPower;
-    double bLPower;
-    double bRPower;
+    public static double fLPower;
+    public static double fRPower;
+    public static double bLPower;
+    public static double bRPower;
+
+    public static double powerScaleFactor = 0.4;
+
 
     long startTime = 0;
 
@@ -34,47 +38,54 @@ public class TempestMainTeleop extends LinearOpMode
         bLPower = 0.0;
         bRPower = 0.0;
 
-        double powerScaleFactor = 0.4;
-
         waitForStart();
         runtime.reset();
 
         while (opModeIsActive()){
-            //tank drive
-            fLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
-            bLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
-            fRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
-            bRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+            moveRobotLogic(robot,gamepad1,gamepad2,telemetry);
 
-            //Straight D-Pad move
-            if (gamepad1.dpad_up) {
-                fLPower = (gamepad1.left_stick_y)+powerScaleFactor;
-                bLPower = (gamepad1.left_stick_y)+powerScaleFactor;
-                fRPower = (gamepad1.right_stick_y+powerScaleFactor);
-                bRPower = (gamepad1.right_stick_y+powerScaleFactor);
-            } else if (gamepad1.dpad_down) {
-                fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
-                bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
-                fRPower = (gamepad1.right_stick_y-powerScaleFactor);
-                bRPower = (gamepad1.right_stick_y)-powerScaleFactor;
-            } else if (gamepad1.dpad_right) {
-                fLPower = (gamepad1.right_stick_y+powerScaleFactor);
-                bLPower = (gamepad1.right_stick_y)+powerScaleFactor;
-                fRPower = (gamepad1.left_stick_y)-powerScaleFactor;
-                bRPower = (gamepad1.left_stick_y)-powerScaleFactor;
-            } else if (gamepad1.dpad_left) {
-                fRPower = (gamepad1.right_stick_y+powerScaleFactor);
-                bRPower = (gamepad1.right_stick_y)+powerScaleFactor;
-                fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
-                bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
-            }
-
-            robot.fLeft.setPower(fLPower);
-            robot.fRight.setPower(fRPower);
-            robot.bLeft.setPower(bLPower);
-            robot.bRight.setPower(bRPower);
-
-            telemetry.update();
         }
+    }
+
+    public static void moveIntakeLogic(Tempest robot, Gamepad gamepad1, Gamepad gamepad2){
+
+    }
+
+    public static void moveRobotLogic(Tempest robot, Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry) {
+        //tank drive
+        fLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
+        bLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
+        fRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+        bRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+
+        //Straight D-Pad move
+        if (gamepad1.dpad_up) {
+            fLPower = (gamepad1.left_stick_y)+powerScaleFactor;
+            bLPower = (gamepad1.left_stick_y)+powerScaleFactor;
+            fRPower = (gamepad1.right_stick_y+powerScaleFactor);
+            bRPower = (gamepad1.right_stick_y+powerScaleFactor);
+        } else if (gamepad1.dpad_down) {
+            fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
+            bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
+            fRPower = (gamepad1.right_stick_y-powerScaleFactor);
+            bRPower = (gamepad1.right_stick_y)-powerScaleFactor;
+        } else if (gamepad1.dpad_right) {
+            fLPower = (gamepad1.right_stick_y+powerScaleFactor);
+            bLPower = (gamepad1.right_stick_y)+powerScaleFactor;
+            fRPower = (gamepad1.left_stick_y)-powerScaleFactor;
+            bRPower = (gamepad1.left_stick_y)-powerScaleFactor;
+        } else if (gamepad1.dpad_left) {
+            fRPower = (gamepad1.right_stick_y+powerScaleFactor);
+            bRPower = (gamepad1.right_stick_y)+powerScaleFactor;
+            fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
+            bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
+        }
+
+        robot.fLeft(fLPower);
+        robot.fRight(fRPower);
+        robot.bLeft(bLPower);
+        robot.bRight(bRPower);
+
+        telemetry.update();
     }
 }
