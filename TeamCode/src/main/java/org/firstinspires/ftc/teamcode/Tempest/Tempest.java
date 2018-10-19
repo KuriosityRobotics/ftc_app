@@ -8,40 +8,21 @@ import android.os.SystemClock;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import android.os.SystemClock;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -52,23 +33,26 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public class Tempest {
     //Drive Motors
-    public DcMotor FLeft;
-    public DcMotor FRight;
-    public DcMotor BLeft;
-    public DcMotor BRight;
+    public DcMotor fLeft;
+    public DcMotor fRight;
+    public DcMotor bLeft;
+    public DcMotor bRight;
+
+    RevTouchSensor upTouch;
 
     //Ints
     public double speedSet;
 
     //Intake Motors;
-    public DcMotor lSlideLeft;
-    public DcMotor lSlideRight;
-    public DcMotor lSlideUp;
+    public DcMotor slideLeft;
+    public DcMotor slideRight;
+    public DcMotor pivot;
 
     //Intake Motors & Servos
     public DcMotor intake;
-    public Servo iRight;
-    public Servo iLeft;
+    public Servo intakeRight;
+    public Servo intakeLeft;
+    public Servo lock;
     //imu
     public BNO055IMU imu;
     public Orientation angles;
@@ -88,19 +72,29 @@ public class Tempest {
         this.linearOpMode = linearOpMode;
 
         //Map drive motors
-        FLeft = hardwareMap.dcMotor.get("fLeft");
-        FRight = hardwareMap.dcMotor.get("fRight");
-        BLeft = hardwareMap.dcMotor.get("bLeft");
-        BRight = hardwareMap.dcMotor.get("bRight");
+        fLeft = hardwareMap.dcMotor.get("fLeft");
+        fRight = hardwareMap.dcMotor.get("fRight");
+        bLeft = hardwareMap.dcMotor.get("bLeft");
+        bRight = hardwareMap.dcMotor.get("bRight");
+
+        intakeRight = hardwareMap.servo.get("intakeRight");
+        intakeLeft = hardwareMap.servo.get("intakeLeft");
+        intake = hardwareMap.dcMotor.get("intake");
+
+        slideLeft = hardwareMap.dcMotor.get("slideLeft");
+        slideRight = hardwareMap.dcMotor.get("slideRight");
+        pivot = hardwareMap.dcMotor.get("pivot");
+        lock = hardwareMap.servo.get("lock");
+
+        upTouch = hardwareMap.get(RevTouchSensor.class,"upTouch");
+
 
         //Map LinearSlide Motors
-
-
         //Set direction of drive motors
-        FLeft.setDirection(DcMotor.Direction.FORWARD);
-        FRight.setDirection(DcMotor.Direction.REVERSE);
-        BLeft.setDirection(DcMotor.Direction.FORWARD);
-        BRight.setDirection(DcMotor.Direction.REVERSE);
+        fLeft.setDirection(DcMotor.Direction.FORWARD);
+        fRight.setDirection(DcMotor.Direction.REVERSE);
+        bLeft.setDirection(DcMotor.Direction.FORWARD);
+        bRight.setDirection(DcMotor.Direction.REVERSE);
     }
 
 
@@ -121,42 +115,42 @@ public class Tempest {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
     public void resetEncoders(){
-        FLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        FRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        BLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        BRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
 
     public void resumeEncoders(){
-        FLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        FRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        BLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        BRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void changeRunModeToUsingEncoder(){
-        FLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        FRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
 
     public void setMotorMode(DcMotor.RunMode runMode){
-        FLeft.setMode(runMode);
-        FRight.setMode(runMode);
-        BLeft.setMode(runMode);
-        BRight.setMode(runMode);
+        fLeft.setMode(runMode);
+        fRight.setMode(runMode);
+        bLeft.setMode(runMode);
+        bRight.setMode(runMode);
     }
 
 
 
     public void setDrivePower(double power){
-        FLeft.setPower(power);
-        FRight.setPower(power);
-        BLeft.setPower(power);
-        BRight.setPower(power);
+        fLeft.setPower(power);
+        fRight.setPower(power);
+        bLeft.setPower(power);
+        bRight.setPower(power);
     }
 
 
@@ -202,10 +196,10 @@ public class Tempest {
             if(scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)){
                 break;
             }
-            FLeft.setPower(-power);
-            FRight.setPower(power);
-            FLeft.setPower(-power);
-            BRight.setPower(power);
+            fLeft.setPower(-power);
+            fRight.setPower(power);
+            fLeft.setPower(-power);
+            bRight.setPower(power);
         }
 
         setDrivePower(0);
@@ -224,39 +218,39 @@ public class Tempest {
     }
 
     public void  moveLinearSlideUp() {
-        lSlideLeft.setPower(linearSlideValue);
-        lSlideRight.setPower(linearSlideValue);
+        slideLeft.setPower(linearSlideValue);
+        slideRight.setPower(linearSlideValue);
     }
     public void  moveLinearSlideDown() {
-        lSlideLeft.setPower(-linearSlideValue);
-        lSlideRight.setPower(-linearSlideValue);
+        slideLeft.setPower(-linearSlideValue);
+        slideRight.setPower(-linearSlideValue);
     }
     public void allWheelDrive(double fLeftPower, double bLeftPower, double fRightPower, double bRightPower) {
-        FLeft.setPower(fLeftPower);
-        FRight.setPower(fRightPower);
-        BRight.setPower(bRightPower);
-        BLeft.setPower(bLeftPower);
+        fLeft.setPower(fLeftPower);
+        fRight.setPower(fRightPower);
+        bRight.setPower(bRightPower);
+        bLeft.setPower(bLeftPower);
     }
     public void fLeft(double power) {
-        FLeft.setPower(power * speedSet);
+        fLeft.setPower(power * speedSet);
     }
     public void fRight(double power) {
-        FLeft.setPower(power * speedSet);
+        fLeft.setPower(power * speedSet);
     }
     public void bLeft(double power) {
-        BLeft.setPower(power * speedSet);
+        bLeft.setPower(power * speedSet);
     }
     public void bRight(double power) {
-        BRight.setPower(power * speedSet);
+        bRight.setPower(power * speedSet);
     }
     public void OutTake() {
-        iRight.setPosition(1);
-        iLeft.setPosition(1);
+        intakeRight.setPosition(1);
+        intakeLeft.setPosition(1);
         intake.setPower(-1);
     }
     public void InTake() {
-        iRight.setPosition(-1);
-        iLeft.setPosition(-1);
+        intakeRight.setPosition(-1);
+        intakeLeft.setPosition(-1);
         intake.setPower(1);
     }
     public void moveRobot(double speed, int targetPostition, long timeInMilli){
@@ -272,19 +266,19 @@ public class Tempest {
             newSpeed = newSpeed * -1;
         }
 
-        FLeft.setPower(newSpeed);
-        FRight.setPower(newSpeed);
-        BLeft.setPower(newSpeed);
-        BRight.setPower(newSpeed);
+        fLeft.setPower(newSpeed);
+        fRight.setPower(newSpeed);
+        bLeft.setPower(newSpeed);
+        bRight.setPower(newSpeed);
 
 
-        FLeft.setTargetPosition(targetPostition);
-        FRight.setTargetPosition(targetPostition);
-        BLeft.setTargetPosition(targetPostition);
-        BRight.setTargetPosition(targetPostition);
+        fLeft.setTargetPosition(targetPostition);
+        fRight.setTargetPosition(targetPostition);
+        bLeft.setTargetPosition(targetPostition);
+        bRight.setTargetPosition(targetPostition);
 
 
-        while(FLeft.isBusy() && FRight.isBusy() && BLeft.isBusy() && BRight.isBusy()
+        while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
                 && (SystemClock.elapsedRealtime() - startTime < timeInMilli) && linearOpMode.opModeIsActive()){
         }
 
@@ -332,10 +326,10 @@ public class Tempest {
         telemetry.update();
         finalTurn(angle);
 
-        FLeft.setPower(speed);
-        FRight.setPower(speed);
-        BLeft.setPower(speed);
-        BRight.setPower(speed);
+        fLeft.setPower(speed);
+        fRight.setPower(speed);
+        bLeft.setPower(speed);
+        bRight.setPower(speed);
 
         moveRobotInches(speed,distanceToTravel*12);
 
@@ -363,6 +357,7 @@ public class Tempest {
         if (maxAngle == 0) {
             return;
         }
+
         while (linearOpMode.opModeIsActive()) {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
@@ -377,13 +372,15 @@ public class Tempest {
             if (scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)) {
                 break;
             }
-            FLeft.setPower(-power);
-            FRight.setPower(power);
-            BLeft.setPower(-power);
-            BRight.setPower(power);
+            fLeft.setPower(-power);
+            fRight.setPower(power);
+            bLeft.setPower(-power);
+            bRight.setPower(power);
         }
 
         setDrivePower(0);
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
+
 }
