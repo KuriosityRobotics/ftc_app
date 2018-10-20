@@ -77,17 +77,14 @@ public class TempestMainTeleop extends LinearOpMode
             if(gamepad1.y){
                 robot.pivot.setPower(-1);
             }else if(gamepad1.x){
-                robot.lock.setPosition(0.5);
+                robot.lock.setPosition(0.25);
                 robot.pivot.setPower(1);
             }else{
                 robot.pivot.setPower(0);
             }
-            if(gamepad1.a){
-                robot.lock.setPosition(0);
-            }
 
             if(robot.upTouch.isPressed()){
-                robot.lock.setPosition(1);
+                robot.lock.setPosition(0.75);
                 robot.pivot.setPower(0);
             }
             if(gamepad2.x && gamepad2.right_bumper) {
@@ -95,12 +92,13 @@ public class TempestMainTeleop extends LinearOpMode
             }else if(gamepad2.x){
                 robot.intakeLeft.setPosition(0.7);
             }
+
             if(gamepad2.b && gamepad2.right_bumper) {
                 robot.intakeRight.setPosition(0.35);
             }else if(gamepad2.b){
                 robot.intakeRight.setPosition(0.2);
             }
-            if(gamepad2.y&&gamepad2.right_bumper){
+            if(gamepad2.y && gamepad2.right_bumper){
                 robot.intakeRight.setPosition(0.35);
                 robot.intakeLeft.setPosition(0.5);
             }else if(gamepad2.y){
