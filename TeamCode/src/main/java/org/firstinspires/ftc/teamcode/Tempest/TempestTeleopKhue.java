@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Tempest;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -40,12 +41,20 @@ public class TempestTeleopKhue extends LinearOpMode {
         waitForStart();
         runtime.reset();
         robot.speedSet = 0.6;
+
+        robot.resetEncoders();
+        robot.changeRunModeToUsingEncoder();
+        robot.intializeIMU();
+
+
+
         while (opModeIsActive()){
             if (gamepad1.right_stick_y != 0 || gamepad1.left_stick_y != 0) {
                 robot.allWheelDrive(gamepad1.left_stick_y, gamepad1.left_stick_y, gamepad1.right_stick_y, gamepad1.right_stick_y);
             } else {
                 robot.setDrivePower(0);
             }
+
             if(gamepad1.dpad_up) {
                 robot.setDrivePower(0.6);
             }else if (gamepad1.dpad_down) {
@@ -56,18 +65,6 @@ public class TempestTeleopKhue extends LinearOpMode {
                 robot.allWheelDrive(-0.6, -0.6, 0.6, 0.6);
             }else{
                 robot.setDrivePower(0);
-            }
-            if (gamepad2.right_bumper) {
-                robot.moveLinearSlideDown();
-                robot.pivot.setPower(-0.8);
-                robot.InTake();
-            }else{
-                robot.pivot.setPower(0);
-            }
-            if (gamepad2.left_bumper) {
-                robot.pivot.setPower(0.8);
-                robot.moveLinearSlideUp();
-                robot.OutTake();
             }
 
             robot.slideRight.setPower(gamepad2.right_stick_y);
@@ -82,8 +79,59 @@ public class TempestTeleopKhue extends LinearOpMode {
             pivotIntakeLogic(robot,gamepad1,gamepad2,telemetry);
             moveIntakeLogic(robot,gamepad1,gamepad2,telemetry);
 
-            telemetry.update();
+            if (gamepad2.dpad_up) {
+                robot.slideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.slideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
 
+            if (gamepad2.dpad_down) {
+                robot.slideLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.slideRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            }
+
+            if (gamepad2.x) {
+                robot.intakeRight.setPosition(1);
+            }
+
+            if (gamepad2.y) {
+                robot.intakeLeft.setPosition(1);
+            }
+
+            if (gamepad2.a) {
+                robot.intakeRight.setPosition(0);
+            }
+            if (gamepad2.b) {
+                robot.intakeLeft.setPosition(0);
+            }
+
+            if (gamepad2.dpad_right){
+                robot.intake.setPower(1);
+            }
+
+            if (gamepad2.dpad_left) {
+                robot.intake.setPower(-1);
+            }
+
+            if (gamepad2.left_stick_y < 0) {
+                robot.slideRight.setPower(-0.5);
+                robot.slideRight.setPower(-0.5);
+            }
+
+            if (gamepad2.left_stick_y != 0 || gamepad2.right_stick_y != 0) {
+                robot.slideRight.setPower(gamepad2.left_stick_y / 2 + gamepad2.right_stick_y / 2);
+                robot.slideLeft.setPower(gamepad2.left_stick_y / 2 + gamepad2.right_stick_y / 2);
+            }
+            if (gamepad2.x && robot.clawsOnOff == true) {
+                robot.intakeLeft.setPosition(0.7);
+                robot.intakeRight.setPosition(0.7);
+                robot.clawsOnOff = false;
+            } else if (gamepad2.x && robot.clawsOnOff == false) {
+                robot.intakeLeft.setPosition(0);
+                robot.intakeRight.setPosition(0);
+                robot.clawsOnOff = true;
+            }
+            telemetry.update();
         }
     }
 
