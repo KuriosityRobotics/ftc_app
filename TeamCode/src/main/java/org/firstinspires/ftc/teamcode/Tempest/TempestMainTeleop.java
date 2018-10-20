@@ -8,10 +8,13 @@ package org.firstinspires.ftc.teamcode.Tempest;
 //@Disabled
 public class TempestMainTeleop extends LinearOpMode
 {
+
     double fLPower;
     double fRPower;
     double bLPower;
     double bRPower;
+    public static double powerScaleFactor = 0.4;
+
     long startTime = 0;
     boolean changedRight = false, onRight = false;
     boolean changedLeft = false, onLeft = false;

@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -63,6 +65,7 @@ public class Tempest {
     public HardwareMap hardwareMap;
     public LinearOpMode linearOpMode;
 
+    boolean clawsOnOff = true;
     static double linearSlideValue = 0.7;
 
     public Tempest(HardwareMap hardwareMap, Telemetry telemetry,LinearOpMode linearOpMode){
@@ -243,6 +246,7 @@ public class Tempest {
     public void bRight(double power) {
         bRight.setPower(power * speedSet);
     }
+
     public void OutTake() {
         intakeRight.setPosition(1);
         intakeLeft.setPosition(1);
@@ -377,7 +381,6 @@ public class Tempest {
             bLeft.setPower(-power);
             bRight.setPower(power);
         }
-
         setDrivePower(0);
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
