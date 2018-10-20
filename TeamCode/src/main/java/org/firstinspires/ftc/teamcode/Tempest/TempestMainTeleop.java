@@ -13,6 +13,9 @@ public class TempestMainTeleop extends LinearOpMode
     double bLPower;
     double bRPower;
     long startTime = 0;
+    boolean changedRight = false, onRight = false;
+    boolean changedLeft = false, onLeft = false;
+
     private ElapsedTime runtime = new ElapsedTime();
     @Override
     public void runOpMode(){
@@ -76,12 +79,31 @@ public class TempestMainTeleop extends LinearOpMode
             }else{
                 robot.pivot.setPower(0);
             }
+            if(gamepad1.a){
+                robot.lock.setPosition(0);
+            }
 
             if(robot.upTouch.isPressed()){
                 robot.lock.setPosition(1);
                 robot.pivot.setPower(0);
             }
-            robot.intake.setPower(gamepad2.left_stick_y);
+            if(gamepad2.x && gamepad2.right_bumper) {
+                robot.intakeLeft.setPosition(0.5);
+            }else if(gamepad2.x){
+                robot.intakeLeft.setPosition(0.7);
+            }
+            if(gamepad2.b && gamepad2.right_bumper) {
+                robot.intakeRight.setPosition(0.35);
+            }else if(gamepad2.b){
+                robot.intakeRight.setPosition(0.2);
+            }
+            if(gamepad2.y&&gamepad2.right_bumper){
+                robot.intakeRight.setPosition(0.35);
+                robot.intakeLeft.setPosition(0.5);
+            }else if(gamepad2.y){
+                robot.intakeLeft.setPosition(0.7);
+                robot.intakeRight.setPosition(0.2);
+            }
 
             if (robot.upTouch.isPressed()) {
                 telemetry.addData("Digital Touch", "Is ressed");
