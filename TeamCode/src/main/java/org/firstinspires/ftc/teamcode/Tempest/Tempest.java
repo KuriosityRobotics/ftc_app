@@ -55,6 +55,9 @@ public class Tempest {
     public Servo intakeRight;
     public Servo intakeLeft;
     public Servo lock;
+    public Servo hangLockLeft;
+    public Servo hangLockRight;
+    public Servo hook;
     //imu
     public BNO055IMU imu;
     public Orientation angles;
@@ -88,6 +91,9 @@ public class Tempest {
         slideRight = hardwareMap.dcMotor.get("slideRight");
         pivot = hardwareMap.dcMotor.get("pivot");
         lock = hardwareMap.servo.get("lock");
+        hangLockLeft = hardwareMap.servo.get("hangLockLeft");
+        hangLockRight = hardwareMap.servo.get("hangLockRight");
+        hook = hardwareMap.servo.get("hook");
 
         upTouch = hardwareMap.get(RevTouchSensor.class,"upTouch");
 

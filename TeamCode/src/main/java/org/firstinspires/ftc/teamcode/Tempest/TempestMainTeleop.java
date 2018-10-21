@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.Tempest;
         import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
         import com.qualcomm.robotcore.hardware.DcMotor;
         import com.qualcomm.robotcore.hardware.DigitalChannel;
+        import com.qualcomm.robotcore.hardware.Gamepad;
+        import com.qualcomm.robotcore.hardware.Servo;
         import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Temepst: Main Teleop", group="Linear Opmode")
 //@Disabled
@@ -13,11 +15,18 @@ public class TempestMainTeleop extends LinearOpMode
     double fRPower;
     double bLPower;
     double bRPower;
+
     public static double powerScaleFactor = 0.4;
 
     long startTime = 0;
     boolean changedRight = false, onRight = false;
     boolean changedLeft = false, onLeft = false;
+    boolean changedBothLeft = false, onDoubleLeft = false;
+    boolean changedBothRight = false, onDoubleRight = false;
+    boolean changedLocks = false, onBoth = false;
+
+
+
 
     private ElapsedTime runtime = new ElapsedTime();
     @Override
@@ -28,6 +37,7 @@ public class TempestMainTeleop extends LinearOpMode
         robot.pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.slideLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.slideRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         //Clears power values
@@ -71,14 +81,14 @@ public class TempestMainTeleop extends LinearOpMode
             robot.bLeft.setPower(bLPower);
             robot.bRight.setPower(bRPower);
 
-            robot.slideRight.setPower(gamepad2.right_stick_y);
-            robot.slideLeft.setPower(-gamepad2.right_stick_y);
+            robot.slideRight.setPower((gamepad2.right_stick_y+gamepad2.left_stick_y)/2);
+            robot.slideLeft.setPower((-gamepad2.right_stick_y-gamepad2.left_stick_y)/2);
 
-            if(gamepad1.y){
-                robot.pivot.setPower(-1);
-            }else if(gamepad1.x){
+            if(gamepad2.dpad_up){
+                robot.pivot.setPower(-0.75);
+            }else if(gamepad2.dpad_down){
                 robot.lock.setPosition(0.25);
-                robot.pivot.setPower(1);
+                robot.pivot.setPower(0.75);
             }else{
                 robot.pivot.setPower(0);
             }
@@ -87,24 +97,59 @@ public class TempestMainTeleop extends LinearOpMode
                 robot.lock.setPosition(0.75);
                 robot.pivot.setPower(0);
             }
-            if(gamepad2.x && gamepad2.right_bumper) {
-                robot.intakeLeft.setPosition(0.5);
-            }else if(gamepad2.x){
-                robot.intakeLeft.setPosition(0.7);
+//            if(gamepad2.x && gamepad2.right_bumper) {
+//                robot.intakeLeft.setPosition(0.5);
+//            }else if(gamepad2.x){
+//                //close
+//                robot.intakeLeft.setPosition(0.7);
+//            }
+//
+//            if(gamepad2.b && gamepad2.right_bumper) {
+//                robot.intakeRight.setPosition(0.35);
+//            }else if(gamepad2.b){
+//                //close
+//                robot.intakeRight.setPosition(0.2);
+//            }
+
+            if(gamepad2.x && !changedLeft){
+                robot.intakeLeft.setPosition(onLeft ? 0.5 : 0.7);
+                onLeft = !onLeft;
+                changedLeft = true;
+            }else if(!gamepad2.x){
+                changedLeft = false;
             }
 
-            if(gamepad2.b && gamepad2.right_bumper) {
-                robot.intakeRight.setPosition(0.35);
-            }else if(gamepad2.b){
-                robot.intakeRight.setPosition(0.2);
+            if(gamepad2.a && !changedRight){
+                robot.intakeRight.setPosition(onRight ? 0.2 : 0.35);
+                onRight = !onRight;
+                changedRight = true;
+            }else if(!gamepad2.a){
+                changedRight = false;
             }
-            if(gamepad2.y && gamepad2.right_bumper){
-                robot.intakeRight.setPosition(0.35);
-                robot.intakeLeft.setPosition(0.5);
-            }else if(gamepad2.y){
-                robot.intakeLeft.setPosition(0.7);
-                robot.intakeRight.setPosition(0.2);
+
+            if(gamepad1.left_bumper){
+                robot.hook.setPosition(0.575);
+            }else if(gamepad1.right_bumper){
+                robot.hook.setPosition(0.2);
             }
+
+            if(gamepad1.a){
+                robot.hangLockLeft.setPosition(0.2);
+                robot.hangLockRight.setPosition(0.15);
+            }else if(gamepad1.b){
+                robot.hangLockLeft.setPosition(0.8);
+                robot.hangLockRight.setPosition(1);
+            }
+
+            if(gamepad1.y){
+                robot.intake.setPower(0.45);
+            }else if(gamepad1.x){
+                robot.intake.setPower(-0.45);
+            }else{
+                robot.intake.setPower(0.15);
+            }
+
+
 
             if (robot.upTouch.isPressed()) {
                 telemetry.addData("Digital Touch", "Is ressed");
