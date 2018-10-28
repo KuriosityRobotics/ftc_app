@@ -45,7 +45,7 @@ public class TempestMainTeleop extends LinearOpMode
         fRPower = 0.0;
         bLPower = 0.0;
         bRPower = 0.0;
-        double powerScaleFactor = 0.4;
+        double powerScaleFactor = 0.7;
         waitForStart();
         runtime.reset();
         while (opModeIsActive()){
@@ -111,19 +111,19 @@ public class TempestMainTeleop extends LinearOpMode
 //                robot.intakeRight.setPosition(0.2);
 //            }
 
-            if(gamepad2.x && !changedLeft){
+            if(gamepad2.a && !changedLeft){
                 robot.intakeLeft.setPosition(onLeft ? 0.5 : 0.7);
                 onLeft = !onLeft;
                 changedLeft = true;
-            }else if(!gamepad2.x){
+            }else if(!gamepad2.a){
                 changedLeft = false;
             }
 
-            if(gamepad2.a && !changedRight){
+            if(gamepad2.x && !changedRight){
                 robot.intakeRight.setPosition(onRight ? 0.2 : 0.35);
                 onRight = !onRight;
                 changedRight = true;
-            }else if(!gamepad2.a){
+            }else if(!gamepad2.x){
                 changedRight = false;
             }
 
@@ -142,9 +142,9 @@ public class TempestMainTeleop extends LinearOpMode
             }
 
             if(gamepad1.y){
-                robot.intake.setPower(0.45);
+                robot.intake.setPower(0.75);
             }else if(gamepad1.x){
-                robot.intake.setPower(-0.45);
+                robot.intake.setPower(-0.75);
             }else{
                 robot.intake.setPower(0.15);
             }
