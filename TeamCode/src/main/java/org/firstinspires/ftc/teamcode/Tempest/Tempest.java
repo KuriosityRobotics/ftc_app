@@ -10,6 +10,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -52,8 +53,8 @@ public class Tempest {
 
     //Intake Motors & Servos
     public DcMotor intake;
-    public Servo intakeRight;
-    public Servo intakeLeft;
+    public CRServo intakeRight;
+    public CRServo intakeLeft;
     public Servo lock;
     public Servo hangLockLeft;
     public Servo hangLockRight;
@@ -83,8 +84,8 @@ public class Tempest {
         bLeft = hardwareMap.dcMotor.get("bLeft");
         bRight = hardwareMap.dcMotor.get("bRight");
 
-        intakeRight = hardwareMap.servo.get("intakeRight");
-        intakeLeft = hardwareMap.servo.get("intakeLeft");
+        intakeRight = hardwareMap.crservo.get("intakeRight");
+        intakeLeft = hardwareMap.crservo.get("intakeLeft");
         intake = hardwareMap.dcMotor.get("intake");
 
         slideLeft = hardwareMap.dcMotor.get("slideLeft");
@@ -253,16 +254,6 @@ public class Tempest {
         bRight.setPower(power * speedSet);
     }
 
-    public void OutTake() {
-        intakeRight.setPosition(1);
-        intakeLeft.setPosition(1);
-        intake.setPower(-1);
-    }
-    public void InTake() {
-        intakeRight.setPosition(-1);
-        intakeLeft.setPosition(-1);
-        intake.setPower(1);
-    }
     public void moveRobot(double speed, int targetPostition, long timeInMilli){
 
         long startTime = SystemClock.elapsedRealtime();

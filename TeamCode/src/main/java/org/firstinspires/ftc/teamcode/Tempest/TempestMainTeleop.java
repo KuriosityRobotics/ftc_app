@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.Tempest;
-        import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-        import com.qualcomm.robotcore.hardware.DcMotor;
-        import com.qualcomm.robotcore.hardware.DigitalChannel;
-        import com.qualcomm.robotcore.hardware.Gamepad;
-        import com.qualcomm.robotcore.hardware.Servo;
-        import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Temepst: Main Teleop", group="Linear Opmode")
 //@Disabled
 public class TempestMainTeleop extends LinearOpMode
@@ -45,7 +45,7 @@ public class TempestMainTeleop extends LinearOpMode
         fRPower = 0.0;
         bLPower = 0.0;
         bRPower = 0.0;
-        double powerScaleFactor = 0.7;
+        double powerScaleFactor = 0.6;
         waitForStart();
         runtime.reset();
         while (opModeIsActive()){
@@ -81,8 +81,8 @@ public class TempestMainTeleop extends LinearOpMode
             robot.bLeft.setPower(bLPower);
             robot.bRight.setPower(bRPower);
 
-            robot.slideRight.setPower((gamepad2.right_stick_y+gamepad2.left_stick_y)/2);
-            robot.slideLeft.setPower((-gamepad2.right_stick_y-gamepad2.left_stick_y)/2);
+            robot.slideRight.setPower(gamepad2.right_stick_y);
+            robot.slideLeft.setPower(-gamepad2.right_stick_y);
 
             if(gamepad2.dpad_up){
                 robot.pivot.setPower(-0.75);
@@ -93,7 +93,9 @@ public class TempestMainTeleop extends LinearOpMode
                 robot.pivot.setPower(0);
             }
 
-            if(robot.upTouch.isPressed()){
+            if(gamepad1.left_bumper){
+                robot.lock.setPosition(0.25);
+            }else if(robot.upTouch.isPressed()){
                 robot.lock.setPosition(0.75);
                 robot.pivot.setPower(0);
             }
@@ -111,21 +113,26 @@ public class TempestMainTeleop extends LinearOpMode
 //                robot.intakeRight.setPosition(0.2);
 //            }
 
-            if(gamepad2.a && !changedLeft){
-                robot.intakeLeft.setPosition(onLeft ? 0.5 : 0.7);
+            if(gamepad2.x && !changedLeft){
+//                robot.intakeLeft.setPosition(onLeft ? 0.5 : 0.7);
+                robot.intakeLeft.setPower(onLeft ? -1 : 1);
                 onLeft = !onLeft;
                 changedLeft = true;
-            }else if(!gamepad2.a){
+            }else if(!gamepad2.x){
                 changedLeft = false;
             }
 
-            if(gamepad2.x && !changedRight){
-                robot.intakeRight.setPosition(onRight ? 0.2 : 0.35);
+            if(gamepad2.a && !changedRight){
+//                robot.intakeRight.setPosition(onRight ? 0.2 : 0.35);
+                robot.intakeRight.setPower(onLeft ? -1 : 1);
                 onRight = !onRight;
                 changedRight = true;
-            }else if(!gamepad2.x){
+            }else if(!gamepad2.a){
                 changedRight = false;
             }
+
+            robot.intakeRight.setPower(gamepad2.left_stick_y);
+            robot.intakeLeft.setPower(-gamepad2.left_stick_y);
 
             if(gamepad1.left_bumper){
                 robot.hook.setPosition(0.575);
@@ -141,13 +148,18 @@ public class TempestMainTeleop extends LinearOpMode
                 robot.hangLockRight.setPosition(1);
             }
 
-            if(gamepad1.y){
-                robot.intake.setPower(0.75);
+            if(gamepad1.x && gamepad1.right_bumper){
+                robot.intake.setPower(0.6);
+            }else if(gamepad1.y && gamepad1.right_bumper){
+                robot.intake.setPower(-0.6);
+            }else if(gamepad1.y){
+                robot.intake.setPower(-0.85);
             }else if(gamepad1.x){
-                robot.intake.setPower(-0.75);
+                robot.intake.setPower(0.85);
             }else{
-                robot.intake.setPower(0.15);
+                robot.intake.setPower(0.5);
             }
+
 
 
 
