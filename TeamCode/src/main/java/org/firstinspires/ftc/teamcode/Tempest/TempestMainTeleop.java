@@ -149,15 +149,15 @@ public class TempestMainTeleop extends LinearOpMode
             }
 
             if(gamepad1.x && gamepad1.right_bumper){
-                robot.intake.setPower(0.6);
+                robot.intake.setPower(0.3);
             }else if(gamepad1.y && gamepad1.right_bumper){
-                robot.intake.setPower(-0.6);
+                robot.intake.setPower(-0.3);
             }else if(gamepad1.y){
-                robot.intake.setPower(-0.85);
+                robot.intake.setPower(-0.5);
             }else if(gamepad1.x){
-                robot.intake.setPower(0.85);
+                robot.intake.setPower(0.65);
             }else{
-                robot.intake.setPower(0.5);
+                robot.intake.setPower(0);
             }
 
 
