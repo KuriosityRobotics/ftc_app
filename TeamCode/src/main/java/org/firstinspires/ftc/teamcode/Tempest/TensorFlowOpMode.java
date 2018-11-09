@@ -27,48 +27,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode.Tempest;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import java.util.List;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-/**
- * This 2018-2019 OpMode illustrates the basics of using the TensorFlow Object Detection API to
- * determine the position of the gold and silver minerals.
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
- *
- * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
- * is explained below.
- */
-@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-@Disabled
-public class ConceptTensorFlowObjectDetection extends LinearOpMode {
+import java.util.List;
+
+
+//@Disabled
+public class TensorFlowOpMode{
+    public static enum Location{
+        CENTER,LEFT,RIGHT;
+
+    }
+    public HardwareMap hardwareMap;
+    public TensorFlowOpMode(HardwareMap hardwareMap, Telemetry telemetry,LinearOpMode linearOpMode) {
+        this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
+        this.linearOpMode = linearOpMode;
+    }
+
+    private Location location;
+    private Telemetry telemetry;
+    private LinearOpMode linearOpMode;
+
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
-    /*
-     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
-     * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
-     * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
-     * web site at https://developer.vuforia.com/license-manager.
-     *
-     * Vuforia license keys are always 380 characters long, and look as if they contain mostly
-     * random data. As an example, here is a example of a fragment of a valid key:
-     *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
-     * Once you've obtained a license key, copy the string from the Vuforia web site
-     * and paste it in to your code on the next line, between the double quotes.
-     */
-    private static final String VUFORIA_KEY = "AbSCRq//////AAAAGYEdTZut2U7TuZCfZGlOu7ZgOzsOlUVdiuQjgLBC9B3dNvrPE1x/REDktOALxt5jBEJJBAX4gM9ofcwMjCzaJKoZQBBlXXxrOscekzvrWkhqs/g+AtWJLkpCOOWKDLSixgH0bF7HByYv4h3fXECqRNGUUCHELf4Uoqea6tCtiGJvee+5K+5yqNfGduJBHcA1juE3kxGMdkqkbfSjfrNgWuolkjXR5z39tRChoOUN24HethAX8LiECiLhlKrJeC4BpdRCRazgJXGLvvI74Tmih9nhCz6zyVurHAHttlrXV17nYLyt6qQB1LtVEuSCkpfLJS8lZWS9ztfC1UEfrQ8m5zA6cYGQXjDMeRumdq9ugMkS";
+    private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -82,30 +79,19 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
      */
     private TFObjectDetector tfod;
 
-    @Override
-    public void runOpMode() {
+    public Location runObjectDetection() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
 
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
         }
-
-        /** Wait for the game to begin */
-        telemetry.addData(">", "Press Play to start tracking");
-        telemetry.update();
-        waitForStart();
-
-        if (opModeIsActive()) {
-            /** Activate Tensor Flow Object Detection. */
             if (tfod != null) {
                 tfod.activate();
             }
 
-            while (opModeIsActive()) {
+            while (this.location!=null && linearOpMode.opModeIsActive()) {
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -127,24 +113,24 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
                             }
                             if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                                 if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                    telemetry.addData("Gold Mineral Position", "Left");
+                                    this.location = Location.LEFT;
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                    telemetry.addData("Gold Mineral Position", "Right");
+                                    this.location = Location.RIGHT;
                                 } else {
-                                    telemetry.addData("Gold Mineral Position", "Center");
-                                }
+                                    this.location = Location.CENTER;
                             }
                         }
-                        telemetry.update();
                     }
                 }
             }
         }
-
         if (tfod != null) {
             tfod.shutdown();
         }
+        return location;
     }
+
+
 
     /**
      * Initialize the Vuforia localization engine.
