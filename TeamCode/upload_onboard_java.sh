@@ -1,4 +1,6 @@
-#keep this file outside of Teamcode folder
+#keep this file inside of the BIG Teamcode folder
+#cd to kuriosityrobotics2018/TeamCode
+#to run in terminal enter: $ ./upload_onboard_java.sh
 
 src_folder="src/main/java/org/firstinspires/ftc/teamcode"
 des_folder="src/org/firstinspires/ftc/teamcode"
