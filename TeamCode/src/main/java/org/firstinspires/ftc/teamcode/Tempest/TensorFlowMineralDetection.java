@@ -43,14 +43,13 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-
-//@Disabled
-public class TensorFlowOpMode{
+public class TensorFlowMineralDetection {
     public enum Location{
         CENTER,LEFT,RIGHT,UNKNOWN;
     }
+
     public HardwareMap hardwareMap;
-    public TensorFlowOpMode(HardwareMap hardwareMap, Telemetry telemetry,LinearOpMode linearOpMode) {
+    public TensorFlowMineralDetection(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode) {
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
         this.linearOpMode = linearOpMode;
@@ -70,9 +69,6 @@ public class TensorFlowOpMode{
     public VuforiaLocalizer vuforia;
 
     public TFObjectDetector tfod;
-
-
-
 
     public Location runObjectDetection() {
         telemetry.addData("telemtry","works");
@@ -135,29 +131,15 @@ public class TensorFlowOpMode{
         return location;
     }
 
-
-
-    /**
-     * Initialize the Vuforia localization engine.
-     */
     private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = CameraDirection.BACK;
 
-        //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
     }
 
-    /**
-     * Initialize the Tensor Flow Object Detection engine.
-     */
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
