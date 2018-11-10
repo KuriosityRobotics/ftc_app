@@ -46,8 +46,8 @@ import java.util.List;
 
 //@Disabled
 public class TensorFlowOpMode{
-    public static enum Location{
-        CENTER,LEFT,RIGHT;
+    public enum Location{
+        CENTER,LEFT,RIGHT,UNKNOWN;
 
     }
     public HardwareMap hardwareMap;
@@ -57,31 +57,26 @@ public class TensorFlowOpMode{
         this.linearOpMode = linearOpMode;
     }
 
-    private Location location;
-    private Telemetry telemetry;
-    private LinearOpMode linearOpMode;
+    public Location location;
+    public Telemetry telemetry;
+    public LinearOpMode linearOpMode;
 
-    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
-    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    public static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    public static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    public static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
-    private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
 
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
-    private VuforiaLocalizer vuforia;
+    public static final String VUFORIA_KEY = "AbSCRq//////AAAAGYEdTZut2U7TuZCfZGlOu7ZgOzsOlUVdiuQjgLBC9B3dNvrPE1x/REDktOALxt5jBEJJBAX4gM9ofcwMjCzaJKoZQBBlXXxrOscekzvrWkhqs/g+AtWJLkpCOOWKDLSixgH0bF7HByYv4h3fXECqRNGUUCHELf4Uoqea6tCtiGJvee+5K+5yqNfGduJBHcA1juE3kxGMdkqkbfSjfrNgWuolkjXR5z39tRChoOUN24HethAX8LiECiLhlKrJeC4BpdRCRazgJXGLvvI74Tmih9nhCz6zyVurHAHttlrXV17nYLyt6qQB1LtVEuSCkpfLJS8lZWS9ztfC1UEfrQ8m5zA6cYGQXjDMeRumdq9ugMkS";
 
-    /**
-     * {@link #tfod} is the variable we will use to store our instance of the Tensor Flow Object
-     * Detection engine.
-     */
-    private TFObjectDetector tfod;
+    public VuforiaLocalizer vuforia;
+
+    public TFObjectDetector tfod;
+
+
+
 
     public Location runObjectDetection() {
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
+
         initVuforia();
 
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
@@ -91,39 +86,38 @@ public class TensorFlowOpMode{
                 tfod.activate();
             }
 
-            while (this.location!=null && linearOpMode.opModeIsActive()) {
+            while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive()) {
                 if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null) {
-                        telemetry.addData("# Object Detected", updatedRecognitions.size());
                         if (updatedRecognitions.size() == 3) {
-                            int goldMineralX = -1;
-                            int silverMineral1X = -1;
-                            int silverMineral2X = -1;
+                            int goldXPos = -1;
+                            int firstSilverXPos = -1;
+                            int secondSilverXPos = -1;
                             for (Recognition recognition : updatedRecognitions) {
                                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                    goldMineralX = (int) recognition.getLeft();
-                                } else if (silverMineral1X == -1) {
-                                    silverMineral1X = (int) recognition.getLeft();
+                                    goldXPos = (int) recognition.getLeft();
+                                } else if (firstSilverXPos == -1) {
+                                    firstSilverXPos = (int) recognition.getLeft();
                                 } else {
-                                    silverMineral2X = (int) recognition.getLeft();
+                                    secondSilverXPos = (int) recognition.getLeft();
                                 }
                             }
-                            if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                                if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+                            if (goldXPos != -1 && firstSilverXPos != -1 && secondSilverXPos != -1) {
+                                if (goldXPos < firstSilverXPos && goldXPos < secondSilverXPos) {
                                     this.location = Location.LEFT;
-                                } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                                } else if (goldXPos > firstSilverXPos && goldXPos > secondSilverXPos) {
                                     this.location = Location.RIGHT;
-                                } else {
+                                } else if(goldXPos >firstSilverXPos && goldXPos <secondSilverXPos){
                                     this.location = Location.CENTER;
+                                } else{
+                                    this.location = Location.UNKNOWN;
+                                }
                             }
                         }
                     }
                 }
             }
-        }
         if (tfod != null) {
             tfod.shutdown();
         }
