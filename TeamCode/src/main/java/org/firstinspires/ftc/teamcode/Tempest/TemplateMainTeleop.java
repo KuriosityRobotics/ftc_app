@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-@TeleOp(name="Template Teleop", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
+@TeleOp(name="Templat", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 //@Disabled
 public class TemplateMainTeleop extends LinearOpMode
 {

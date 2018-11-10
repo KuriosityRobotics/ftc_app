@@ -48,7 +48,6 @@ import java.util.List;
 public class TensorFlowOpMode{
     public enum Location{
         CENTER,LEFT,RIGHT,UNKNOWN;
-
     }
     public HardwareMap hardwareMap;
     public TensorFlowOpMode(HardwareMap hardwareMap, Telemetry telemetry,LinearOpMode linearOpMode) {
@@ -76,7 +75,8 @@ public class TensorFlowOpMode{
 
 
     public Location runObjectDetection() {
-
+        telemetry.addData("telemtry","works");
+        telemetry.update();
         initVuforia();
 
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
@@ -90,19 +90,27 @@ public class TensorFlowOpMode{
                 if (tfod != null) {
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null) {
+                        telemetry.addData("size of updated reco", updatedRecognitions.size());
                         if (updatedRecognitions.size() == 3) {
                             int goldXPos = -1;
                             int firstSilverXPos = -1;
                             int secondSilverXPos = -1;
                             for (Recognition recognition : updatedRecognitions) {
+                                telemetry.addData("reco = ",recognition.getLabel());
                                 if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
                                     goldXPos = (int) recognition.getLeft();
+                                    telemetry.addData("gold position",goldXPos);
                                 } else if (firstSilverXPos == -1) {
                                     firstSilverXPos = (int) recognition.getLeft();
+                                    telemetry.addData("first silver pos",firstSilverXPos);
                                 } else {
                                     secondSilverXPos = (int) recognition.getLeft();
+                                    telemetry.addData("second silver pos",secondSilverXPos);
                                 }
+                                telemetry.update();
                             }
+                            telemetry.addData("outsoude of for each loop", " ");
+                            telemetry.update();
                             if (goldXPos != -1 && firstSilverXPos != -1 && secondSilverXPos != -1) {
                                 if (goldXPos < firstSilverXPos && goldXPos < secondSilverXPos) {
                                     this.location = Location.LEFT;
@@ -113,6 +121,9 @@ public class TensorFlowOpMode{
                                 } else{
                                     this.location = Location.UNKNOWN;
                                 }
+                                telemetry.addData("LOCATION",this.location);
+                                telemetry.update();
+                                return location;
                             }
                         }
                     }

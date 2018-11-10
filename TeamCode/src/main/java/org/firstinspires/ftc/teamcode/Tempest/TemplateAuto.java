@@ -15,19 +15,13 @@ public class TemplateAuto extends LinearOpMode
     @Override
     public void runOpMode(){
         //Init's robot
-        Tempest robot = new Tempest(hardwareMap, telemetry, this);   //DO NOT DELETE
         TensorFlowOpMode tensorFlowOpMode = new TensorFlowOpMode(hardwareMap,telemetry,this);
 
         waitForStart();
         runtime.reset();
         while (opModeIsActive()){
-            if(tensorFlowOpMode.runObjectDetection() == TensorFlowOpMode.Location.CENTER){
-                telemetry.addData("Mineral","Center");
-            }else if(tensorFlowOpMode.runObjectDetection() == TensorFlowOpMode.Location.LEFT){
-                telemetry.addData("Mineral","Left");
-            }else{
-                telemetry.addData("Mineral","Right");
-            }
+            tensorFlowOpMode.runObjectDetection();
+            telemetry.addData("Location",tensorFlowOpMode.location);
             telemetry.update();
             //when you hit start, code in this runs
             sleep(100000); //this should always be the last line of your code don't delete this
