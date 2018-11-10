@@ -1,26 +1,39 @@
 #keep this file outside of Teamcode folder
 
-src_folder="src/main/java/org/firstinspires/ftc/teamcode/Tempest"
-des_folder="src/org/firstinspires/ftc/teamcode/Tempest"
+src_folder="src/main/java/org/firstinspires/ftc/teamcode"
+des_folder="src/org/firstinspires/ftc/teamcode"
+host_name="http://192.168.49.1:8080"
+
+echo -e "Connecting to ${host_name}, make sure this is the right ip for the onbotjava."
+echo -e "Deleting everything on onbotjava for ${des_folder}..."
+curl '${host_name}/java/file/delete' --data 'delete=["${des_folder}"]' --compressed
 
 for file in ${src_folder}/*
 do
-    echo $(basename $file)
+    echo -e $(basename $file)
     file_only=$(basename $file)    
-    des="http://192.168.49.1:8080/java/file/save?f=/${des_folder}/${file_only}"
+    des="${host_name}/java/file/save?f=/${des_folder}/${file_only}"
     src="data@${src_folder}/${file_only}"
-    echo $des
-    echo $src
-    echo "connecting"
+    echo -e $des
+    echo -e $src
+    echo -e "Uploading..."
     curl $des --data-urlencode $src --compressed
 
 done
 
 #do the build
-echo "building.......\r"
-curl 'http://192.168.49.1:8080/java/build/start' 
-echo 'waiting for build.... \r'
+echo -e " "
+host_name_build="${host_name}/java/build/start"
+echo -e "Building.......${host_name_build}"
 
-curl 'http://192.168.49.1:8080/java/build/wait'
+curl $host_name_build
 
-echo 'Done\r'
+echo -e " "
+echo -e 'Waiting for build....'
+
+#curl '${host_name}/java/build/wait'
+
+host_name_wait="${host_name}/java/build/wait"
+
+curl $host_name_wait
+echo -e 'Done'
