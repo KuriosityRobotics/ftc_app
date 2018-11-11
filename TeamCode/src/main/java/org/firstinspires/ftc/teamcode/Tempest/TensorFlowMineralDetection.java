@@ -118,8 +118,6 @@ public class TensorFlowMineralDetection {
                                 this.location = Location.LEFT;
                                 return location;
                             }
-
-
                     }
                 }
             }
