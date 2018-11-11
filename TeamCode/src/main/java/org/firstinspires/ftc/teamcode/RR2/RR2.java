@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Tempest;
+package org.firstinspires.ftc.teamcode.RR2;
 
 /**
  * Created by sam on 1/21/18.
@@ -10,16 +10,10 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -34,7 +28,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
  * Created by Kuro on 10/29/2017.
  */
 
-public class Tempest {
+public class RR2 {
     //Drive Motors
     public DcMotor fLeft;
     public DcMotor fRight;
@@ -47,15 +41,12 @@ public class Tempest {
     public double speedSet;
 
     //Intake Motors;
-    public DcMotor slideLeft;
-    public DcMotor slideRight;
+    public DcMotor slide;
     public DcMotor pivot;
 
     //Intake Motors & Servos
     public DcMotor intake;
-    public CRServo intakeRight;
-    public CRServo intakeLeft;
-    public Servo lock;
+    public Servo blocker;
     public Servo hangLockLeft;
     public Servo hangLockRight;
     public Servo hook;
@@ -72,7 +63,7 @@ public class Tempest {
     boolean clawsOnOff = true;
     static double linearSlideValue = 0.7;
 
-    public Tempest(HardwareMap hardwareMap, Telemetry telemetry,LinearOpMode linearOpMode){
+    public RR2(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode){
 
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
@@ -84,14 +75,11 @@ public class Tempest {
         bLeft = hardwareMap.dcMotor.get("bLeft");
         bRight = hardwareMap.dcMotor.get("bRight");
 
-        intakeRight = hardwareMap.crservo.get("intakeRight");
-        intakeLeft = hardwareMap.crservo.get("intakeLeft");
         intake = hardwareMap.dcMotor.get("intake");
+        blocker = hardwareMap.servo.get("blocker");
 
-        slideLeft = hardwareMap.dcMotor.get("slideLeft");
-        slideRight = hardwareMap.dcMotor.get("slideRight");
+        slide = hardwareMap.dcMotor.get("slide");
         pivot = hardwareMap.dcMotor.get("pivot");
-        lock = hardwareMap.servo.get("lock");
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
         hook = hardwareMap.servo.get("hook");
@@ -228,12 +216,10 @@ public class Tempest {
     }
 
     public void  moveLinearSlideUp() {
-        slideLeft.setPower(linearSlideValue);
-        slideRight.setPower(linearSlideValue);
+        slide.setPower(linearSlideValue);
     }
     public void  moveLinearSlideDown() {
-        slideLeft.setPower(-linearSlideValue);
-        slideRight.setPower(-linearSlideValue);
+        slide.setPower(-linearSlideValue);
     }
     public void allWheelDrive(double fLeftPower, double bLeftPower, double fRightPower, double bRightPower) {
         fLeft.setPower(fLeftPower);
