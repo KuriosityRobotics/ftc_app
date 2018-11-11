@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Tempest;
+package org.firstinspires.ftc.teamcode.RR2;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -16,7 +16,7 @@ public class SamTeleop extends LinearOpMode
     @Override
     public void runOpMode(){
         //Init's robot
-        Tempest robot = new Tempest(hardwareMap, telemetry, this);   //DO NOT DELETE
+        RR2 robot = new RR2(hardwareMap, telemetry, this);   //DO NOT DELETE
 
         waitForStart();
         runtime.reset();
