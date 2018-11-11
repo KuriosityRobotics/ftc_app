@@ -10,6 +10,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -49,7 +50,7 @@ public class RR2 {
     public Servo blocker;
     public Servo hangLockLeft;
     public Servo hangLockRight;
-    public Servo hook;
+    public CRServo hook;
     //imu
     public BNO055IMU imu;
     public Orientation angles;
@@ -82,7 +83,7 @@ public class RR2 {
         pivot = hardwareMap.dcMotor.get("pivot");
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
-        hook = hardwareMap.servo.get("hook");
+        hook = hardwareMap.crservo.get("hook");
 
         upTouch = hardwareMap.get(RevTouchSensor.class,"upTouch");
 

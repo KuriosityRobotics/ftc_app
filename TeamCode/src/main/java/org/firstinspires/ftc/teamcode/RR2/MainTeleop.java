@@ -71,10 +71,10 @@ public class MainTeleop extends LinearOpMode {
                 telemetry.update();
             }
             if (gamepad1.a) {
-                robot.blocker.setPosition(180);
+                robot.blocker.setPosition(0.7);
             }
             else if (gamepad1.b) {
-                robot.blocker.setPosition(70);
+                robot.blocker.setPosition(0.5);
             }
             //Pivoting Slide For Outtake
             if (gamepad1.y) {
@@ -97,6 +97,8 @@ public class MainTeleop extends LinearOpMode {
             else {
                 robot.slide.setPower(0);
             }
+
+            //Hang Locking
             if (gamepad2.a) {
                 robot.hangLockLeft.setPosition(0.55);
                 robot.hangLockRight.setPosition(0.3);
@@ -105,6 +107,14 @@ public class MainTeleop extends LinearOpMode {
                 robot.hangLockLeft.setPosition(0.71);
                 robot.hangLockRight.setPosition(0.21);
             }
+            if (gamepad2.x) {
+                robot.hook.setPower(0.3);
+            } else if (gamepad2.y) {
+                robot.hook.setPower(-0.3);
+            } else {
+                robot.hook.setPower(0);
+            }
+
 //            if(gamepad2.b && !hookIn && onHook){
 //                robot.hangLockLeft.setPosition(90);
 //                robot.hangLockRight.setPosition(90);
