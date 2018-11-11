@@ -70,6 +70,8 @@ public class TensorFlowMineralDetection {
 
     public TFObjectDetector tfod;
 
+    boolean isGoldInFrame = false;
+
     public Location runObjectDetection() {
         telemetry.addData("telemtry","works");
         telemetry.update();
@@ -78,53 +80,50 @@ public class TensorFlowMineralDetection {
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod();
         }
-            if (tfod != null) {
-                tfod.activate();
-            }
+        if (tfod != null) {
+            tfod.activate();
+        }
 
-            while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive()) {
-                if (tfod != null) {
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                        telemetry.addData("size of updated reco", updatedRecognitions.size());
-                        if (updatedRecognitions.size() == 3) {
-                            int goldXPos = -1;
-                            int firstSilverXPos = -1;
-                            int secondSilverXPos = -1;
-                            for (Recognition recognition : updatedRecognitions) {
-                                telemetry.addData("reco = ",recognition.getLabel());
-                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                    goldXPos = (int) recognition.getLeft();
-                                    telemetry.addData("gold position",goldXPos);
-                                } else if (firstSilverXPos == -1) {
-                                    firstSilverXPos = (int) recognition.getLeft();
-                                    telemetry.addData("first silver pos",firstSilverXPos);
-                                } else {
-                                    secondSilverXPos = (int) recognition.getLeft();
-                                    telemetry.addData("second silver pos",secondSilverXPos);
-                                }
+        while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive()) {
+            if (tfod != null) {
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                if (updatedRecognitions != null) {
+                    if (updatedRecognitions.size() == 2) {
+                        int goldXPos = -1;
+                        int firstSilverXPos = -1;
+                        int secondSilverXPos = -1;
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData("reco = ", recognition.getLabel());
+                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                goldXPos = (int) recognition.getLeft();
+                                telemetry.addData("gold position", goldXPos);
                                 telemetry.update();
-                            }
-                            telemetry.addData("outsoude of for each loop", " ");
-                            telemetry.update();
-                            if (goldXPos != -1 && firstSilverXPos != -1 && secondSilverXPos != -1) {
-                                if (goldXPos < firstSilverXPos && goldXPos < secondSilverXPos) {
-                                    this.location = Location.LEFT;
-                                } else if (goldXPos > firstSilverXPos && goldXPos > secondSilverXPos) {
-                                    this.location = Location.RIGHT;
-                                } else if(goldXPos >firstSilverXPos && goldXPos <secondSilverXPos){
-                                    this.location = Location.CENTER;
-                                } else{
-                                    this.location = Location.UNKNOWN;
-                                }
-                                telemetry.addData("LOCATION",this.location);
-                                telemetry.update();
-                                return location;
+                                isGoldInFrame = true;
+                            } else if (firstSilverXPos == -1) {
+                                firstSilverXPos = (int) recognition.getLeft();
+                            } else if(secondSilverXPos == -1){
+                                secondSilverXPos = (int) recognition.getLeft();
                             }
                         }
+                        telemetry.addData("outside of for each loop", " ");
+                        telemetry.addData("gold position", goldXPos);
+                        telemetry.update();
+                            if (goldXPos > firstSilverXPos && isGoldInFrame) {
+                                this.location = Location.RIGHT;
+                                return location;
+                            } else if (goldXPos < firstSilverXPos && isGoldInFrame) {
+                                this.location = Location.CENTER;
+                                return location;
+                            } else{
+                                this.location = Location.LEFT;
+                                return location;
+                            }
+
+
                     }
                 }
             }
+        }
         if (tfod != null) {
             tfod.shutdown();
         }
