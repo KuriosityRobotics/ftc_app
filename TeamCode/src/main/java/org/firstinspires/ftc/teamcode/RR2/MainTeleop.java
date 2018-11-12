@@ -12,14 +12,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 //@Disabled
 public class MainTeleop extends LinearOpMode {
 
+    boolean changedBlocker = false, onBlock = false;
+    boolean changedHook = false, onHook = false;
+
     double fLPower;
     double fRPower;
     double bLPower;
     double bRPower;
-    int pivotPosition;
     public static double powerScaleFactor = 0.4;
-    boolean hookIn;
-    boolean onHook = true;
     long startTime = 0;
 
 
@@ -38,28 +38,44 @@ public class MainTeleop extends LinearOpMode {
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
-            //Drive Controls
-            robot.fLeft.setPower(-gamepad1.left_stick_y);
-            robot.bLeft.setPower(-gamepad1.left_stick_y);
-            robot.fRight.setPower(-gamepad1.right_stick_y);
-            robot.bRight.setPower(-gamepad1.right_stick_y);
-            if (gamepad1.dpad_left) {
-                robot.fLeft.setPower(1);
-                robot.bLeft.setPower(1);
-            }
-            if (gamepad1.dpad_right) {
-                robot.fRight.setPower(1);
-                robot.bRight.setPower(1);
+            //tank drive
+            fLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
+            bLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
+            fRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+            bRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+            //Straight D-Pad move
+            if (gamepad1.dpad_up) {
+                fLPower = (gamepad1.left_stick_y)+powerScaleFactor;
+                bLPower = (gamepad1.left_stick_y)+powerScaleFactor;
+                fRPower = (gamepad1.right_stick_y+powerScaleFactor);
+                bRPower = (gamepad1.right_stick_y+powerScaleFactor);
+            } else if (gamepad1.dpad_down) {
+                fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
+                bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
+                fRPower = (gamepad1.right_stick_y-powerScaleFactor);
+                bRPower = (gamepad1.right_stick_y)-powerScaleFactor;
+            } else if (gamepad1.dpad_right) {
+                fLPower = (gamepad1.right_stick_y)+powerScaleFactor;
+                bLPower = (gamepad1.right_stick_y)+powerScaleFactor;
+                fRPower = (gamepad1.left_stick_y)-powerScaleFactor;
+                bRPower = (gamepad1.left_stick_y)-powerScaleFactor;
+            } else if (gamepad1.dpad_left) {
+                fRPower = (gamepad1.right_stick_y)+powerScaleFactor;
+                bRPower = (gamepad1.right_stick_y)+powerScaleFactor;
+                fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
+                bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
             }
             else {
-                robot.allWheelDrive(0,0,0,0);
+                fRPower = 0;
+                fLPower = 0;
+                bRPower = 0;
+                bLPower = 0;
             }
-            if (gamepad1.dpad_up) {
-                robot.allWheelDrive(1,1,1,1);
-            }
-            if (gamepad1.dpad_down) {
-                robot.allWheelDrive(-1,-1,-1,-1);
-            }
+            robot.fLeft.setPower(fLPower);
+            robot.fRight.setPower(fRPower);
+            robot.bLeft.setPower(bLPower);
+            robot.bRight.setPower(bRPower);
+
             //Intake Control
             if (gamepad2.left_stick_y != 0) {
                 robot.intake.setPower(gamepad2.left_stick_y);
@@ -67,15 +83,17 @@ public class MainTeleop extends LinearOpMode {
                 telemetry.update();
             } else {
                 robot.intake.setPower(0);
-                telemetry.addLine("Not Moving Intake");
-                telemetry.update();
+                //telemetry.addLine("Not Moving Intake");
+                //telemetry.update();
             }
-            if (gamepad1.a) {
-                robot.blocker.setPosition(0.7);
+
+            //blocker for outtake
+            if(gamepad2.x){
+                robot.blocker.setPosition(0.3);
+            }else{
+                robot.blocker.setPosition(0);
             }
-            else if (gamepad1.b) {
-                robot.blocker.setPosition(0.5);
-            }
+
             //Pivoting Slide For Outtake
             if (gamepad1.y) {
                 robot.pivot.setPower(-1);
@@ -91,29 +109,35 @@ public class MainTeleop extends LinearOpMode {
             }
 
             //Controlling the Slide with Gamepad2
-            if (gamepad2.right_stick_y != 0) {
-                robot.slide.setPower(-gamepad2.right_stick_y);
-            }
-            else {
-                robot.slide.setPower(0);
-            }
+            robot.slide.setPower(-gamepad2.right_stick_y);
+
 
             //Hang Locking
-            if (gamepad2.a) {
+            if (gamepad1.a) {
                 robot.hangLockLeft.setPosition(0.55);
                 robot.hangLockRight.setPosition(0.3);
             }
-            else if (gamepad2.b) {
+            else if (gamepad1.b) {
                 robot.hangLockLeft.setPosition(0.71);
                 robot.hangLockRight.setPosition(0.21);
             }
-            if (gamepad2.x) {
+
+            //hook
+            if (gamepad2.a) {
                 robot.hook.setPower(0.3);
-            } else if (gamepad2.y) {
+                telemetry.addLine("Hook Latch");
+                telemetry.update();
+            } else if (gamepad2.b) {
                 robot.hook.setPower(-0.3);
+                telemetry.addLine("Hook Not Latched");
+                telemetry.update();
             } else {
                 robot.hook.setPower(0);
             }
+            telemetry.addData("position of hook",robot.hook.getConnectionInfo());
+            telemetry.update();
+
+
 
 //            if(gamepad2.b && !hookIn && onHook){
 //                robot.hangLockLeft.setPosition(90);
