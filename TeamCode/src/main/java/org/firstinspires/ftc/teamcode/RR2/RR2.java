@@ -8,6 +8,7 @@ import android.os.SystemClock;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -40,6 +41,8 @@ public class RR2 {
 
     //Ints
     public double speedSet;
+
+    public Rev2mDistanceSensor distance;
 
     //Intake Motors;
     public DcMotor slide;
@@ -86,6 +89,8 @@ public class RR2 {
         hook = hardwareMap.crservo.get("hook");
 
         upTouch = hardwareMap.get(RevTouchSensor.class,"upTouch");
+
+        distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
 
 
         //Map LinearSlide Motors

@@ -38,11 +38,7 @@ public class MainTeleop extends LinearOpMode {
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
-            //tank drive
-            fLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
-            bLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
-            fRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
-            bRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+
             //Straight D-Pad move
             if (gamepad1.dpad_up) {
                 fLPower = (gamepad1.left_stick_y)+powerScaleFactor;
@@ -64,13 +60,18 @@ public class MainTeleop extends LinearOpMode {
                 bRPower = (gamepad1.right_stick_y)+powerScaleFactor;
                 fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
                 bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
-            }
-            else {
+            } else {
                 fRPower = 0;
                 fLPower = 0;
                 bRPower = 0;
                 bLPower = 0;
             }
+            //tank drive
+            fLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
+            bLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
+            fRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+            bRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+
             robot.fLeft.setPower(fLPower);
             robot.fRight.setPower(fRPower);
             robot.bLeft.setPower(bLPower);
