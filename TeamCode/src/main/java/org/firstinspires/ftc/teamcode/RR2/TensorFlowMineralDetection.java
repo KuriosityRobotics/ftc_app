@@ -71,8 +71,6 @@ public class TensorFlowMineralDetection {
     boolean isGoldInFrame = false;
 
     public Location runObjectDetection() {
-        telemetry.addData("telemtry","works");
-        telemetry.update();
         initVuforia();
 
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
@@ -91,31 +89,27 @@ public class TensorFlowMineralDetection {
                         int firstSilverXPos = -1;
                         int secondSilverXPos = -1;
                         for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData("reco = ", recognition.getLabel());
                             if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                goldXPos = (int) recognition.getLeft();
-                                telemetry.addData("gold position", goldXPos);
-                                telemetry.update();
+                                goldXPos = (int) recognition.getTop();
                                 isGoldInFrame = true;
                             } else if (firstSilverXPos == -1) {
-                                firstSilverXPos = (int) recognition.getLeft();
+                                firstSilverXPos = (int) recognition.getTop();
                             } else if(secondSilverXPos == -1){
-                                secondSilverXPos = (int) recognition.getLeft();
+                                secondSilverXPos = (int) recognition.getTop();
                             }
                         }
-                        telemetry.addData("outside of for each loop", " ");
-                        telemetry.addData("gold position", goldXPos);
-                        telemetry.update();
                             if (goldXPos > firstSilverXPos && isGoldInFrame) {
-                                this.location = Location.RIGHT;
-                                return location;
-                            } else if (goldXPos < firstSilverXPos && isGoldInFrame) {
                                 this.location = Location.CENTER;
                                 return location;
-                            } else{
+                            } else if (goldXPos < firstSilverXPos && isGoldInFrame) {
                                 this.location = Location.LEFT;
                                 return location;
+                            } else {
+                                this.location = Location.RIGHT;
+                                return location;
                             }
+
+
                     }
                 }
             }

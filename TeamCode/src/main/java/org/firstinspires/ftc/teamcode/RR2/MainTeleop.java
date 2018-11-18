@@ -19,7 +19,7 @@ public class MainTeleop extends LinearOpMode {
     double fRPower;
     double bLPower;
     double bRPower;
-    public static double powerScaleFactor = 0.4;
+    public static double powerScaleFactor = 1.5;
     long startTime = 0;
 
 
@@ -38,7 +38,11 @@ public class MainTeleop extends LinearOpMode {
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
-
+            //tank drive
+            fLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
+            bLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
+            fRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+            bRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
             //Straight D-Pad move
             if (gamepad1.dpad_up) {
                 fLPower = (gamepad1.left_stick_y)+powerScaleFactor;
@@ -60,17 +64,8 @@ public class MainTeleop extends LinearOpMode {
                 bRPower = (gamepad1.right_stick_y)+powerScaleFactor;
                 fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
                 bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
-            } else {
-                fRPower = 0;
-                fLPower = 0;
-                bRPower = 0;
-                bLPower = 0;
             }
-            //tank drive
-            fLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
-            bLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
-            fRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
-            bRPower = -(gamepad1.right_stick_y)*powerScaleFactor;
+
 
             robot.fLeft.setPower(fLPower);
             robot.fRight.setPower(fRPower);
@@ -125,11 +120,15 @@ public class MainTeleop extends LinearOpMode {
 
             //hook
             if (gamepad2.a) {
-                robot.hook.setPower(0.3);
+                robot.hook.setPower(0.35);
+                sleep(2500);
+                robot.hook.setPower(0);
                 telemetry.addLine("Hook Latch");
                 telemetry.update();
             } else if (gamepad2.b) {
-                robot.hook.setPower(-0.3);
+                robot.hook.setPower(-0.35);
+                sleep(1000);
+                robot.hook.setPower(0);
                 telemetry.addLine("Hook Not Latched");
                 telemetry.update();
             } else {

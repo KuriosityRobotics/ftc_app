@@ -116,7 +116,7 @@ public class RR2 {
         imu.initialize(parameters);
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
     }
     public void resetEncoders(){
         fLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -251,6 +251,7 @@ public class RR2 {
         long startTime = SystemClock.elapsedRealtime();
 
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         double newSpeed = speed;
@@ -272,7 +273,7 @@ public class RR2 {
 
 
         while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
-                && (SystemClock.elapsedRealtime() - startTime < timeInMilli) && linearOpMode.opModeIsActive()){
+                && linearOpMode.opModeIsActive()){
         }
 
         brakeMotors();
@@ -294,15 +295,6 @@ public class RR2 {
         setDrivePower(0);
     }
 
-
-
-    public final void sleep(long milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
 
     public void autoNav(double speed, double x_start, double y_start, double x_end, double y_end){
         double distanceToTravel = 0;
