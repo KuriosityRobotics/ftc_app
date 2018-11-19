@@ -211,9 +211,84 @@ public class RR2 {
     }
 
     public void straightLine(double speed, double targetDistance) {
+        changeRunModeToUsingEncoder();
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        int toInches = (int) Math.floor(targetDistance * (400/17.5));
+        int rotations = (int) Math.floor(targetDistance * (400/17.5));
+        double fLeftPower = speed;
+        double bLeftPower = speed;
+        double fRightPower = speed;
+        double bRightPower = speed;
+        double straightCorrection = 0;
+        boolean isNegative = false;
+        fLeft.setTargetPosition(rotations);
+        bLeft.setTargetPosition(rotations);
+        bRight.setTargetPosition(rotations);
+        fRight.setTargetPosition(rotations);
+        fLeft.setPower(speed);
+        fRight.setPower(speed);
+        bLeft.setPower(speed);
+        bRight.setPower(speed);
+        double decreasingSpeed = 0;
+        double scaleFactor = 1;
+        double currentPositon;
+
+        if (targetDistance < 0) {
+            isNegative = true;
+        }
+        double difference = 0;
+        while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
+                && linearOpMode.opModeIsActive()){
+            int absCurrentPositon = Math.abs(fLeft.getCurrentPosition());
+            int absRotation = Math.abs(rotations);
+
+            //scaleFactor = Math.abs((Math.abs(rotations) - Math.abs(currentPositon)) / Math.abs(rotations));
+            scaleFactor = Math.abs(absRotation - absCurrentPositon) / absRotation;
+            decreasingSpeed = (speed * 1); //TODO
+
+            telemetry.addLine("ScaleFactor: " + scaleFactor);
+            telemetry.addLine("Current Position: " + absCurrentPositon);
+            telemetry.addLine("Rotations: " + rotations);
+            telemetry.addLine("Decreasing Speed: " + decreasingSpeed);
+            telemetry.update();
+
+            difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
+            straightCorrection = Math.abs(difference) / 9;
+            double leftPower = decreasingSpeed;
+            double rightPower = decreasingSpeed;
+
+            if (!isNegative) {
+                if (difference < 0) {
+                    rightPower += straightCorrection;
+                }
+                if (difference > 0) {
+                    leftPower += straightCorrection;
+                }
+            } else {
+                if (difference > 0) {
+                    rightPower -= straightCorrection;
+                }
+                if (difference < 0) {
+                    leftPower -= straightCorrection;
+                }
+            }
+            telemetry.addLine("LeftPower: " + leftPower);
+            telemetry.addLine("RightPower: " + rightPower);
+
+            fLeft.setPower(leftPower);
+            bLeft.setPower(leftPower);
+            bRight.setPower(rightPower);
+            fRight.setPower(rightPower);
+        }
+        brakeRobot();
+
+    }
+    public void moveRobotInches(double speed, double targetDistance){
+
+        changeRunModeToUsingEncoder();
+        resetEncoders();
+        setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int toInches = (int) Math.floor(targetDistance * (400/17.75));
         double fLeftPower = speed;
         double bLeftPower = speed;
         double fRightPower = speed;
@@ -229,56 +304,40 @@ public class RR2 {
         bRight.setPower(speed);
 
         double difference = 0;
-        while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
-                && linearOpMode.opModeIsActive()){
-            difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
-            scaleFactor = Math.abs(difference) / 10;
-            if (difference < 0) {
-                fRight.setPower(fRightPower += scaleFactor);
-                bRight.setPower(bRightPower += scaleFactor);
-            }
-            if (difference > 0) {
-                fLeft.setPower(fLeftPower += scaleFactor);
-                bLeft.setPower(bLeftPower += scaleFactor);
-            } else {
-                fLeft.setPower(speed);
-                fRight.setPower(speed);
-                bLeft.setPower(speed);
-                bRight.setPower(speed);
-            }
-        }
-        brakeRobot();
-
-    }
-    public void moveRobotInches(double speed, double targetDistance){
-
-        resetEncoders();
-        changeRunModeToUsingEncoder();
-        /*
-         - reset imu
-         - get imu angle
-         - each time go through loop get imu angle
-         - if angle is not original angle move right/left motors to get back to original angle
-         - turn right motors if angle is positive
-         - turn left motors if angle is negative
-         */
-
         //int startPosition = fLeft.getCurrentPosition();
         double changingSpeed = speed;
         double scale;
-        double rotationsNeeded = targetDistance * (400 / 14);
+        double rotationsNeeded = targetDistance * (400 / 17.75);
         int currentPosition = 0;
+
         while (rotationsNeeded > currentPosition) {
             currentPosition = Math.abs(fLeft.getCurrentPosition());
             telemetry.addLine("currentPosition: " + currentPosition);
             scale = Math.abs((rotationsNeeded - currentPosition)) / rotationsNeeded;
             telemetry.addLine("Scale: " + scale);
             changingSpeed = (speed * scale);
+            difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
+            scaleFactor = Math.abs(difference) / 9;
             if (changingSpeed < 0.1) {
                 changingSpeed = 0.1;
             }
-            allWheelDrive(changingSpeed, changingSpeed, changingSpeed, changingSpeed);
-            telemetry.addLine(changingSpeed + "");
+            if (difference < 0) {
+                fRight.setPower(fRightPower += scaleFactor);
+                bRight.setPower(bRightPower += scaleFactor);
+            }
+            else if (difference > 0) {
+                fLeft.setPower(fLeftPower += scaleFactor);
+                bLeft.setPower(bLeftPower += scaleFactor);
+            }
+            else {
+                fRightPower = changingSpeed;
+                fLeftPower = changingSpeed;
+                bLeftPower = changingSpeed;
+                bRightPower = changingSpeed;
+                allWheelDrive(changingSpeed, changingSpeed, changingSpeed, changingSpeed);
+            }
+
+            telemetry.addLine("changing speed: " + changingSpeed);
             telemetry.addLine("RotationsNeeded: " + rotationsNeeded);
             telemetry.update();
         }
