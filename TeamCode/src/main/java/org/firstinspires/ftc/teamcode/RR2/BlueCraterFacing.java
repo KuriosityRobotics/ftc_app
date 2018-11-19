@@ -55,7 +55,7 @@ public class BlueCraterFacing extends LinearOpMode
 
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.pivot.setTargetPosition(-4000);
+            //robot.pivot.setTargetPosition(-4000);
 
             while(robot.pivot.isBusy() && opModeIsActive()){
                 telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
@@ -65,19 +65,36 @@ public class BlueCraterFacing extends LinearOpMode
             telemetry.update();
             robot.pivot.setPower(0);
 
-            robot.hook.setPower(-0.35); //open
-            sleep(2500);
-            robot.hook.setPower(0);
+            //robot.hook.setPower(-0.35); //open
+            //sleep(2500);
+            //robot.hook.setPower(0);
 
             robot.moveRobot(0.2,100);
 
             tensorFlowMineralDetection.runObjectDetection();
             if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
                 robot.finalTurn(-20);
+                robot.moveRobot(0.2,600);
+                robot.moveRobot(0.2, -350);
+                robot.finalTurn(60);
             }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
                 robot.finalTurn(20);
+                robot.moveRobot(0.2,550);
+                robot.moveRobot(0.2, -250);
+                robot.finalTurn(60);
+            } else {
+                robot.moveRobot(0.2,550);
+                robot.moveRobot(0.2, -250);
+                robot.finalTurn(60);
             }
 
+            //Getting to Depot
+            robot.moveRobotInches(0.2, 105);
+            robot.finalTurn(180);
+            robot.moveRobotInches(0.2, 300);
+            //robot.intake.setPower(0.5);
+            //robot.slide.setPower();
+            robot.moveRobotInches(0.2, -270);
             //after the robot turns u need to go foward and hit the mineral then go to depot and back to creater
             //start programming here 
             //when you hit start, code in this runs

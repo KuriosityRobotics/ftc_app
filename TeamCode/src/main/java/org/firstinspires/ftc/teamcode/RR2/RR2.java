@@ -99,6 +99,7 @@ public class RR2 {
         fRight.setDirection(DcMotor.Direction.REVERSE);
         bLeft.setDirection(DcMotor.Direction.FORWARD);
         bRight.setDirection(DcMotor.Direction.REVERSE);
+
     }
 
 
@@ -188,7 +189,6 @@ public class RR2 {
         }
         while(linearOpMode.opModeIsActive()){
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
             double currentDeltatAngle = Math.abs(angles.firstAngle - startHeading);
             double scaleFactor = currentDeltatAngle / maxAngle;
             double absolutePower = 1-scaleFactor;
@@ -210,15 +210,84 @@ public class RR2 {
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    public void straightLine(double speed, double targetDistance) {
+        resetEncoders();
+        setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int positionValue = (int) Math.floor(targetDistance *(400/17.5));
+        double fLeftPower = speed;
+        double bLeftPower = speed;
+        double fRightPower = speed;
+        double bRightPower = speed;
+        double deltaDifference;
+        double scaleFactor = 0;
+        fLeft.setTargetPosition(positionValue);
+        bLeft.setTargetPosition(positionValue);
+        bRight.setTargetPosition(positionValue);
+        fRight.setTargetPosition(positionValue);
+        fLeft.setPower(speed);
+        fRight.setPower(speed);
+        bLeft.setPower(speed);
+        bRight.setPower(speed);
 
+        double difference = 0;
+        while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
+                && linearOpMode.opModeIsActive()){
+            difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
+            if () {
+                fRight.setPower(fRightPower += scaleFactor);
+                bRight.setPower(bRightPower += scaleFactor);
+            }
+            if (currentAngle > startAngle) {
+                fLeft.setPower(fLeftPower += scaleFactor);
+                bLeft.setPower(bLeftPower += scaleFactor);
+            } else {
+                fLeft.setPower(speed);
+                fRight.setPower(speed);
+                bLeft.setPower(speed);
+                bRight.setPower(speed);
+            }
+        }
+        brakeRobot();
 
+    }
     public void moveRobotInches(double speed, double targetDistance){
-        moveRobot(speed, (int)(targetDistance / 22.25 * 1000));
-        brakeMotors();
+
+        resetEncoders();
+        changeRunModeToUsingEncoder();
+        /*
+         - reset imu
+         - get imu angle
+         - each time go through loop get imu angle
+         - if angle is not original angle move right/left motors to get back to original angle
+         - turn right motors if angle is positive
+         - turn left motors if angle is negative
+         */
+
+        //int startPosition = fLeft.getCurrentPosition();
+        double changingSpeed = speed;
+        double scale;
+        double rotationsNeeded = targetDistance * (400 / 14);
+        int currentPosition = 0;
+        while (rotationsNeeded > currentPosition) {
+            currentPosition = Math.abs(fLeft.getCurrentPosition());
+            telemetry.addLine("currentPosition: " + currentPosition);
+            scale = Math.abs((rotationsNeeded - currentPosition)) / rotationsNeeded;
+            telemetry.addLine("Scale: " + scale);
+            changingSpeed = (speed * scale);
+            if (changingSpeed < 0.1) {
+                changingSpeed = 0.1;
+            }
+            allWheelDrive(changingSpeed, changingSpeed, changingSpeed, changingSpeed);
+            telemetry.addLine(changingSpeed + "");
+            telemetry.addLine("RotationsNeeded: " + rotationsNeeded);
+            telemetry.update();
+        }
+        brakeRobot();
     }
     public void moveRobot(double speed, int targetPostition) {
         moveRobot(speed, targetPostition, 10000);
-        brakeMotors();
+        double currentPosition;
+        brakeRobot();
     }
 
     public void  moveLinearSlideUp() {
@@ -276,7 +345,7 @@ public class RR2 {
                 && linearOpMode.opModeIsActive()){
         }
 
-        brakeMotors();
+        brakeRobot();
 
         telemetry.addLine("finished sleeping");
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -289,10 +358,6 @@ public class RR2 {
         }else{
             return "blue";
         }
-    }
-
-    public void brakeMotors(){
-        setDrivePower(0);
     }
 
 
@@ -319,7 +384,19 @@ public class RR2 {
         moveRobotInches(speed,distanceToTravel*12);
 
     }
-
+    public void driveMotorsBreakZeroBehavior() {
+        fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    public void brakeRobot() {
+        driveMotorsBreakZeroBehavior();
+        fLeft.setPower(0);
+        fRight.setPower(0);
+        bRight.setPower(0);
+        bLeft.setPower(0);
+    }
     public void multiplAutofinalTurn(double targetHeading,long timeInMilli) {
         targetHeading = Range.clip(targetHeading, -179, 179);
 
