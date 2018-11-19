@@ -210,7 +210,7 @@ public class RR2 {
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void straightLine(double speed, double targetDistance) {
+    public void finalMove(double speed, double targetDistance) {
         changeRunModeToUsingEncoder();
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -294,66 +294,7 @@ public class RR2 {
         brakeRobot();
 
     }
-    public void moveRobotInches(double speed, double targetDistance){
 
-        changeRunModeToUsingEncoder();
-        resetEncoders();
-        setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        int toInches = (int) Math.floor(targetDistance * (400/17.75));
-        double fLeftPower = speed;
-        double bLeftPower = speed;
-        double fRightPower = speed;
-        double bRightPower = speed;
-        double scaleFactor = 0;
-        fLeft.setTargetPosition(toInches);
-        bLeft.setTargetPosition(toInches);
-        bRight.setTargetPosition(toInches);
-        fRight.setTargetPosition(toInches);
-        fLeft.setPower(speed);
-        fRight.setPower(speed);
-        bLeft.setPower(speed);
-        bRight.setPower(speed);
-
-        double difference = 0;
-        //int startPosition = fLeft.getCurrentPosition();
-        double changingSpeed = speed;
-        double scale;
-        double rotationsNeeded = targetDistance * (400 / 17.75);
-        int currentPosition = 0;
-
-        while (rotationsNeeded > currentPosition) {
-            currentPosition = Math.abs(fLeft.getCurrentPosition());
-            telemetry.addLine("currentPosition: " + currentPosition);
-            scale = Math.abs((rotationsNeeded - currentPosition)) / rotationsNeeded;
-            telemetry.addLine("Scale: " + scale);
-            changingSpeed = (speed * scale);
-            difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
-            scaleFactor = Math.abs(difference) / 9;
-            if (changingSpeed < 0.1) {
-                changingSpeed = 0.1;
-            }
-            if (difference < 0) {
-                fRight.setPower(fRightPower += scaleFactor);
-                bRight.setPower(bRightPower += scaleFactor);
-            }
-            else if (difference > 0) {
-                fLeft.setPower(fLeftPower += scaleFactor);
-                bLeft.setPower(bLeftPower += scaleFactor);
-            }
-            else {
-                fRightPower = changingSpeed;
-                fLeftPower = changingSpeed;
-                bLeftPower = changingSpeed;
-                bRightPower = changingSpeed;
-                allWheelDrive(changingSpeed, changingSpeed, changingSpeed, changingSpeed);
-            }
-
-            telemetry.addLine("changing speed: " + changingSpeed);
-            telemetry.addLine("RotationsNeeded: " + rotationsNeeded);
-            telemetry.update();
-        }
-        brakeRobot();
-    }
     public void moveRobot(double speed, int targetPostition) {
         moveRobot(speed, targetPostition, 10000);
         double currentPosition;
@@ -451,7 +392,7 @@ public class RR2 {
         bLeft.setPower(speed);
         bRight.setPower(speed);
 
-        moveRobotInches(speed,distanceToTravel*12);
+        finalMove(speed,distanceToTravel*12);
 
     }
     public void driveMotorsBreakZeroBehavior() {

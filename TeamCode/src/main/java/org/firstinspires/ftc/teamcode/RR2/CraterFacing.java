@@ -6,9 +6,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name="Blue Crater Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
+@Autonomous(name="Crater Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 //@Disabled
-public class BlueCraterFacing extends LinearOpMode
+public class CraterFacing extends LinearOpMode
 {
     private ElapsedTime runtime = new ElapsedTime();
     @Override
@@ -74,30 +74,29 @@ public class BlueCraterFacing extends LinearOpMode
             tensorFlowMineralDetection.runObjectDetection();
             if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
                 robot.finalTurn(-20);
-                robot.moveRobot(0.2,600);
-                robot.moveRobot(0.2, -350);
-                robot.finalTurn(60);
+                robot.finalMove(0.2,22);
+                robot.finalMove(0.2, -18);
             }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
                 robot.finalTurn(20);
-                robot.moveRobot(0.2,550);
-                robot.moveRobot(0.2, -250);
-                robot.finalTurn(60);
+                robot.finalMove(0.2,20);
+                robot.finalMove(0.2, -18);
             } else {
-                robot.moveRobot(0.2,550);
-                robot.moveRobot(0.2, -250);
-                robot.finalTurn(60);
-            }
+                robot.finalMove(0.2,22);
+                robot.finalMove(0.2, -18);
 
+            }
+            robot.finalTurn(50);
             //Getting to Depot
-            robot.moveRobotInches(0.2, 105);
-            robot.finalTurn(180);
-            robot.moveRobotInches(0.2, 300);
+            robot.finalMove(0.2, 49);
+            robot.finalTurn(113);
+            robot.finalMove(0.2, 60);
             //robot.intake.setPower(0.5);
             //robot.slide.setPower();
-            robot.moveRobotInches(0.2, -270);
+            robot.finalMove(0.2, -75);
             //after the robot turns u need to go foward and hit the mineral then go to depot and back to creater
-            //start programming here 
+            //start programming here
             //when you hit start, code in this runs
+            sleep(1000000000);
         }
     }
 }
