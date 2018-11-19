@@ -213,17 +213,16 @@ public class RR2 {
     public void straightLine(double speed, double targetDistance) {
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        int positionValue = (int) Math.floor(targetDistance *(400/17.5));
+        int toInches = (int) Math.floor(targetDistance * (400/17.5));
         double fLeftPower = speed;
         double bLeftPower = speed;
         double fRightPower = speed;
         double bRightPower = speed;
-        double deltaDifference;
         double scaleFactor = 0;
-        fLeft.setTargetPosition(positionValue);
-        bLeft.setTargetPosition(positionValue);
-        bRight.setTargetPosition(positionValue);
-        fRight.setTargetPosition(positionValue);
+        fLeft.setTargetPosition(toInches);
+        bLeft.setTargetPosition(toInches);
+        bRight.setTargetPosition(toInches);
+        fRight.setTargetPosition(toInches);
         fLeft.setPower(speed);
         fRight.setPower(speed);
         bLeft.setPower(speed);
@@ -233,11 +232,12 @@ public class RR2 {
         while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
                 && linearOpMode.opModeIsActive()){
             difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
-            if () {
+            scaleFactor = Math.abs(difference) / 10;
+            if (difference < 0) {
                 fRight.setPower(fRightPower += scaleFactor);
                 bRight.setPower(bRightPower += scaleFactor);
             }
-            if (currentAngle > startAngle) {
+            if (difference > 0) {
                 fLeft.setPower(fLeftPower += scaleFactor);
                 bLeft.setPower(bLeftPower += scaleFactor);
             } else {
