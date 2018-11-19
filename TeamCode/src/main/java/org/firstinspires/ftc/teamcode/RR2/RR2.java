@@ -214,70 +214,77 @@ public class RR2 {
         changeRunModeToUsingEncoder();
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         double rotations = targetDistance * (400/17.5);
+
         double leftPower = speed;
         double rightPower = speed;
+
         double straightCorrection;
+
         boolean isNegative = false;
+
         double deccelerationLeft;
         double deccelerationRight;
+
         fLeft.setTargetPosition((int)rotations);
         bLeft.setTargetPosition((int)rotations);
         bRight.setTargetPosition((int)rotations);
         fRight.setTargetPosition((int)rotations);
+
         fLeft.setPower(speed);
         fRight.setPower(speed);
         bLeft.setPower(speed);
         bRight.setPower(speed);
-        double decreasingSpeed = 0;
+
         double scaleFactor;
-        double currentPositon = fLeft.getCurrentPosition();
+        double currentPositon;
 
         if (targetDistance < 0) {
             isNegative = true;
         }
+
         double difference = 0;
         while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
                 && linearOpMode.opModeIsActive()){
             currentPositon = Math.abs(fLeft.getCurrentPosition());
 
             scaleFactor = Math.abs(rotations - currentPositon) / rotations;
-            deccelerationLeft = leftPower * scaleFactor;
-            deccelerationRight = rightPower * scaleFactor;
-            //scaleFactor = 1 - (Math.abs(Math.sqrt(1 - (Math.pow(currentPositon - (rotations / 2), 2) / Math.pow(rotations / 2, 2)))));
-            //scaleFactor = 0.3;
-            //decreasingSpeed = (speed * scaleFactor);
-
-            telemetry.addLine("ScaleFactor: " + scaleFactor);
-            telemetry.addLine("Current Position: " + currentPositon);
-            telemetry.addLine("Rotations: " + rotations);
-            telemetry.addLine("Decreasing Speed: " + decreasingSpeed);
-            telemetry.update();
 
             difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
-            straightCorrection = Math.abs(difference) / 9;
-            if (deccelerationLeft < 0.1) {
-                deccelerationLeft = 0.1;
-                deccelerationRight = 0.1
-            }
+            straightCorrection = Math.abs(difference) / 1000;
+
+            deccelerationLeft = leftPower * scaleFactor;
+            deccelerationRight = rightPower * scaleFactor;
+
             if (!isNegative) {
                 if (difference < 0) {
-                    rightPower += straightCorrection;
+                    deccelerationRight += straightCorrection;
                 }
                 if (difference > 0) {
-                    leftPower += straightCorrection;
+                    deccelerationLeft += straightCorrection;
                 }
             } else {
                 if (difference > 0) {
-                    rightPower -= straightCorrection;
+                    deccelerationRight -= straightCorrection;
                 }
                 if (difference < 0) {
-                    leftPower -= straightCorrection;
+                    deccelerationLeft -= straightCorrection;
                 }
             }
 
+
+
             telemetry.addLine("LeftPower: " + deccelerationLeft);
             telemetry.addLine("RightPower: " + deccelerationRight);
+            telemetry.addLine("correction: " + straightCorrection);
+            telemetry.addLine("difference: " + difference);
+
             telemetry.update();
             fLeft.setPower(deccelerationLeft);
             bLeft.setPower(deccelerationLeft);
