@@ -214,24 +214,24 @@ public class RR2 {
         changeRunModeToUsingEncoder();
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        int rotations = (int) Math.floor(targetDistance * (400/17.5));
-        double fLeftPower = speed;
-        double bLeftPower = speed;
-        double fRightPower = speed;
-        double bRightPower = speed;
-        double straightCorrection = 0;
+        double rotations = targetDistance * (400/17.5);
+        double leftPower = speed;
+        double rightPower = speed;
+        double straightCorrection;
         boolean isNegative = false;
-        fLeft.setTargetPosition(rotations);
-        bLeft.setTargetPosition(rotations);
-        bRight.setTargetPosition(rotations);
-        fRight.setTargetPosition(rotations);
+        double deccelerationLeft;
+        double deccelerationRight;
+        fLeft.setTargetPosition((int)rotations);
+        bLeft.setTargetPosition((int)rotations);
+        bRight.setTargetPosition((int)rotations);
+        fRight.setTargetPosition((int)rotations);
         fLeft.setPower(speed);
         fRight.setPower(speed);
         bLeft.setPower(speed);
         bRight.setPower(speed);
         double decreasingSpeed = 0;
-        double scaleFactor = 1;
-        double currentPositon;
+        double scaleFactor;
+        double currentPositon = fLeft.getCurrentPosition();
 
         if (targetDistance < 0) {
             isNegative = true;
@@ -239,24 +239,27 @@ public class RR2 {
         double difference = 0;
         while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
                 && linearOpMode.opModeIsActive()){
-            int absCurrentPositon = Math.abs(fLeft.getCurrentPosition());
-            int absRotation = Math.abs(rotations);
+            currentPositon = Math.abs(fLeft.getCurrentPosition());
 
-            //scaleFactor = Math.abs((Math.abs(rotations) - Math.abs(currentPositon)) / Math.abs(rotations));
-            scaleFactor = Math.abs(absRotation - absCurrentPositon) / absRotation;
-            decreasingSpeed = (speed * 1); //TODO
+            scaleFactor = Math.abs(rotations - currentPositon) / rotations;
+            deccelerationLeft = leftPower * scaleFactor;
+            deccelerationRight = rightPower * scaleFactor;
+            //scaleFactor = 1 - (Math.abs(Math.sqrt(1 - (Math.pow(currentPositon - (rotations / 2), 2) / Math.pow(rotations / 2, 2)))));
+            //scaleFactor = 0.3;
+            //decreasingSpeed = (speed * scaleFactor);
 
             telemetry.addLine("ScaleFactor: " + scaleFactor);
-            telemetry.addLine("Current Position: " + absCurrentPositon);
+            telemetry.addLine("Current Position: " + currentPositon);
             telemetry.addLine("Rotations: " + rotations);
             telemetry.addLine("Decreasing Speed: " + decreasingSpeed);
             telemetry.update();
 
             difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
             straightCorrection = Math.abs(difference) / 9;
-            double leftPower = decreasingSpeed;
-            double rightPower = decreasingSpeed;
-
+            if (deccelerationLeft < 0.1) {
+                deccelerationLeft = 0.1;
+                deccelerationRight = 0.1
+            }
             if (!isNegative) {
                 if (difference < 0) {
                     rightPower += straightCorrection;
@@ -272,13 +275,14 @@ public class RR2 {
                     leftPower -= straightCorrection;
                 }
             }
-            telemetry.addLine("LeftPower: " + leftPower);
-            telemetry.addLine("RightPower: " + rightPower);
 
-            fLeft.setPower(leftPower);
-            bLeft.setPower(leftPower);
-            bRight.setPower(rightPower);
-            fRight.setPower(rightPower);
+            telemetry.addLine("LeftPower: " + deccelerationLeft);
+            telemetry.addLine("RightPower: " + deccelerationRight);
+            telemetry.update();
+            fLeft.setPower(deccelerationLeft);
+            bLeft.setPower(deccelerationLeft);
+            bRight.setPower(deccelerationRight);
+            fRight.setPower(deccelerationRight);
         }
         brakeRobot();
 
