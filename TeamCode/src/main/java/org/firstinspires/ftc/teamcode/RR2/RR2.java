@@ -338,12 +338,18 @@ public class RR2 {
 
         if(targetPostition<0){
             newSpeed = newSpeed * -1;
+            fLeft.setPower(newSpeed-0.15);
+            fRight.setPower(newSpeed);
+            bLeft.setPower(newSpeed-0.15);
+            bRight.setPower(newSpeed);
+        }else{
+            fLeft.setPower(newSpeed);
+            fRight.setPower(newSpeed+0.1);
+            bLeft.setPower(newSpeed);
+            bRight.setPower(newSpeed+0.1);
         }
 
-        fLeft.setPower(newSpeed);
-        fRight.setPower(newSpeed);
-        bLeft.setPower(newSpeed);
-        bRight.setPower(newSpeed);
+
 
 
         fLeft.setTargetPosition(targetPostition);

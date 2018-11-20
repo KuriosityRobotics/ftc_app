@@ -74,20 +74,20 @@ public class CraterFacing extends LinearOpMode
             tensorFlowMineralDetection.runObjectDetection();
             if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
                 robot.finalTurn(-20);
-                robot.finalMove(0.2,15.3);
+                robot.moveRobot(0.2,300);
                 robot.moveRobot(0.2, -220);
                 robot.finalTurn(50);
                 //Getting to Depot
                 robot.finalMove(0.2, 20.8);
             }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
                 robot.finalTurn(20);
-                robot.finalMove(0.2,16.3);
+                robot.moveRobot(0.2,300);
                 robot.moveRobot(0.2, -200);
                 robot.finalTurn(50);
                 //Getting to Depot
                 robot.finalMove(0.2, 18);
             } else {
-                robot.finalMove(0.2,12);
+                robot.moveRobot(0.2,300);
                 robot.moveRobot(0.2, -200);
                 robot.finalTurn(50);
                 //Getting to Depot
