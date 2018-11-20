@@ -30,7 +30,11 @@ public class MoveInchesTest extends LinearOpMode
 //            robot.bLeft.setPower(0.1);
 //            telemetry.addLine("" + (robot.angles.thirdAngle));
             //robot.moveRobotInches(0.5, 20);
-            robot.straightLine(0.2, 20);
+            robot.finalMove(0.2,20);
+            telemetry.addLine("Current Position: " + robot.fLeft.getCurrentPosition());
+            telemetry.update();
+//            sleep(100);
+//            robot.moveRobot(0.2, -400);
             robot.brakeRobot();
             sleep(100000000);
         }

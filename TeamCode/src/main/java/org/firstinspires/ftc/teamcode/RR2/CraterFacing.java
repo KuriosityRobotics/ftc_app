@@ -69,36 +69,39 @@ public class CraterFacing extends LinearOpMode
             //sleep(2500);
             //robot.hook.setPower(0);
 
-            robot.moveRobot(0.2,100);
-
+            robot.moveRobot(0.2,50);
+            robot.slide.setPower(0);
             tensorFlowMineralDetection.runObjectDetection();
             if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
                 robot.finalTurn(-20);
-                robot.moveRobot(0.2,300);
-                robot.moveRobot(0.2, -220);
+                robot.finalMove(0.2, 20);
+                sleep(500);
+                robot.finalMove(0.2, -20);
                 robot.finalTurn(50);
                 //Getting to Depot
-                robot.finalMove(0.2, 20.8);
+                robot.moveRobot(0.2, 420);
             }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
                 robot.finalTurn(20);
-                robot.moveRobot(0.2,300);
-                robot.moveRobot(0.2, -200);
-                robot.finalTurn(50);
+                robot.finalMove(0.2, 20);
+                sleep(500);
+                robot.finalMove(0.2, -20);
+                robot.finalTurn(75);
                 //Getting to Depot
-                robot.finalMove(0.2, 18);
+                robot.moveRobot(0.2, 380);
             } else {
-                robot.moveRobot(0.2,300);
-                robot.moveRobot(0.2, -200);
+                robot.finalMove(0.2, 18);
+                sleep(500);
+                robot.finalMove(0.2, -18);
                 robot.finalTurn(50);
                 //Getting to Depot
-                robot.finalMove(0.2, 17);
+                robot.finalMove(0.2, 46);
             }
 
             robot.finalTurn(116);
-            robot.finalMove(0.2, 45);
             //robot.intake.setPower(0.5);
             //robot.slide.setPower();
-            robot.finalMove(0.2, -75);
+            robot.finalMove(0.2, 54);
+            robot.finalMove(0.2, -54);
             //after the robot turns u need to go foward and hit the mineral then go to depot and back to creater
             //start programming here
             //when you hit start, code in this runs
