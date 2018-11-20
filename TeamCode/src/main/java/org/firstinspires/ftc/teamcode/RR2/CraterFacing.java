@@ -38,32 +38,32 @@ public class CraterFacing extends LinearOpMode
 //            sleep(1000);
 //            robot.hook.setPower(0);
 
-            robot.pivot.setPower(1);
+//            robot.pivot.setPower(1);
+//
+//            while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
+//                telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
+//                telemetry.update();
+//            }
+//            telemetry.addData("done", "done");
+//            robot.pivot.setPower(0);
+//
+//            robot.hangLockLeft.setPosition(0.71);
+//            robot.hangLockRight.setPosition(0.21);
+//            sleep(1000);
+//
+//            //robot.pivot.setPower(-1);
 
-            while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
-                telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
-                telemetry.update();
-            }
-            telemetry.addData("done", "done");
-            robot.pivot.setPower(0);
-
-            robot.hangLockLeft.setPosition(0.71);
-            robot.hangLockRight.setPosition(0.21);
-            sleep(1000);
-
-            robot.pivot.setPower(-1);
-
-            robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            //robot.pivot.setTargetPosition(-4000);
-
-            while(robot.pivot.isBusy() && opModeIsActive()){
-                telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
-                telemetry.update();
-            }
-
-            telemetry.update();
-            robot.pivot.setPower(0);
+//            robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            //robot.pivot.setTargetPosition(-4000);
+//
+//            while(robot.pivot.isBusy() && opModeIsActive()){
+//                telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
+//                telemetry.update();
+//            }
+//
+//            telemetry.update();
+            //robot.pivot.setPower(0);
 
             //robot.hook.setPower(-0.35); //open
             //sleep(2500);
@@ -74,22 +74,28 @@ public class CraterFacing extends LinearOpMode
             tensorFlowMineralDetection.runObjectDetection();
             if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
                 robot.finalTurn(-20);
-                robot.finalMove(0.2,22);
-                robot.finalMove(0.2, -18);
+                robot.finalMove(0.2,15.3);
+                robot.moveRobot(0.2, -220);
+                robot.finalTurn(50);
+                //Getting to Depot
+                robot.finalMove(0.2, 20.8);
             }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
                 robot.finalTurn(20);
-                robot.finalMove(0.2,20);
-                robot.finalMove(0.2, -18);
+                robot.finalMove(0.2,16.3);
+                robot.moveRobot(0.2, -200);
+                robot.finalTurn(50);
+                //Getting to Depot
+                robot.finalMove(0.2, 18);
             } else {
-                robot.finalMove(0.2,22);
-                robot.finalMove(0.2, -18);
-
+                robot.finalMove(0.2,12);
+                robot.moveRobot(0.2, -200);
+                robot.finalTurn(50);
+                //Getting to Depot
+                robot.finalMove(0.2, 17);
             }
-            robot.finalTurn(50);
-            //Getting to Depot
-            robot.finalMove(0.2, 49);
-            robot.finalTurn(113);
-            robot.finalMove(0.2, 60);
+
+            robot.finalTurn(116);
+            robot.finalMove(0.2, 45);
             //robot.intake.setPower(0.5);
             //robot.slide.setPower();
             robot.finalMove(0.2, -75);
