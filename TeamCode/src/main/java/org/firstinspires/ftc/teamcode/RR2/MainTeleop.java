@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
 //@Disabled
 public class MainTeleop extends LinearOpMode {
@@ -38,6 +40,8 @@ public class MainTeleop extends LinearOpMode {
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
+
+
             //tank drive
             fLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
             bLPower = -(gamepad1.left_stick_y)*powerScaleFactor;
@@ -96,7 +100,7 @@ public class MainTeleop extends LinearOpMode {
                 telemetry.addLine("Pivot Going Up");
                 telemetry.update();
             }
-            else if (gamepad1.x) {
+            else if (gamepad1.x && robot.distance.getDistance(DistanceUnit.MM)>150) {
                 robot.pivot.setPower(1);
                 telemetry.addLine("Pivot Going Down");
                 telemetry.update();
@@ -111,7 +115,7 @@ public class MainTeleop extends LinearOpMode {
             //Hang Locking
             if (gamepad1.a) {
                 robot.hangLockLeft.setPosition(0.55);
-                robot.hangLockRight.setPosition(0.3);
+                robot.hangLockRight.setPosition(0.35);
             }
             else if (gamepad1.b) {
                 robot.hangLockLeft.setPosition(0.71);

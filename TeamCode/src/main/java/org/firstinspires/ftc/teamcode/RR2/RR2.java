@@ -205,8 +205,8 @@ public class RR2 {
             fLeft.setPower(-power);
             bRight.setPower(power);
         }
-
-        setDrivePower(0);
+        brakeRobot();
+        linearOpMode.sleep(100);
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
@@ -315,6 +315,7 @@ public class RR2 {
         }
 
         brakeRobot();
+        linearOpMode.sleep(100);
 
     }
 
@@ -323,6 +324,21 @@ public class RR2 {
         bLeft.setPower(inchesToTravel * (400 / 17.5));
         fRight.setPower(inchesToTravel * (400 / 17.5));
         bRight.setPower(inchesToTravel * (400 / 17.5));
+    }
+
+    public void bothSideMove(double speed, int targetLeft, int targetRight) {
+        fLeft.setTargetPosition(targetLeft);
+        bLeft.setTargetPosition(targetLeft);
+        fRight.setTargetPosition(targetRight);
+        bRight.setTargetPosition(targetRight);
+        allWheelDrive(speed, speed, speed, speed);
+
+        while (fLeft.isBusy() && fRight.isBusy() && linearOpMode.opModeIsActive()) {
+            telemetry.addLine("Left Position: " + fLeft.getCurrentPosition());
+            telemetry.addLine("Right Position: " + fRight.getCurrentPosition());
+            telemetry.update();
+        }
+        brakeRobot();
     }
 
     public void moveRobot(double speed, int targetPostition) {

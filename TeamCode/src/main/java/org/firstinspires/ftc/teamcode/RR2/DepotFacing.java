@@ -6,9 +6,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name="Crater Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
+@Autonomous(name="Depot Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 //@Disabled
-public class CraterFacing extends LinearOpMode
+public class DepotFacing extends LinearOpMode
 {
     private ElapsedTime runtime = new ElapsedTime();
     @Override
@@ -62,7 +62,7 @@ public class CraterFacing extends LinearOpMode
 
             robot.pivot.setPower(1);
             robot.pivot.setTargetPosition(0);
-
+//
             robot.intializeIMU();
             robot.moveRobot(0.2,50);
             robot.slide.setPower(0);
@@ -70,27 +70,35 @@ public class CraterFacing extends LinearOpMode
             if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
                 robot.finalTurn(-22);
                 robot.finalMove(0.5, 60);
+                robot.finalTurn(12);
+                robot.finalMove(0.5, 50);
+                robot.finalMove(0.5, -50);
+                robot.finalTurn(-22);
                 robot.finalMove(0.5, -55);
                 //Getting to Depot
             }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
                 robot.finalTurn(22);
                 robot.finalMove(0.5, 60);
+                robot.finalTurn(-12);
+                robot.finalMove(0.5, 50);
+                robot.finalMove(0.5, -50);
+                robot.finalTurn(22);
                 robot.finalMove(0.5, -55);
                 //Getting to Depot
             } else {
-                robot.finalMove(0.5, 55);
-                robot.finalMove(0.5, -50);
+                robot.finalMove(0.5, 105);
+                robot.finalMove(0.5, -100);
                 //Getting to Depot
             }
 
             robot.finalTurn(55);
 
-            robot.finalMove(0.5, 98);
+            robot.finalMove(0.5, 85);
             robot.finalTurn(135);
             //robot.intake.setPower(0.5);
             //robot.slide.setPower();
-            robot.finalMove(0.7, 120);
-            robot.finalMove(0.7, -150);
+            robot.finalMove(0.7, 75);
+
             sleep(1000000000);
         }
     }
