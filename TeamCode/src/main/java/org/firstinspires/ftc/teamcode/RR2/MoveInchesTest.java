@@ -19,23 +19,20 @@ public class MoveInchesTest extends LinearOpMode
         //Init's robot
         RR2 robot = new RR2(hardwareMap,telemetry,this);
         robot.driveMotorsBreakZeroBehavior();
+        robot.resetEncoders();
         waitForStart();
         runtime.reset();
-        robot.intializeIMU();
+        //robot.intializeIMU();
+        robot.changeRunModeToUsingEncoder();
+
         while (opModeIsActive()){
-//            robot.intializeIMU();
-//            robot.angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-//            double startAngle = robot.angles.thirdAngle;
-//            robot.fLeft.setPower(0.1);
-//            robot.bLeft.setPower(0.1);
-//            telemetry.addLine("" + (robot.angles.thirdAngle));
-            //robot.moveRobotInches(0.5, 20);
-            robot.finalMove(0.2,20);
-            telemetry.addLine("Current Position: " + robot.fLeft.getCurrentPosition());
+            robot.intializeIMU();
+            robot.finalMove(0.4,20);
+            robot.finalMove(04, -20);
+            telemetry.addLine("Right Position: " + robot.fRight.getCurrentPosition());
+            telemetry.addLine("Left Position: " + robot.fLeft.getCurrentPosition());
             telemetry.update();
-//            sleep(100);
-//            robot.moveRobot(0.2, -400);
-            robot.brakeRobot();
+            //robot.brakeRobot();
             sleep(100000000);
         }
         //Run1: 16.5  Run3:17 Run4: 18.25 Run5: 19.25

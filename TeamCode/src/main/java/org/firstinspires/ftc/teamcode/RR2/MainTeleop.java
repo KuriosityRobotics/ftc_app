@@ -85,9 +85,9 @@ public class MainTeleop extends LinearOpMode {
 
             //blocker for outtake
             if(gamepad2.x){
-                robot.blocker.setPosition(0.3);
+                robot.blocker.setPosition(0.5);
             }else{
-                robot.blocker.setPosition(0);
+                robot.blocker.setPosition(0.1);
             }
 
             //Pivoting Slide For Outtake

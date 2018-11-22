@@ -232,6 +232,10 @@ public class RR2 {
         double deccelerationLeft;
         double deccelerationRight;
 
+        if (targetDistance < 0) {
+            isNegative = true;
+        }
+
         if (!isNegative) {
             rotations = targetDistance / 0.028;
         } else {
@@ -248,61 +252,68 @@ public class RR2 {
         bLeft.setPower(speed);
         bRight.setPower(speed);
 
-
         double scaleFactor;
         double currentPositon;
 
-        if (targetDistance < 0) {
-            isNegative = true;
-        }
-
-
         double difference = 0;
-        while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
-                && linearOpMode.opModeIsActive()){
-            currentPositon = Math.abs(fLeft.getCurrentPosition());
+        while((fLeft.isBusy() && fRight.isBusy()) && linearOpMode.opModeIsActive()){
 
-            scaleFactor = Math.abs(Math.abs(rotations - currentPositon) / rotations);
+//            currentPositon = Math.abs(bLeft.getCurrentPosition());
+//
+//            scaleFactor = Math.abs(Math.abs(rotations - currentPositon) / rotations);
+//
+//            difference = bLeft.getCurrentPosition() - bRight.getCurrentPosition();
+//            straightCorrection = Math.abs(difference) / 1000;
+//
+//            if(scaleFactor<0.15){
+//                scaleFactor = 0.15;
+//            }
+//
+//            deccelerationLeft = leftPower;
+//            deccelerationRight = rightPower;
+//
+//            if (!isNegative) {
+//                if (difference < 0) {
+//                    deccelerationRight -= straightCorrection;
+//                }
+//                if (difference > 0) {
+//                    deccelerationLeft += straightCorrection;
+//                }
+//            } else {
+//                if (difference > 0) {
+//                    deccelerationLeft -= straightCorrection;
+//                }
+//                if (difference < 0) {
+//                    deccelerationRight -= straightCorrection;
+//                }
+//            }
+//
+//            deccelerationLeft = deccelerationLeft * scaleFactor;
+//            deccelerationRight = deccelerationRight * scaleFactor;
+//
+//
+//
+//            telemetry.addLine("LeftPower: " + deccelerationLeft);
+//            telemetry.addLine("RightPower: " + deccelerationRight);
+//            telemetry.addLine("correction: " + straightCorrection);
+//            telemetry.addLine("Difference: " + difference);
+//
+//            telemetry.update();
+//            fLeft.setPower(deccelerationLeft);
+//            fRight.setPower(deccelerationRight);
+//            bLeft.setPower(deccelerationLeft);
+//            bRight.setPower(deccelerationRight);
 
-            difference = fLeft.getCurrentPosition() - fRight.getCurrentPosition();
-            straightCorrection = Math.abs(difference) / 1000;
+            telemetry.addLine("Target position: " + rotations);
 
-            if(scaleFactor<0.1){
-                scaleFactor = 0.1;
-            }
-
-            deccelerationLeft = leftPower * scaleFactor;
-            deccelerationRight = rightPower * scaleFactor;
-
-            if (!isNegative) {
-                if (difference < 0) {
-                    deccelerationRight += straightCorrection;
-                }
-                if (difference > 0) {
-                    deccelerationLeft += straightCorrection;
-                }
-            } else {
-                if (difference > 0) {
-                    deccelerationLeft -= straightCorrection;
-                }
-                if (difference < 0) {
-                    deccelerationRight -= straightCorrection;
-                }
-            }
-
-
-
-            telemetry.addLine("LeftPower: " + deccelerationLeft);
-            telemetry.addLine("RightPower: " + deccelerationRight);
-            telemetry.addLine("correction: " + straightCorrection);
-            telemetry.addLine("difference: " + difference);
-
+            telemetry.addLine("Right position: " + fRight.getCurrentPosition());
+            telemetry.addLine("Left position: " + fLeft.getCurrentPosition());
             telemetry.update();
-            fLeft.setPower(deccelerationLeft);
-            fRight.setPower(deccelerationRight);
-            bLeft.setPower(deccelerationLeft);
-            bRight.setPower(deccelerationRight);
+//            telemetry.addLine("RightPower: " + deccelerationRight);
+//            telemetry.addLine("correction: " + straightCorrection);
+//            telemetry.addLine("Difference: " + difference);
         }
+
         brakeRobot();
 
     }
@@ -357,29 +368,25 @@ public class RR2 {
 
         if(targetPostition<0){
             newSpeed = newSpeed * -1;
-            fLeft.setPower(newSpeed-0.15);
+            fLeft.setPower(newSpeed);
             fRight.setPower(newSpeed);
-            bLeft.setPower(newSpeed-0.15);
+            bLeft.setPower(newSpeed);
             bRight.setPower(newSpeed);
         }else{
             fLeft.setPower(newSpeed);
-            fRight.setPower(newSpeed+0.1);
+            fRight.setPower(newSpeed);
             bLeft.setPower(newSpeed);
-            bRight.setPower(newSpeed+0.1);
+            bRight.setPower(newSpeed);
         }
-
-
-
 
         fLeft.setTargetPosition(targetPostition);
         fRight.setTargetPosition(targetPostition);
         bLeft.setTargetPosition(targetPostition);
         bRight.setTargetPosition(targetPostition);
 
-
         while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
                 && linearOpMode.opModeIsActive()){
-            telemetry.addData("encoder",fLeft.getCurrentPosition());
+            //telemetry.addData("encoder",fLeft.getCurrentPosition());
         }
 
         brakeRobot();
@@ -433,6 +440,7 @@ public class RR2 {
         fRight.setPower(0);
         bRight.setPower(0);
         bLeft.setPower(0);
+
     }
     public void multiplAutofinalTurn(double targetHeading,long timeInMilli) {
         targetHeading = Range.clip(targetHeading, -179, 179);
