@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.RR2;
 
-/**
- * Created by sam on 1/21/18.
- */
-
 import android.os.SystemClock;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -26,46 +22,38 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-/**
- * Created by Kuro on 10/29/2017.
- */
-
 public class RR2 {
     //Drive Motors
-    public DcMotor fLeft;
-    public DcMotor fRight;
-    public DcMotor bLeft;
-    public DcMotor bRight;
+    private DcMotor fLeft;
+    private DcMotor fRight;
+    private DcMotor bLeft;
+    private DcMotor bRight;
 
-    RevTouchSensor upTouch;
+    private RevTouchSensor upTouch;
 
-    //Ints
-    public double speedSet;
-
-    public Rev2mDistanceSensor distance;
+    private Rev2mDistanceSensor distance;
 
     //Intake Motors;
-    public DcMotor slide;
-    public DcMotor pivot;
+    private DcMotor slide;
+    private DcMotor pivot;
 
     //Intake Motors & Servos
-    public DcMotor intake;
-    public Servo blocker;
-    public Servo hangLockLeft;
-    public Servo hangLockRight;
-    public CRServo hook;
+    private DcMotor intake;
+
+    private Servo blocker;
+    private Servo hangLockLeft;
+    private Servo hangLockRight;
+    private CRServo hook;
     //imu
-    public BNO055IMU imu;
-    public Orientation angles;
-    public Position position;
+    private BNO055IMU imu;
+    private Orientation angles;
+    private Position position;
 
     //Inherited classes from Op Mode
-    public Telemetry telemetry;
-    public HardwareMap hardwareMap;
-    public LinearOpMode linearOpMode;
+    private Telemetry telemetry;
+    private HardwareMap hardwareMap;
+    private LinearOpMode linearOpMode;
 
-    boolean clawsOnOff = true;
-    static double linearSlideValue = 0.7;
 
     public RR2(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode){
 
@@ -101,9 +89,6 @@ public class RR2 {
         bRight.setDirection(DcMotor.Direction.REVERSE);
 
     }
-
-
-
     public void intializeIMU(){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
@@ -126,14 +111,6 @@ public class RR2 {
         bRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-
-    public void resumeEncoders(){
-        fLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
     public void changeRunModeToUsingEncoder(){
         fLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -148,17 +125,6 @@ public class RR2 {
         bLeft.setMode(runMode);
         bRight.setMode(runMode);
     }
-
-
-
-    public void setDrivePower(double power){
-        fLeft.setPower(power);
-        fRight.setPower(power);
-        bLeft.setPower(power);
-        bRight.setPower(power);
-    }
-
-
 
     public void finalTurn(double targetHeading){
         finalTurn(targetHeading, 10000);
@@ -309,9 +275,6 @@ public class RR2 {
             telemetry.addLine("Right position: " + fRight.getCurrentPosition());
             telemetry.addLine("Left position: " + fLeft.getCurrentPosition());
             telemetry.update();
-//            telemetry.addLine("RightPower: " + deccelerationRight);
-//            telemetry.addLine("correction: " + straightCorrection);
-//            telemetry.addLine("Difference: " + difference);
         }
 
         brakeRobot();
@@ -319,57 +282,10 @@ public class RR2 {
 
     }
 
-    public void moverobotInches(double speed, double inchesToTravel) {
-        fLeft.setPower(inchesToTravel * (400 / 17.5));
-        bLeft.setPower(inchesToTravel * (400 / 17.5));
-        fRight.setPower(inchesToTravel * (400 / 17.5));
-        bRight.setPower(inchesToTravel * (400 / 17.5));
-    }
-
-    public void bothSideMove(double speed, int targetLeft, int targetRight) {
-        fLeft.setTargetPosition(targetLeft);
-        bLeft.setTargetPosition(targetLeft);
-        fRight.setTargetPosition(targetRight);
-        bRight.setTargetPosition(targetRight);
-        allWheelDrive(speed, speed, speed, speed);
-
-        while (fLeft.isBusy() && fRight.isBusy() && linearOpMode.opModeIsActive()) {
-            telemetry.addLine("Left Position: " + fLeft.getCurrentPosition());
-            telemetry.addLine("Right Position: " + fRight.getCurrentPosition());
-            telemetry.update();
-        }
-        brakeRobot();
-    }
-
     public void moveRobot(double speed, int targetPostition) {
         moveRobot(speed, targetPostition, 10000);
         double currentPosition;
         brakeRobot();
-    }
-
-    public void  moveLinearSlideUp() {
-        slide.setPower(linearSlideValue);
-    }
-    public void  moveLinearSlideDown() {
-        slide.setPower(-linearSlideValue);
-    }
-    public void allWheelDrive(double fLeftPower, double bLeftPower, double fRightPower, double bRightPower) {
-        fLeft.setPower(fLeftPower);
-        fRight.setPower(fRightPower);
-        bRight.setPower(bRightPower);
-        bLeft.setPower(bLeftPower);
-    }
-    public void fLeft(double power) {
-        fLeft.setPower(power * speedSet);
-    }
-    public void fRight(double power) {
-        fLeft.setPower(power * speedSet);
-    }
-    public void bLeft(double power) {
-        bLeft.setPower(power * speedSet);
-    }
-    public void bRight(double power) {
-        bRight.setPower(power * speedSet);
     }
 
     public void moveRobot(double speed, int targetPostition, long timeInMilli){
@@ -402,9 +318,7 @@ public class RR2 {
 
         while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
                 && linearOpMode.opModeIsActive()){
-            //telemetry.addData("encoder",fLeft.getCurrentPosition());
         }
-
         brakeRobot();
 
         telemetry.addLine("finished sleeping");
@@ -412,38 +326,6 @@ public class RR2 {
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public String getColor(ColorSensor colorSensor){
-        if(colorSensor.blue() > colorSensor.red()){
-            return "red";
-        }else{
-            return "blue";
-        }
-    }
-
-
-    public void autoNav(double speed, double x_start, double y_start, double x_end, double y_end){
-        double distanceToTravel = 0;
-        distanceToTravel = Math.sqrt(((x_start-x_end)*(x_start-x_end))+((y_start-y_end)*(y_start-y_end)));
-        double oppositeSide = Math.abs(y_end-y_start);
-        double lengthB = distanceToTravel;
-        double adjacentSjde = Math.abs(x_end-x_start);
-        double angle = 0;
-        angle = Math.atan(oppositeSide/adjacentSjde);
-        this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        telemetry.addData("angle",angle);
-        telemetry.addData("distance",distanceToTravel);
-        telemetry.update();
-        finalTurn(angle);
-
-        fLeft.setPower(speed);
-        fRight.setPower(speed);
-        bLeft.setPower(speed);
-        bRight.setPower(speed);
-
-        finalMove(speed,distanceToTravel*12);
-
-    }
     public void driveMotorsBreakZeroBehavior() {
         fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -456,53 +338,5 @@ public class RR2 {
         fRight.setPower(0);
         bRight.setPower(0);
         bLeft.setPower(0);
-
     }
-    public void multiplAutofinalTurn(double targetHeading,long timeInMilli) {
-        targetHeading = Range.clip(targetHeading, -179, 179);
-
-        long startTime = SystemClock.elapsedRealtime();
-
-        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        position = imu.getPosition();
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double startHeading = angles.firstAngle;
-        double maxAngle = startHeading - targetHeading;
-        maxAngle = Math.abs(maxAngle);
-
-        int sign = 0;
-        if (targetHeading > startHeading) {
-            sign = 1;
-        } else {
-            sign = -1;
-        }
-        if (maxAngle == 0) {
-            return;
-        }
-
-        while (linearOpMode.opModeIsActive()) {
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-            double currentDeltatAngle = Math.abs(angles.firstAngle - startHeading);
-            double scaleFactor = currentDeltatAngle / maxAngle;
-            double absolutePower = 1 - scaleFactor;
-
-            if (absolutePower < 0.01) {
-                absolutePower = 0.01;
-            }
-            double power = absolutePower * sign;
-            if (scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)) {
-                break;
-            }
-            fLeft.setPower(-power);
-            fRight.setPower(power);
-            bLeft.setPower(-power);
-            bRight.setPower(power);
-        }
-        setDrivePower(0);
-        this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-
 }

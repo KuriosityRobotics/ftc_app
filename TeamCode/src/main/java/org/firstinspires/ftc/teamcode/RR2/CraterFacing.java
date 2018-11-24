@@ -7,12 +7,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous(name="Crater Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
-//@Disabled
 public class CraterFacing extends LinearOpMode
 {
     private ElapsedTime runtime = new ElapsedTime();
-    RR2 robot;
-    TensorFlowMineralDetection tensorFlowMineralDetection;
+    private RR2 robot;
+    private TensorFlowMineralDetection tensorFlowMineralDetection;
     @Override
     public void runOpMode() throws InterruptedException{
         //Init's robot

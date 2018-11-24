@@ -1,7 +1,4 @@
 package org.firstinspires.ftc.teamcode.RR2;
-/**
- * Created by Khue on 11/10/18.
- */
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,7 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
-//@Disabled
 public class MainTeleop extends LinearOpMode {
 
     RR2 robot;
