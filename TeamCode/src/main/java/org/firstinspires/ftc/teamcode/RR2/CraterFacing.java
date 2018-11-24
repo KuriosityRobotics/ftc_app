@@ -87,11 +87,13 @@ public class CraterFacing extends LinearOpMode
 
             robot.finalMove(0.5, 98);
             robot.finalTurn(135);
-            //robot.intake.setPower(0.5);
-            //robot.slide.setPower();
             robot.finalMove(0.7, 120);
+            robot.intake.setPower(1);
+            sleep(2500);
+            robot.intake.setPower(0);
             robot.finalMove(0.7, -150);
-            sleep(1000000000);
+
+             sleep(1000000000);
         }
     }
 }

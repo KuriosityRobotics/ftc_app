@@ -77,15 +77,7 @@ public class MainTeleop extends LinearOpMode {
             robot.bRight.setPower(bRPower);
 
             //Intake Control
-            if (gamepad2.left_stick_y != 0) {
-                robot.intake.setPower(gamepad2.left_stick_y);
-                telemetry.addLine("Moving Intake");
-                telemetry.update();
-            } else {
-                robot.intake.setPower(0);
-                //telemetry.addLine("Not Moving Intake");
-                //telemetry.update();
-            }
+            robot.intake.setPower(-gamepad2.left_stick_y);
 
             //blocker for outtake
             if(gamepad2.x){
@@ -111,25 +103,38 @@ public class MainTeleop extends LinearOpMode {
             //Controlling the Slide with Gamepad2
             robot.slide.setPower(-gamepad2.right_stick_y);
 
-
-            //Hang Locking
-            if (gamepad1.a) {
-                robot.hangLockLeft.setPosition(0.55);
-                robot.hangLockRight.setPosition(0.35);
-            }
-            else if (gamepad1.b) {
-                robot.hangLockLeft.setPosition(0.71);
-                robot.hangLockRight.setPosition(0.21);
-            }
-
-            //hook
             if (gamepad2.a) {
                 robot.hook.setPower(0.35);
                 sleep(2500);
                 robot.hook.setPower(0);
                 telemetry.addLine("Hook Latch");
                 telemetry.update();
-            } else if (gamepad2.b) {
+                robot.pivot.setPower(-1);
+                telemetry.addLine("Pivot Going Up");
+                telemetry.update();
+                robot.hangLockLeft.setPosition(0.40);
+                robot.hangLockRight.setPosition(0.38);
+
+            }
+            //Hang Locking
+//            if (gamepad1.a) {
+//                robot.hangLockLeft.setPosition(0.40);
+//                robot.hangLockRight.setPosition(0.38);
+//            }
+//            else if (gamepad1.b) {
+//                robot.hangLockLeft.setPosition(0.61);
+//                robot.hangLockRight.setPosition(0.21);
+//            }
+
+            //hook
+//            if (gamepad2.a) {
+//                robot.hook.setPower(0.35);
+//                sleep(2500);
+//                robot.hook.setPower(0);
+//                telemetry.addLine("Hook Latch");
+//                telemetry.update();
+//            }
+            if (gamepad2.b) {
                 robot.hook.setPower(-0.35);
                 sleep(1000);
                 robot.hook.setPower(0);
