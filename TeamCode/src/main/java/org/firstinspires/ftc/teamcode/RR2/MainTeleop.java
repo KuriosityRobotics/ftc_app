@@ -133,16 +133,9 @@ public class MainTeleop extends LinearOpMode {
 
     private void hookLogic(){
         if (gamepad2.a) {
-            robot.hook.setPower(0.35);
-            sleep(2500);
-            robot.hook.setPower(0);
+            robot.hook.setPosition(0);
         }else if (gamepad2.b) {
-            robot.hook.setPower(-0.35);
-            sleep(1000);
-            robot.hook.setPower(0);
-
-        } else {
-            robot.hook.setPower(0);
+            robot.hook.setPosition(1);
         }
     }
 }

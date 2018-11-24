@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.RR2;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous(name="MoveInches test", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
-//@Disabled
+@Disabled
 public class MoveInchesTest extends LinearOpMode
 {
     private ElapsedTime runtime = new ElapsedTime();

@@ -105,9 +105,7 @@ public class DepotFacing extends LinearOpMode
         telemetry.update();
         robot.pivot.setPower(0);
 
-        robot.hook.setPower(-0.35); //open
-        sleep(2500);
-        robot.hook.setPower(0);
+        robot.hook.setPosition(0); //open
 
         robot.pivot.setPower(1);
         robot.pivot.setTargetPosition(0);

@@ -3,13 +3,14 @@ package org.firstinspires.ftc.teamcode.RR2;
  * Created by Khue on 11/10/18.
  */
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="EncoderRetrieval", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class EncoderRetrieval extends LinearOpMode {
 
     boolean changedBlocker = false, onBlock = false;

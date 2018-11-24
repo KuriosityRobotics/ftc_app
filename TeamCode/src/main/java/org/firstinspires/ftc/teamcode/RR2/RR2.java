@@ -24,26 +24,26 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public class RR2 {
     //Drive Motors
-    private DcMotor fLeft;
-    private DcMotor fRight;
-    private DcMotor bLeft;
-    private DcMotor bRight;
+    public DcMotor fLeft;
+    public DcMotor fRight;
+    public DcMotor bLeft;
+    public DcMotor bRight;
 
     private RevTouchSensor upTouch;
 
-    private Rev2mDistanceSensor distance;
+    public Rev2mDistanceSensor distance;
 
     //Intake Motors;
-    private DcMotor slide;
-    private DcMotor pivot;
+    public DcMotor slide;
+    public DcMotor pivot;
 
     //Intake Motors & Servos
-    private DcMotor intake;
+    public DcMotor intake;
 
-    private Servo blocker;
-    private Servo hangLockLeft;
-    private Servo hangLockRight;
-    private CRServo hook;
+    public Servo blocker;
+    public Servo hangLockLeft;
+    public Servo hangLockRight;
+    public Servo hook;
     //imu
     private BNO055IMU imu;
     private Orientation angles;
@@ -74,7 +74,7 @@ public class RR2 {
         pivot = hardwareMap.dcMotor.get("pivot");
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
-        hook = hardwareMap.crservo.get("hook");
+        hook = hardwareMap.servo.get("hook");
 
         upTouch = hardwareMap.get(RevTouchSensor.class,"upTouch");
 
