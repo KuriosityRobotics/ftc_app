@@ -82,8 +82,7 @@ public class CraterFacing extends LinearOpMode
         telemetry.addData("done", "done");
         robot.pivot.setPower(0);
 
-        robot.hangLockLeft.setPosition(0.71);
-        robot.hangLockRight.setPosition(0.21);
+        robot.hangLockOpen();
         sleep(1000);
 
         robot.pivot.setPower(-1);
@@ -105,7 +104,6 @@ public class CraterFacing extends LinearOpMode
         robot.pivot.setPower(1);
         robot.pivot.setTargetPosition(0);
     }
-
 }
 
 

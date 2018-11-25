@@ -29,8 +29,6 @@ public class RR2 {
     public DcMotor bLeft;
     public DcMotor bRight;
 
-    private RevTouchSensor upTouch;
-
     public Rev2mDistanceSensor distance;
 
     //Intake Motors;
@@ -75,8 +73,6 @@ public class RR2 {
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
         hook = hardwareMap.servo.get("hook");
-
-        upTouch = hardwareMap.get(RevTouchSensor.class,"upTouch");
 
         distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
 
@@ -332,6 +328,7 @@ public class RR2 {
         fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
+
     public void brakeRobot() {
         driveMotorsBreakZeroBehavior();
         fLeft.setPower(0);
@@ -339,4 +336,16 @@ public class RR2 {
         bRight.setPower(0);
         bLeft.setPower(0);
     }
+
+    public void hangLockClose(){
+        hangLockLeft.setPosition(0.32);
+        hangLockRight.setPosition(0.5);
+    }
+
+    public void hangLockOpen(){
+        hangLockLeft.setPosition(0.21);
+        hangLockRight.setPosition(0.63);
+    }
+
+
 }
