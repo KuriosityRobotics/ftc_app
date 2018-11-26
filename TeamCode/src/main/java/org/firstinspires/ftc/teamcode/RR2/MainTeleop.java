@@ -123,11 +123,6 @@ public class MainTeleop extends LinearOpMode {
     private void slideLogic(){
         //Controlling the Slide with Gamepad2
         double slidePower = gamepad2.right_stick_y;
-//        if(robot.slide.getCurrentPosition() < 0 || robot.slide.getCurrentPosition()>=1000){
-//            telemetry.addData("slide position",robot.slide.getCurrentPosition());
-//            telemetry.update();
-//            slidePower = 0;
-//        }
         robot.slide.setPower(slidePower);
     }
 
