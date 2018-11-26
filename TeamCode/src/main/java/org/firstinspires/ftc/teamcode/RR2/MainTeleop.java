@@ -32,6 +32,8 @@ public class MainTeleop extends LinearOpMode {
         robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         robot.slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -49,7 +51,9 @@ public class MainTeleop extends LinearOpMode {
             hookLogic();
             setToHangMode();
             hangRobot();
+            hangRobot();
             dropRobot();
+            movePivotToDumpPosition();
         }
     }
 
@@ -119,9 +123,11 @@ public class MainTeleop extends LinearOpMode {
     private void slideLogic(){
         //Controlling the Slide with Gamepad2
         double slidePower = gamepad2.right_stick_y;
-        if(robot.slide.getCurrentPosition() == 0 || robot.slide.getCurrentPosition()==1500){
-            slidePower = 0;
-        }
+//        if(robot.slide.getCurrentPosition() < 0 || robot.slide.getCurrentPosition()>=1000){
+//            telemetry.addData("slide position",robot.slide.getCurrentPosition());
+//            telemetry.update();
+//            slidePower = 0;
+//        }
         robot.slide.setPower(slidePower);
     }
 
@@ -170,13 +176,17 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.pivot.setPower(-1);
-            robot.pivot.setTargetPosition(-5000);
-            while (robot.pivot.isBusy()){
+            robot.pivot.setTargetPosition(-4500);
+            while (robot.pivot.isBusy() && opModeIsActive()){
                 telemetry.addData("Pivot","moving pivot up to hang position");
                 telemetry.update();
                 driveLogic();
+                if(gamepad1.y){
+                    return;
+                }
             }
             robot.pivot.setPower(0);
+            robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -186,7 +196,7 @@ public class MainTeleop extends LinearOpMode {
             sleep(1000);
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setPower(1);
-            while(robot.distance.getDistance(DistanceUnit.MM)>75){
+            while(robot.distance.getDistance(DistanceUnit.MM)>75 && opModeIsActive()){
                 if(gamepad2.right_bumper){
                     telemetry.addData("Hang Status","Aborting hang...");
                     telemetry.update();
@@ -235,6 +245,22 @@ public class MainTeleop extends LinearOpMode {
 
             robot.pivot.setPower(1);
             robot.pivot.setTargetPosition(0);
+        }
+    }
+
+    private void movePivotToDumpPosition(){
+        if(gamepad1.right_trigger>0){
+            robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.pivot.setPower(-1);
+            robot.pivot.setTargetPosition(-4750);
+            while (robot.pivot.isBusy() && opModeIsActive()){
+                driveLogic();
+                slideLogic();
+                intakeLogic();
+            }
+            robot.pivot.setPower(0);
+            robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 }
