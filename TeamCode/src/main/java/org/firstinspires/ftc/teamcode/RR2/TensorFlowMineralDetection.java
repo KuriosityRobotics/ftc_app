@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RR2;
 
+import android.os.SystemClock;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -50,8 +52,8 @@ public class TensorFlowMineralDetection {
         if (tfod != null) {
             tfod.activate();
         }
-
-        while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive()) {
+        long startTime = SystemClock.elapsedRealtime();
+        while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 3000) {
             if (tfod != null) {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
@@ -71,16 +73,17 @@ public class TensorFlowMineralDetection {
                         }
                             if (goldXPos > firstSilverXPos && isGoldInFrame) {
                                 this.location = Location.CENTER;
+                                tfod.shutdown();
                                 return location;
                             } else if (goldXPos < firstSilverXPos && isGoldInFrame) {
                                 this.location = Location.LEFT;
+                                tfod.shutdown();
                                 return location;
                             } else {
                                 this.location = Location.RIGHT;
+                                tfod.shutdown();
                                 return location;
                             }
-
-
                     }
                 }
             }
@@ -88,6 +91,7 @@ public class TensorFlowMineralDetection {
         if (tfod != null) {
             tfod.shutdown();
         }
+        location = Location.UNKNOWN;
         return location;
     }
 

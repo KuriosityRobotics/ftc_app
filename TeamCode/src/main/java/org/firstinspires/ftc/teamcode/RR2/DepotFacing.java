@@ -36,9 +36,9 @@ public class DepotFacing extends LinearOpMode
         }
     }
     private void navigateToDepotThenCrater() {
-        robot.finalTurn(55);
+        robot.finalTurn(60);
 
-        robot.finalMove(0.5, 85);
+        robot.finalMove(0.5, 94);
         robot.finalTurn(135);
         //robot.intake.setPower(0.5);
         //robot.slide.setPower();
@@ -57,6 +57,9 @@ public class DepotFacing extends LinearOpMode
             robot.finalMove(0.5, 60);
             robot.finalTurn(12);
             robot.finalMove(0.5, 50);
+            robot.intake.setPower(1);
+            sleep(2500);
+            robot.intake.setPower(0);
             robot.finalMove(0.5, -50);
             robot.finalTurn(-22);
             robot.finalMove(0.5, -55);
@@ -66,12 +69,18 @@ public class DepotFacing extends LinearOpMode
             robot.finalMove(0.5, 60);
             robot.finalTurn(-12);
             robot.finalMove(0.5, 50);
+            robot.intake.setPower(1);
+            sleep(2500);
+            robot.intake.setPower(0);
             robot.finalMove(0.5, -50);
             robot.finalTurn(22);
             robot.finalMove(0.5, -55);
             //Getting to Depot
         } else {
             robot.finalMove(0.5, 105);
+            robot.intake.setPower(1);
+            sleep(2500);
+            robot.intake.setPower(0);
             robot.finalMove(0.5, -100);
             //Getting to Depot
         }
@@ -92,11 +101,7 @@ public class DepotFacing extends LinearOpMode
 
         robot.pivot.setPower(-1);
 
-        robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.pivot.setTargetPosition(-4000);
-
-        while(robot.pivot.isBusy() && opModeIsActive()){
+        while(robot.bottomDistance.getDistance(DistanceUnit.MM) >23 && opModeIsActive()){
             telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
             telemetry.update();
         }
@@ -105,7 +110,9 @@ public class DepotFacing extends LinearOpMode
         robot.pivot.setPower(0);
 
         robot.hook.setPosition(0); //open
-
+        sleep(1000);
+        robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.pivot.setPower(1);
         robot.pivot.setTargetPosition(0);
     }

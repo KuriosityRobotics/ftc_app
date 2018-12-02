@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RR2;
 
+import android.content.Intent;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -168,17 +170,13 @@ public class MainTeleop extends LinearOpMode {
             robot.hook.setPosition(0);
             telemetry.addData("hook status","opening...");
             telemetry.update();
+            robot.pivot.setPower(-1);
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.pivot.setPower(-1);
             robot.pivot.setTargetPosition(-4500);
-            while (robot.pivot.isBusy() && opModeIsActive()){
-                telemetry.addData("Pivot","moving pivot up to hang position");
-                telemetry.update();
+
+            while(robot.pivot.isBusy() && opModeIsActive()){
                 driveLogic();
-                if(gamepad1.y){
-                    return;
-                }
             }
             robot.pivot.setPower(0);
             robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -191,7 +189,7 @@ public class MainTeleop extends LinearOpMode {
             sleep(1000);
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setPower(1);
-            while(robot.distance.getDistance(DistanceUnit.MM)>75 && opModeIsActive()){
+            while(robot.distance.getDistance(DistanceUnit.MM)>55 && opModeIsActive()){
                 if(gamepad2.right_bumper){
                     telemetry.addData("Hang Status","Aborting hang...");
                     telemetry.update();

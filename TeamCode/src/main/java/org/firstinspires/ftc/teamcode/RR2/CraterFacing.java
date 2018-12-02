@@ -23,6 +23,7 @@ public class CraterFacing extends LinearOpMode
         robot.bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
         robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -37,13 +38,14 @@ public class CraterFacing extends LinearOpMode
     }
 
     private void navigateToDepotThenCrater() {
-        robot.finalTurn(55);
+        robot.finalTurn(60);
 
         robot.finalMove(0.5, 98);
         robot.finalTurn(135);
         robot.finalMove(0.7, 120);
+        robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.intake.setPower(1);
-        sleep(2500);
+        sleep(3000);
         robot.intake.setPower(0);
         robot.finalMove(0.7, -150);
         telemetry.addData("Status","done");
@@ -57,17 +59,17 @@ public class CraterFacing extends LinearOpMode
         tensorFlowMineralDetection.runObjectDetection();
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
             robot.finalTurn(-22);
-            robot.finalMove(0.5, 60);
-            robot.finalMove(0.5, -55);
+            robot.finalMove(0.5, 58);
+            robot.finalMove(0.5, -53);
             //Getting to Depot
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
             robot.finalTurn(22);
-            robot.finalMove(0.5, 60);
+            robot.finalMove(0.5, 58);
             robot.finalMove(0.5, -55);
             //Getting to Depot
         } else {
-            robot.finalMove(0.5, 55);
-            robot.finalMove(0.5, -50);
+            robot.finalMove(0.5, 53);
+            robot.finalMove(0.5, -48);
             //Getting to Depot
         }
     }
@@ -87,11 +89,7 @@ public class CraterFacing extends LinearOpMode
 
         robot.pivot.setPower(-1);
 
-        robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.pivot.setTargetPosition(-4000);
-
-        while(robot.pivot.isBusy() && opModeIsActive()){
+        while(robot.bottomDistance.getDistance(DistanceUnit.MM) >23 && opModeIsActive()){
             telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
             telemetry.update();
         }
@@ -100,7 +98,9 @@ public class CraterFacing extends LinearOpMode
         robot.pivot.setPower(0);
 
         robot.hook.setPosition(0); //open
-
+        sleep(1000);
+        robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.pivot.setPower(1);
         robot.pivot.setTargetPosition(0);
     }
