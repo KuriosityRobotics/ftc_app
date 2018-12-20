@@ -54,7 +54,7 @@ public class CraterFacing extends LinearOpMode
 
     private void knockOffMineral() {
         robot.intializeIMU();
-        robot.moveRobot(0.2,50);
+        robot.moveRobot(0.5,50);
         robot.slide.setPower(0);
         tensorFlowMineralDetection.runObjectDetection();
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){

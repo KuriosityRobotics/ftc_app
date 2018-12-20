@@ -5,12 +5,8 @@ import android.os.SystemClock;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -19,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -33,6 +30,9 @@ public class RR2 {
     public Rev2mDistanceSensor distance;
 
     public Rev2mDistanceSensor bottomDistance;
+    public Rev2mDistanceSensor frontRightDistance;
+    public Rev2mDistanceSensor backRightDistance;
+    public Rev2mDistanceSensor frontDistance;
 
     //Intake Motors;
     public DcMotor slide;
@@ -82,6 +82,9 @@ public class RR2 {
 
         distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
         bottomDistance = hardwareMap.get(Rev2mDistanceSensor.class,"bottomDistance");
+        frontRightDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontRightDistance");
+        backRightDistance = hardwareMap.get(Rev2mDistanceSensor.class,"backRightDistance");
+        frontDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontDistance");
 
         //Map LinearSlide Motors
         //Set direction of drive motors
@@ -365,6 +368,72 @@ public class RR2 {
     public void setTeamMarker(){
         teamMarker.setPosition(0.2);
         linearOpMode.sleep(1000);
+    }
+
+    public void wallFollow(double speed, double distance){
+        boolean notTimeLimit = true;
+        this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        fLeft.setPower(speed);
+        fRight.setPower(speed);
+        bLeft.setPower(speed);
+        bRight.setPower(speed);
+
+        fLeft.setTargetPosition((int)distance);
+        fRight.setTargetPosition((int)distance);
+        bLeft.setTargetPosition((int)distance);
+        bRight.setTargetPosition((int)distance);
+
+        while(fLeft.isBusy() && linearOpMode.opModeIsActive()){
+            fLeft.setPower(speed+(frontRightDistance.getDistance(DistanceUnit.MM)-100)/100);
+            bLeft.setPower(speed+(frontRightDistance.getDistance(DistanceUnit.MM)-100)/100);
+            fRight.setPower(speed+(backRightDistance.getDistance(DistanceUnit.MM)-100)/100);
+            bRight.setPower(speed+(backRightDistance.getDistance(DistanceUnit.MM)-100)/100);
+            if(frontDistance.getDistance(DistanceUnit.MM)<200){
+                fLeft.setPower(0);
+                fRight.setPower(0);
+                bLeft.setPower(0);
+                bRight.setPower(0);
+                long startTime = SystemClock.elapsedRealtime();
+                while (((SystemClock.elapsedRealtime() - startTime) < 3000)){
+                    if(frontDistance.getDistance(DistanceUnit.MM)>200){
+                        notTimeLimit = false;
+                        break;
+                    }
+                }
+                if(notTimeLimit){
+                    finalMove(0.7, -150);
+                }
+            }
+        }
+        finalMove(0.7,-150);
+        brakeRobot();
+    }
+
+    public void keepDistance(long timeLimitInMilli){
+        long startTime = SystemClock.elapsedRealtime();
+        double speed;
+        while(SystemClock.elapsedRealtime()-startTime<timeLimitInMilli){
+            speed = (frontDistance.getDistance(DistanceUnit.CM)-18)/10;
+            fLeft.setPower(speed);
+            bLeft.setPower(speed);
+            fRight.setPower(speed);
+            bRight.setPower(speed);
+        }
+        brakeRobot();
+    }
+
+    public void goToWall(double speed){
+        fLeft.setPower(speed);
+        bLeft.setPower(speed);
+        fRight.setPower(speed);
+        bRight.setPower(speed);
+        while(frontDistance.getDistance(DistanceUnit.CM)>10){
+
+        }
+        brakeRobot();
     }
 
 

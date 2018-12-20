@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -40,6 +41,8 @@ public class TensorFlowMineralDetection {
     public VuforiaLocalizer vuforia;
 
     public TFObjectDetector tfod;
+
+    public WebcamName webcamName;
 
     boolean isGoldInFrame = false;
 
@@ -97,6 +100,8 @@ public class TensorFlowMineralDetection {
 
     private void initVuforia() {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam");
+        parameters.cameraName = webcamName;
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = CameraDirection.BACK;
