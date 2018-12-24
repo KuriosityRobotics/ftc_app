@@ -50,11 +50,7 @@ public class TensorFlowMineralDetection {
     boolean isGoldInFrame = false;
 
     public Location runObjectDetection() throws VuforiaException{
-        initVuforia();
 
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        }
         if (tfod != null) {
             tfod.activate();
         }
@@ -102,7 +98,7 @@ public class TensorFlowMineralDetection {
         return location;
     }
 
-    private void initVuforia() throws VuforiaException {
+    public void initVuforia() throws VuforiaException {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -117,7 +113,7 @@ public class TensorFlowMineralDetection {
 
     }
 
-    private void initTfod() {
+    public void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);

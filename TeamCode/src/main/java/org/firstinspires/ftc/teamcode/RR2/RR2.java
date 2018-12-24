@@ -20,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
 
 public class RR2 {
@@ -444,7 +445,7 @@ public class RR2 {
         long startTime = SystemClock.elapsedRealtime();
         double speed;
         while(SystemClock.elapsedRealtime()-startTime<timeLimitInMilli){
-            speed = (frontDistance.getDistance(DistanceUnit.CM)-18)/10;
+            speed = (frontFacingLeft.getDistance(DistanceUnit.CM)-40)/100;
             fLeft.setPower(speed);
             bLeft.setPower(speed);
             fRight.setPower(speed);
@@ -453,13 +454,67 @@ public class RR2 {
         brakeRobot();
     }
 
+    public double moveRobotKillSwitch(double speed, double distance, double backDistance){
+        boolean notTimeLimit = true;
+        this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        fLeft.setPower(speed);
+        fRight.setPower(speed);
+        bLeft.setPower(speed);
+        bRight.setPower(speed);
+
+        fLeft.setTargetPosition((int)(distance/0.028));
+        fRight.setTargetPosition((int)(distance/0.028));
+        bLeft.setTargetPosition((int)(distance/0.028));
+        bRight.setTargetPosition((int)(distance/0.028));
+        while(fLeft.isBusy() && linearOpMode.opModeIsActive()) {
+            if (frontDistance.getDistance(MM) < 350 || frontFacingLeft.getDistance(MM) < 350) {
+                fLeft.setPower(0);
+                fRight.setPower(0);
+                bLeft.setPower(0);
+                bRight.setPower(0);
+                long startTime = SystemClock.elapsedRealtime();
+                while (((SystemClock.elapsedRealtime() - startTime) < 500)) {
+                    if (frontDistance.getDistance(MM) > 200 && frontFacingLeft.getDistance(MM) > 200) {
+                        notTimeLimit = false;
+                        break;
+                    } else {
+                        notTimeLimit = true;
+                    }
+                }
+                if (notTimeLimit) {
+                    brakeRobot();
+                    intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    intake.setPower(1);
+                    linearOpMode.sleep(3000);
+                    intake.setPower(0);
+                    return -fLeft.getCurrentPosition() * 0.028;
+                }
+            }else{
+                fLeft.setPower(speed);
+                fRight.setPower(speed);
+                bLeft.setPower(speed);
+                bRight.setPower(speed);
+            }
+        }
+        brakeRobot();
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intake.setPower(1);
+        linearOpMode.sleep(3000);
+        intake.setPower(0);
+        return backDistance;
+    }
+
     public void goToWall(double speed){
         fLeft.setPower(speed);
         bLeft.setPower(speed);
         fRight.setPower(speed);
         bRight.setPower(speed);
-        while(frontDistance.getDistance(DistanceUnit.CM)>10){
-
+        while(frontDistance.getDistance(DistanceUnit.CM)>39 && linearOpMode.opModeIsActive()){
+            telemetry.addData("distance",frontDistance.getDistance(CM));
+            telemetry.update();
         }
         brakeRobot();
     }

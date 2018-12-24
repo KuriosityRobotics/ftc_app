@@ -28,32 +28,39 @@ public class CraterFacing extends LinearOpMode
 
         robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        tensorFlowMineralDetection.initVuforia();
+        tensorFlowMineralDetection.initTfod();
 
         waitForStart();
         runtime.reset();
         while (opModeIsActive()){
-            robot.wallFollow(0.4,200);
-            break;
+//            robot.goToWall(0.3);
+//            break;
 //            telemetry.addData("frontRightDistance",robot.frontRightDistance.getDistance(MM));
 //            telemetry.addData("backRightDistance",robot.backRightDistance.getDistance(MM));
 //            telemetry.update();
-//            dropDownFromLander();
-//            knockOffMineral();
-//            navigateToDepotThenCrater();
+            dropDownFromLander();
+            knockOffMineral();
+            navigateToDepotThenCrater();
+//            telemetry.addLine("Mineral location: "+ tensorFlowMineralDetection.runObjectDetection().toString());
+//            telemetry.update();
+//            sleep(1000);
+//            robot.moveRobotKillSwitch(0.7,120,-120);
+//            robot.keepDistance(10000);
+            break;
         }
     }
 
     private void navigateToDepotThenCrater() {
         robot.finalTurn(60);
 
-        robot.finalMove(0.5, 98);
+        robot.goToWall(0.3);
         robot.finalTurn(135);
-        robot.finalMove(0.7, 120);
-        robot.intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.intake.setPower(1);
-        sleep(3000);
-        robot.intake.setPower(0);
-        robot.finalMove(0.7, -150);
+        robot.finalMove(0.7, robot.moveRobotKillSwitch(0.7,120,-120));
+        robot.finalMove(0.7,-3.5);
         telemetry.addData("Status","done");
         telemetry.update();
     }
@@ -63,6 +70,8 @@ public class CraterFacing extends LinearOpMode
         robot.moveRobot(0.5,50);
         robot.slide.setPower(0);
         tensorFlowMineralDetection.runObjectDetection();
+        telemetry.addLine("Mineral location: "+ tensorFlowMineralDetection.location);
+        telemetry.update();
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
             robot.finalTurn(-22);
             robot.finalMove(0.5, 58);
@@ -82,6 +91,7 @@ public class CraterFacing extends LinearOpMode
 
     private void dropDownFromLander(){
         robot.pivot.setPower(1);
+        robot.pivot2.setPower(-1);
 
         while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
@@ -89,11 +99,13 @@ public class CraterFacing extends LinearOpMode
         }
         telemetry.addData("done", "done");
         robot.pivot.setPower(0);
+        robot.pivot2.setPower(0);
 
         robot.hangLockOpen();
         sleep(1000);
 
         robot.pivot.setPower(-1);
+        robot.pivot2.setPower(1);
 
         while(robot.bottomDistance.getDistance(DistanceUnit.MM) >23 && opModeIsActive()){
             telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
@@ -102,13 +114,19 @@ public class CraterFacing extends LinearOpMode
 
         telemetry.update();
         robot.pivot.setPower(0);
+        robot.pivot2.setPower(0);
 
         robot.hook.setPosition(0); //open
         sleep(1000);
-        robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         robot.pivot.setPower(1);
-        robot.pivot.setTargetPosition(0);
+        robot.pivot2.setPower(-1);
+        while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
+            telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
+            telemetry.update();
+        }
+        robot.pivot2.setPower(0);
+        robot.pivot.setPower(0);
     }
 }
 
