@@ -4,14 +4,17 @@ import android.os.SystemClock;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaException;
 
 import java.util.List;
 
@@ -36,7 +39,7 @@ public class TensorFlowMineralDetection {
     public static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
 
-    public static final String VUFORIA_KEY = "AbSCRq//////AAAAGYEdTZut2U7TuZCfZGlOu7ZgOzsOlUVdiuQjgLBC9B3dNvrPE1x/REDktOALxt5jBEJJBAX4gM9ofcwMjCzaJKoZQBBlXXxrOscekzvrWkhqs/g+AtWJLkpCOOWKDLSixgH0bF7HByYv4h3fXECqRNGUUCHELf4Uoqea6tCtiGJvee+5K+5yqNfGduJBHcA1juE3kxGMdkqkbfSjfrNgWuolkjXR5z39tRChoOUN24HethAX8LiECiLhlKrJeC4BpdRCRazgJXGLvvI74Tmih9nhCz6zyVurHAHttlrXV17nYLyt6qQB1LtVEuSCkpfLJS8lZWS9ztfC1UEfrQ8m5zA6cYGQXjDMeRumdq9ugMkS";
+    public static final String VUFORIA_KEY = "AQOQmUj/////AAABmXCrndWask2hud2XzSvIrY52Fjls7yhcRKcQMVgooTqhv7MCYikM1d8E8z5LHk0DHRlwk+Qwvhl1k+p6NIRSQ4dHtbxYxpD0nO9pEhtlY/ABsjRyS+QrC3xqImfkY+IL6zNXtySZjozAhoNmP2sIx7JBN6hcpdabhrywRplCBfOh2uUI3FLMD544Lo6BIHST42mTExPyUIRmCLf4JHEavNAa3cC19X8IRzfm7cWlKLbAJCzNls2Tkp/wkUAdRSBdDQ4156qBsiIC5XoFVhdz+M7o62+MqKlDa6bm+VcYvex8gkAwRaoiOYGyzIdVLvbnbAAdAdjApeDozBzukAjsjF3tPltcVYyIJRM5mRWeNJGj";
 
     public VuforiaLocalizer vuforia;
 
@@ -46,7 +49,7 @@ public class TensorFlowMineralDetection {
 
     boolean isGoldInFrame = false;
 
-    public Location runObjectDetection() {
+    public Location runObjectDetection() throws VuforiaException{
         initVuforia();
 
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
@@ -56,6 +59,7 @@ public class TensorFlowMineralDetection {
             tfod.activate();
         }
         long startTime = SystemClock.elapsedRealtime();
+
         while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 3000) {
             if (tfod != null) {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
@@ -66,12 +70,12 @@ public class TensorFlowMineralDetection {
                         int secondSilverXPos = -1;
                         for (Recognition recognition : updatedRecognitions) {
                             if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                goldXPos = (int) recognition.getTop();
+                                goldXPos = (int) recognition.getLeft();
                                 isGoldInFrame = true;
                             } else if (firstSilverXPos == -1) {
-                                firstSilverXPos = (int) recognition.getTop();
+                                firstSilverXPos = (int) recognition.getLeft();
                             } else if(secondSilverXPos == -1){
-                                secondSilverXPos = (int) recognition.getTop();
+                                secondSilverXPos = (int) recognition.getLeft();
                             }
                         }
                             if (goldXPos > firstSilverXPos && isGoldInFrame) {
@@ -98,15 +102,19 @@ public class TensorFlowMineralDetection {
         return location;
     }
 
-    private void initVuforia() {
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+    private void initVuforia() throws VuforiaException {
         webcamName = hardwareMap.get(WebcamName.class, "Webcam");
-        parameters.cameraName = webcamName;
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
+
+        parameters.cameraName = webcamName;
         parameters.cameraDirection = CameraDirection.BACK;
 
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+        this.vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
     }
 
     private void initTfod() {
@@ -115,5 +123,9 @@ public class TensorFlowMineralDetection {
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+
+
+
+
     }
 }

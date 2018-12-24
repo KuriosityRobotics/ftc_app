@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
+
 @Autonomous(name="Crater Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 public class CraterFacing extends LinearOpMode
 {
@@ -30,10 +32,14 @@ public class CraterFacing extends LinearOpMode
         waitForStart();
         runtime.reset();
         while (opModeIsActive()){
-            dropDownFromLander();
-            knockOffMineral();
-            navigateToDepotThenCrater();
+            robot.wallFollow(0.4,200);
             break;
+//            telemetry.addData("frontRightDistance",robot.frontRightDistance.getDistance(MM));
+//            telemetry.addData("backRightDistance",robot.backRightDistance.getDistance(MM));
+//            telemetry.update();
+//            dropDownFromLander();
+//            knockOffMineral();
+//            navigateToDepotThenCrater();
         }
     }
 

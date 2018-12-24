@@ -20,6 +20,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
+
 public class RR2 {
     //Drive Motors
     public DcMotor fLeft;
@@ -33,10 +35,14 @@ public class RR2 {
     public Rev2mDistanceSensor frontRightDistance;
     public Rev2mDistanceSensor backRightDistance;
     public Rev2mDistanceSensor frontDistance;
+    public Rev2mDistanceSensor frontFacingLeft;
+    public Rev2mDistanceSensor frontLeftDistance;
+    public Rev2mDistanceSensor backLeftDistance;
 
     //Intake Motors;
     public DcMotor slide;
     public DcMotor pivot;
+    public DcMotor pivot2;
 
     //Intake Motors & Servos
     public DcMotor intake;
@@ -75,6 +81,7 @@ public class RR2 {
 
         slide = hardwareMap.dcMotor.get("slide");
         pivot = hardwareMap.dcMotor.get("pivot");
+        pivot2 = hardwareMap.dcMotor.get("pivot2");
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
         hook = hardwareMap.servo.get("hook");
@@ -84,7 +91,10 @@ public class RR2 {
         bottomDistance = hardwareMap.get(Rev2mDistanceSensor.class,"bottomDistance");
         frontRightDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontRightDistance");
         backRightDistance = hardwareMap.get(Rev2mDistanceSensor.class,"backRightDistance");
-        frontDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontDistance");
+        frontDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontFacingRight");
+        frontFacingLeft = hardwareMap.get(Rev2mDistanceSensor.class,"frontFacingLeft");
+        frontLeftDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontLeftDistance");
+
 
         //Map LinearSlide Motors
         //Set direction of drive motors
@@ -381,35 +391,53 @@ public class RR2 {
         bLeft.setPower(speed);
         bRight.setPower(speed);
 
-        fLeft.setTargetPosition((int)distance);
-        fRight.setTargetPosition((int)distance);
-        bLeft.setTargetPosition((int)distance);
-        bRight.setTargetPosition((int)distance);
+        fLeft.setTargetPosition((int)(distance/0.028));
+        fRight.setTargetPosition((int)(distance/0.028));
+        bLeft.setTargetPosition((int)(distance/0.028));
+        bRight.setTargetPosition((int)(distance/0.028));
 
         while(fLeft.isBusy() && linearOpMode.opModeIsActive()){
-            fLeft.setPower(speed+(frontRightDistance.getDistance(DistanceUnit.MM)-100)/100);
-            bLeft.setPower(speed+(frontRightDistance.getDistance(DistanceUnit.MM)-100)/100);
-            fRight.setPower(speed+(backRightDistance.getDistance(DistanceUnit.MM)-100)/100);
-            bRight.setPower(speed+(backRightDistance.getDistance(DistanceUnit.MM)-100)/100);
-            if(frontDistance.getDistance(DistanceUnit.MM)<200){
-                fLeft.setPower(0);
-                fRight.setPower(0);
-                bLeft.setPower(0);
-                bRight.setPower(0);
-                long startTime = SystemClock.elapsedRealtime();
-                while (((SystemClock.elapsedRealtime() - startTime) < 3000)){
-                    if(frontDistance.getDistance(DistanceUnit.MM)>200){
-                        notTimeLimit = false;
-                        break;
-                    }
-                }
-                if(notTimeLimit){
-                    finalMove(0.7, -150);
-                }
-            }
+            double leftPower = speed+normalizedDelta(frontRightDistance.getDistance(MM),70)/1000;
+            double rightPower = speed+normalizedDelta(backRightDistance.getDistance(MM),70)/1000;
+
+            fLeft.setPower(leftPower);
+            bLeft.setPower(leftPower);
+            fRight.setPower(rightPower);
+            bRight.setPower(rightPower);
+
+            telemetry.addData("frontRightDistance",frontRightDistance.getDistance(MM));
+            telemetry.addData("backRightDistance",backRightDistance.getDistance(MM));
+            telemetry.update();
+//            if(frontDistance.getDistance(MM)<200 || frontFacingLeft.getDistance(MM)<200){
+//                fLeft.setPower(0);
+//                fRight.setPower(0);
+//                bLeft.setPower(0);
+//                bRight.setPower(0);
+//                long startTime = SystemClock.elapsedRealtime();
+//                while (((SystemClock.elapsedRealtime() - startTime) < 3000)){
+//                    if(frontDistance.getDistance(MM)>200 && frontFacingLeft.getDistance(MM)>200){
+//                        notTimeLimit = false;
+//                        break;
+//                    }else{
+//                        notTimeLimit = true;
+//                    }
+//                }
+//                if(notTimeLimit){
+//                    finalTurn(0);
+//                    wallFollow(0.7,-fLeft.getCurrentPosition()*0.028);
+//                    brakeRobot();
+//                }
+//            }
         }
-        finalMove(0.7,-150);
         brakeRobot();
+    }
+
+    public double normalizedDelta(double distance, double constant){
+        double delta = distance-constant;
+        if(delta>-50 && delta<50){
+            delta = 0;
+        }
+        return delta;
     }
 
     public void keepDistance(long timeLimitInMilli){
@@ -432,6 +460,32 @@ public class RR2 {
         bRight.setPower(speed);
         while(frontDistance.getDistance(DistanceUnit.CM)>10){
 
+        }
+        brakeRobot();
+    }
+
+    public void wallFollow2(){
+        while (linearOpMode.opModeIsActive()) {
+            double distance = frontRightDistance.getDistance(DistanceUnit.CM) / 400;
+            distance = Range.clip(distance,1,5);
+            double scaledDistanced = Math.pow(distance, 0.5);
+
+
+            fLeft.setPower(scaledDistanced * 2);
+            bLeft.setPower(scaledDistanced * 2);
+            fRight.setPower(0.5 - (scaledDistanced * 2));
+            bRight.setPower(0.5 - (scaledDistanced * 2));
+        }
+    }
+
+    public void wallFollow3(){
+        while (linearOpMode.opModeIsActive()) {
+            double distance = frontRightDistance.getDistance(DistanceUnit.CM);
+
+            fLeft.setPower((distance-7)/10+0.5);
+            bLeft.setPower((distance-7)/10+0.5);
+            fRight.setPower((7-distance)/10+0.5);
+            bRight.setPower((7-distance)/10+0.5);
         }
         brakeRobot();
     }
