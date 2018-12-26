@@ -26,6 +26,9 @@ public class DepotFacing extends LinearOpMode
         robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        tensorFlowMineralDetection.initVuforia();
+        tensorFlowMineralDetection.initTfod();
+
         waitForStart();
         runtime.reset();
         while (opModeIsActive()){
@@ -36,13 +39,12 @@ public class DepotFacing extends LinearOpMode
         }
     }
     private void navigateToDepotThenCrater() {
-        robot.finalTurn(60);
 
-        robot.finalMove(0.5, 94);
+        robot.finalTurn(60);
+        robot.goToWall(0.3);
         robot.finalTurn(135);
-        //robot.intake.setPower(0.5);
-        //robot.slide.setPower();
-        robot.finalMove(0.7, 75);
+        robot.goToCrater(1);
+
         telemetry.addData("Status","done");
         telemetry.update();
     }
@@ -88,6 +90,7 @@ public class DepotFacing extends LinearOpMode
 
     private void dropDownFromLander(){
         robot.pivot.setPower(1);
+        robot.pivot2.setPower(-1);
 
         while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
@@ -95,11 +98,13 @@ public class DepotFacing extends LinearOpMode
         }
         telemetry.addData("done", "done");
         robot.pivot.setPower(0);
+        robot.pivot2.setPower(0);
 
         robot.hangLockOpen();
         sleep(1000);
 
         robot.pivot.setPower(-1);
+        robot.pivot2.setPower(1);
 
         while(robot.bottomDistance.getDistance(DistanceUnit.MM) >23 && opModeIsActive()){
             telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
@@ -108,12 +113,18 @@ public class DepotFacing extends LinearOpMode
 
         telemetry.update();
         robot.pivot.setPower(0);
+        robot.pivot2.setPower(0);
 
         robot.hook.setPosition(0); //open
         sleep(1000);
-        robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         robot.pivot.setPower(1);
-        robot.pivot.setTargetPosition(0);
+        robot.pivot2.setPower(-1);
+        while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
+            telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
+            telemetry.update();
+        }
+        robot.pivot2.setPower(0);
+        robot.pivot.setPower(0);
     }
 }

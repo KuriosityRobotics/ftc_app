@@ -471,19 +471,24 @@ public class RR2 {
         bRight.setTargetPosition((int)(distance/0.028));
         while(fLeft.isBusy() && linearOpMode.opModeIsActive()) {
             if (frontDistance.getDistance(MM) < 350 || frontFacingLeft.getDistance(MM) < 350) {
+                telemetry.addData("distance",frontDistance.getDistance(MM));
+                telemetry.update();
                 fLeft.setPower(0);
                 fRight.setPower(0);
                 bLeft.setPower(0);
                 bRight.setPower(0);
                 long startTime = SystemClock.elapsedRealtime();
-                while (((SystemClock.elapsedRealtime() - startTime) < 500)) {
-                    if (frontDistance.getDistance(MM) > 200 && frontFacingLeft.getDistance(MM) > 200) {
+                while (((SystemClock.elapsedRealtime() - startTime) < 2000)) {
+                    if (frontDistance.getDistance(MM) > 350 && frontFacingLeft.getDistance(MM) > 350) {
                         notTimeLimit = false;
                         break;
                     } else {
                         notTimeLimit = true;
                     }
                 }
+                telemetry.addData("outside inner while loop","");
+                telemetry.addData("distance",frontDistance.getDistance(MM));
+                telemetry.update();
                 if (notTimeLimit) {
                     brakeRobot();
                     intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -505,6 +510,28 @@ public class RR2 {
         linearOpMode.sleep(3000);
         intake.setPower(0);
         return backDistance;
+    }
+
+    public void goToCrater(double speed){
+        position = imu.getPosition();
+        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double currentPosition = angles.thirdAngle;
+        telemetry.addLine(Double.toString(currentPosition));
+        telemetry.update();
+        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fLeft.setPower(speed);
+        fRight.setPower(speed);
+        bLeft.setPower(speed);
+        bRight.setPower(speed);
+
+        while(linearOpMode.opModeIsActive() && Math.abs(angles.thirdAngle - currentPosition)<2.5 ){
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("X",angles.thirdAngle);
+            telemetry.addData("Y",angles.secondAngle);
+            telemetry.addData("Z",angles.firstAngle);
+            telemetry.update();
+        }
+        brakeRobot();
     }
 
     public void goToWall(double speed){

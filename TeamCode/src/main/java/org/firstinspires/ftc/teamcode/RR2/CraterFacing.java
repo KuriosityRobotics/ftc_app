@@ -37,6 +37,7 @@ public class CraterFacing extends LinearOpMode
         waitForStart();
         runtime.reset();
         while (opModeIsActive()){
+
 //            robot.goToWall(0.3);
 //            break;
 //            telemetry.addData("frontRightDistance",robot.frontRightDistance.getDistance(MM));
@@ -56,11 +57,10 @@ public class CraterFacing extends LinearOpMode
 
     private void navigateToDepotThenCrater() {
         robot.finalTurn(60);
-
         robot.goToWall(0.3);
         robot.finalTurn(135);
-        robot.finalMove(0.7, robot.moveRobotKillSwitch(0.7,120,-120));
-        robot.finalMove(0.7,-3.5);
+        robot.moveRobotKillSwitch(0.7,120,-120);
+        robot.goToCrater(-1);
         telemetry.addData("Status","done");
         telemetry.update();
     }

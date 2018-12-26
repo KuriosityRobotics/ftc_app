@@ -1,13 +1,23 @@
 package org.firstinspires.ftc.teamcode.RR2;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.SystemClock;
+import android.view.TextureView;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
 public class MainTeleop extends LinearOpMode {
@@ -19,10 +29,17 @@ public class MainTeleop extends LinearOpMode {
     double bLPower;
     double bRPower;
 
+    boolean isHangStarted = false;
+
+
     double intakePower;
     boolean onSlowDrive, changedSlowDrive = false;
     public static double powerScaleFactor = 1;
     long startTime = 0;
+    FtcRobotControllerActivity activity;
+    Runnable runnableBlack;
+    Runnable runnableRed;
+    Runnable runnableGreen;
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -35,29 +52,74 @@ public class MainTeleop extends LinearOpMode {
         robot.pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.pivot2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         robot.slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        activity = (FtcRobotControllerActivity)AppUtil.getInstance().getRootActivity();
+
 
         waitForStart();
         runtime.reset();
+
+        runnableBlack = new Runnable() {
+            @Override
+            public void run() {
+                activity.changeColor(Color.BLACK);
+
+            }
+        };
+
+        runnableRed = new Runnable() {
+            @Override
+            public void run() {
+                activity.changeColor(Color.RED);
+
+            }
+        };
+
+        runnableGreen = new Runnable() {
+            @Override
+            public void run() {
+                activity.changeColor(Color.GREEN);
+
+            }
+        };
         while (opModeIsActive()) {
-            slowDriveLogic();
-            driveLogic();
-            intakeLogic();
-            blockerLogic();
-            pivotLogic();
-            slideLogic();
-            hangLogic();
-            hookLogic();
-            setToHangMode();
-            hangRobot();
-            hangRobot();
-            dropRobot();
-            movePivotToDumpPosition();
+
+            telemetry.addData("new code","hi");
+            telemetry.update();
+
+
+//            slowDriveLogic();
+//            driveLogic();
+//            intakeLogic();
+//            blockerLogic();
+//            pivotLogic();
+//            slideLogic();
+//            hangLogic();
+//            hookLogic();
+//            setToHangMode();
+//            hangRobot();
+//            hangRobot();
+//            dropRobot();
+//            movePivotToDumpPosition();
+//            robot.pivot.setMode(DcMotor.RunMo de.RUN_USING_ENCODER);
+//            robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            robot.fLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            robot.bRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            telemetry.addData("lol","hi");
+//            telemetry.addData("fLeft",robot.fLeft.getCurrentPosition());
+//            telemetry.addData("bRight",robot.bRight.getCurrentPosition());
+//            telemetry.addData("pivot",robot.pivot.getCurrentPosition());
+//            telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
+
+
         }
     }
 
@@ -173,30 +235,54 @@ public class MainTeleop extends LinearOpMode {
 
     private void setToHangMode(){
         if(gamepad1.a) {
+            isHangStarted = true;
             robot.hangLockOpen();
             robot.hook.setPosition(0);
+            activity.runOnUiThread(runnableRed);
             telemetry.addData("hook status","opening...");
             telemetry.update();
-            robot.pivot.setPower(-1);
+            robot.pivot.setPower(1);
+            robot.pivot2.setPower(1);
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.pivot.setTargetPosition(-4500);
+            robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.pivot2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.pivot.setTargetPosition(-50);
+            robot.pivot2.setTargetPosition(50);
 
-            while(robot.pivot.isBusy() && opModeIsActive()){
+            while(robot.pivot.isBusy() && opModeIsActive()&& robot.pivot2.isBusy()){
+                telemetry.addData("pivot",robot.pivot.getCurrentPosition());
+                telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
+                telemetry.update();
                 driveLogic();
+
             }
             robot.pivot.setPower(0);
             robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.pivot2.setPower(0);
+            robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+
+
     }
 
     private void hangRobot(){
-        if(gamepad1.b){
+
+        if(gamepad1.b) {
             robot.hook.setPosition(1);
             sleep(1000);
+//            if(sensor sees hook){
+//                activity.runOnUiThread(runnableGreen);
+//            }else{
+//              return;
+//          }
+
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setPower(1);
+            robot.pivot2.setPower(1);
             while(robot.distance.getDistance(DistanceUnit.MM)>70 && opModeIsActive()){
+
                 if(gamepad2.right_bumper){
                     telemetry.addData("Hang Status","Aborting hang...");
                     telemetry.update();
@@ -208,6 +294,7 @@ public class MainTeleop extends LinearOpMode {
             }
             sleep(500);
             robot.pivot.setPower(0);
+            robot.pivot2.setPower(0);
             robot.hangLockClose();
             telemetry.addData("Hang Status","Hang successful");
             telemetry.update();
@@ -255,13 +342,19 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.pivot.setPower(-1);
             robot.pivot.setTargetPosition(-4750);
-            while (robot.pivot.isBusy() && opModeIsActive()){
+            robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.pivot2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.pivot2.setPower(-1);
+            robot.pivot2.setTargetPosition(4750);
+            while (robot.pivot.isBusy() && opModeIsActive() && robot.pivot2.isBusy()){
                 driveLogic();
                 slideLogic();
                 intakeLogic();
             }
             robot.pivot.setPower(0);
             robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.pivot2.setPower(0);
+            robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 }
