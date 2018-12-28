@@ -492,10 +492,7 @@ public class RR2 {
                 telemetry.update();
                 if (notTimeLimit) {
                     brakeRobot();
-                    intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    intake.setPower(1);
-                    linearOpMode.sleep(3000);
-                    intake.setPower(0);
+                    releaseTeamMarker();
                     return -fLeft.getCurrentPosition() * 0.028;
                 }
             }else{
@@ -506,11 +503,14 @@ public class RR2 {
             }
         }
         brakeRobot();
+        releaseTeamMarker();
+        return backDistance;
+    }
+    public void releaseTeamMarker(){
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setPower(1);
         linearOpMode.sleep(3000);
         intake.setPower(0);
-        return backDistance;
     }
 
     public void goToCrater(double speed){
