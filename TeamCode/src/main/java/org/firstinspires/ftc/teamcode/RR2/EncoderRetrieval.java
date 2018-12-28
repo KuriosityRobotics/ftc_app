@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+
 @TeleOp(name="EncoderRetrieval", group="Linear Opmode")
 @Disabled
 public class EncoderRetrieval extends LinearOpMode {

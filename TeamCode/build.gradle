@@ -18,7 +18,7 @@ android {
     }
     sourceSets.main {
         java {
-//            exclude 'org/firstinspires/ftc/teamcode/**'
+//            exclude 'org/firstinspires/ftc/teamcode/RR2/Auto/**'
         }
     }
 }

@@ -1,14 +1,6 @@
 package org.firstinspires.ftc.teamcode.RR2;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.os.SystemClock;
-import android.view.TextureView;
-import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -49,14 +41,20 @@ public class MainTeleop extends LinearOpMode {
         //Init's robot
         robot = new RR2(hardwareMap, telemetry, this);   //DO NOT DELETE
         robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.pivot2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        robot.pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        robot.pivot2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
         robot.slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -92,33 +90,33 @@ public class MainTeleop extends LinearOpMode {
         };
         while (opModeIsActive()) {
 
-            telemetry.addData("new code","hi");
-            telemetry.update();
+//            telemetry.addData("new code","hi");
+//            telemetry.update();
 
 
-//            slowDriveLogic();
-//            driveLogic();
-//            intakeLogic();
-//            blockerLogic();
-//            pivotLogic();
-//            slideLogic();
-//            hangLogic();
-//            hookLogic();
-//            setToHangMode();
-//            hangRobot();
-//            hangRobot();
-//            dropRobot();
-//            movePivotToDumpPosition();
-//            robot.pivot.setMode(DcMotor.RunMo de.RUN_USING_ENCODER);
-//            robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            robot.fLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//            robot.bRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slowDriveLogic();
+            driveLogic();
+            intakeLogic();
+            blockerLogic();
+            pivotLogic();
+            slideLogic();
+            hangLogic();
+            hookLogic();
+            setToHangMode();
+            hangRobot();
+            hangRobot();
+            dropRobot();
+            movePivotToDumpPosition();
+//
 //            telemetry.addData("lol","hi");
 //            telemetry.addData("fLeft",robot.fLeft.getCurrentPosition());
 //            telemetry.addData("bRight",robot.bRight.getCurrentPosition());
 //            telemetry.addData("pivot",robot.pivot.getCurrentPosition());
 //            telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
-
+//            telemetry.addData("touch",robot.hangTouch.isPressed());
+            telemetry.addData("pivot",robot.pivot.getCurrentPosition());
+            telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
+            telemetry.update();
 
         }
     }
@@ -154,6 +152,8 @@ public class MainTeleop extends LinearOpMode {
         }
 
 
+
+
         robot.fLeft.setPower(fLPower);
         robot.fRight.setPower(fRPower);
         robot.bLeft.setPower(bLPower);
@@ -179,12 +179,12 @@ public class MainTeleop extends LinearOpMode {
     private void pivotLogic(){
         //Pivoting Slide For Outtake
         if (gamepad1.y) {
-            robot.pivot.setPower(-1);
-            robot.pivot2.setPower(1);
-        }
-        else if (gamepad1.x && robot.distance.getDistance(DistanceUnit.MM)>150) {
             robot.pivot.setPower(1);
             robot.pivot2.setPower(-1);
+        }
+        else if (gamepad1.x && robot.distance.getDistance(DistanceUnit.MM)>150) {
+            robot.pivot.setPower(-1);
+            robot.pivot2.setPower(1);
         } else {
             robot.pivot.setPower(0);
             robot.pivot2.setPower(0);
@@ -247,15 +247,15 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.pivot.setTargetPosition(-50);
-            robot.pivot2.setTargetPosition(50);
+
+            robot.pivot.setTargetPosition(-4750);
+            robot.pivot2.setTargetPosition(4750);
 
             while(robot.pivot.isBusy() && opModeIsActive()&& robot.pivot2.isBusy()){
                 telemetry.addData("pivot",robot.pivot.getCurrentPosition());
                 telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
                 telemetry.update();
                 driveLogic();
-
             }
             robot.pivot.setPower(0);
             robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -271,15 +271,18 @@ public class MainTeleop extends LinearOpMode {
         if(gamepad1.b) {
             robot.hook.setPosition(1);
             sleep(1000);
-//            if(sensor sees hook){
-//                activity.runOnUiThread(runnableGreen);
-//            }else{
-//              return;
-//          }
+            if(robot.hangTouch.isPressed()){
+                activity.runOnUiThread(runnableGreen);
+            }else{
+                telemetry.addData("Hang Status","Aborting hang...");
+                telemetry.update();
+                activity.runOnUiThread(runnableBlack);
+                return;
+            }
 
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.pivot.setPower(1);
+            robot.pivot.setPower(-1);
             robot.pivot2.setPower(1);
             while(robot.distance.getDistance(DistanceUnit.MM)>70 && opModeIsActive()){
 

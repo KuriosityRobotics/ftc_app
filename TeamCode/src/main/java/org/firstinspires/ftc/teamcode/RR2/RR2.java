@@ -5,6 +5,7 @@ import android.os.SystemClock;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -30,8 +31,8 @@ public class RR2 {
     public DcMotor bLeft;
     public DcMotor bRight;
 
+    public RevTouchSensor hangTouch;
     public Rev2mDistanceSensor distance;
-
     public Rev2mDistanceSensor bottomDistance;
     public Rev2mDistanceSensor frontRightDistance;
     public Rev2mDistanceSensor backRightDistance;
@@ -96,7 +97,7 @@ public class RR2 {
         frontFacingLeft = hardwareMap.get(Rev2mDistanceSensor.class,"frontFacingLeft");
         frontLeftDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontLeftDistance");
 
-
+        hangTouch = hardwareMap.get(RevTouchSensor.class,"hangTouch");
         //Map LinearSlide Motors
         //Set direction of drive motors
         fLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -534,12 +535,12 @@ public class RR2 {
         brakeRobot();
     }
 
-    public void goToWall(double speed){
+    public void goToWall(double speed,double distance){
         fLeft.setPower(speed);
         bLeft.setPower(speed);
         fRight.setPower(speed);
         bRight.setPower(speed);
-        while(frontDistance.getDistance(DistanceUnit.CM)>39 && linearOpMode.opModeIsActive()){
+        while(frontDistance.getDistance(DistanceUnit.CM)>distance && linearOpMode.opModeIsActive()){
             telemetry.addData("distance",frontDistance.getDistance(CM));
             telemetry.update();
         }
