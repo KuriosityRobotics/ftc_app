@@ -33,20 +33,38 @@ public class MainTeleop extends LinearOpMode {
     Runnable runnableRed;
     Runnable runnableGreen;
 
-
     private ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
+        initLogic();
+        while (opModeIsActive()) {
+            slowDriveLogic();
+            driveLogic();
+            intakeLogic();
+            blockerLogic();
+            pivotLogic();
+            slideLogic();
+            hangLogic();
+            hookLogic();
+            setToHangMode();
+            hangRobot();
+            hangRobot();
+            dropRobot();
+            movePivotToDumpPosition();
+        }
+    }
+
+    private void initLogic(){
         //Init's robot
         robot = new RR2(hardwareMap, telemetry, this);   //DO NOT DELETE
         robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        robot.pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        robot.pivot2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.pivot2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -88,37 +106,6 @@ public class MainTeleop extends LinearOpMode {
 
             }
         };
-        while (opModeIsActive()) {
-
-//            telemetry.addData("new code","hi");
-//            telemetry.update();
-
-
-            slowDriveLogic();
-            driveLogic();
-            intakeLogic();
-            blockerLogic();
-            pivotLogic();
-            slideLogic();
-            hangLogic();
-            hookLogic();
-            setToHangMode();
-            hangRobot();
-            hangRobot();
-            dropRobot();
-            movePivotToDumpPosition();
-//
-//            telemetry.addData("lol","hi");
-//            telemetry.addData("fLeft",robot.fLeft.getCurrentPosition());
-//            telemetry.addData("bRight",robot.bRight.getCurrentPosition());
-//            telemetry.addData("pivot",robot.pivot.getCurrentPosition());
-//            telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
-//            telemetry.addData("touch",robot.hangTouch.isPressed());
-            telemetry.addData("pivot",robot.pivot.getCurrentPosition());
-            telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
-            telemetry.update();
-
-        }
     }
 
     //teleop methods
