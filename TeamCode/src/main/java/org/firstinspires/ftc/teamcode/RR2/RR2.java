@@ -326,7 +326,7 @@ public class RR2 {
         linearOpMode.sleep(100);
     }
 
-    private void moveRobot(double speed, int targetPostition){
+    public void moveRobot(double speed, int targetPostition){
         //called by final move - bare bones move function
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
