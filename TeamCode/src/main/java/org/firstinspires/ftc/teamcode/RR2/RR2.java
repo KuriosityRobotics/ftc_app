@@ -72,6 +72,7 @@ public class RR2 {
         this.hardwareMap = hardwareMap;
         this.linearOpMode = linearOpMode;
 
+        //config names need to match configs on the phone
         //Map drive motors
         fLeft = hardwareMap.dcMotor.get("fLeft");
         fRight = hardwareMap.dcMotor.get("fRight");
@@ -104,8 +105,8 @@ public class RR2 {
         fRight.setDirection(DcMotor.Direction.REVERSE);
         bLeft.setDirection(DcMotor.Direction.FORWARD);
         bRight.setDirection(DcMotor.Direction.REVERSE);
-
     }
+
     public void intializeIMU(){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
@@ -121,6 +122,7 @@ public class RR2 {
 
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
     }
+
     public void resetEncoders(){
         fLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -143,11 +145,13 @@ public class RR2 {
         bRight.setMode(runMode);
     }
 
+    //normal use method default 10 second kill time
     public void finalTurn(double targetHeading){
         finalTurn(targetHeading, 10000);
     }
 
-    public void finalTurn(double targetHeading,long timeInMilli){
+    //turn method with timed kill switch
+    public void finalTurn(double targetHeading, long timeInMilli){
         targetHeading = Range.clip(targetHeading, -179, 179);
 
         long startTime = SystemClock.elapsedRealtime();
@@ -194,6 +198,8 @@ public class RR2 {
     }
 
     public void finalMove(double speed, double targetDistance) {
+        //move robot function
+        //to move backwards make targetDistance negative
         double rotations = 0;
         if (targetDistance>0) {
             rotations = targetDistance / 0.028;
@@ -201,123 +207,127 @@ public class RR2 {
             rotations = targetDistance / 0.026;
         }
         moveRobot(speed,(int)(rotations));
-//        changeRunModeToUsingEncoder();
-//        resetEncoders();
-//        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//        fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//
-//        double rotations = targetDistance * (400/17.5);
-//
-//        double leftPower = speed;
-//        double rightPower = speed;
-//
-//        double straightCorrection;
-//
-//        boolean isNegative = false;
-//
-//        double deccelerationLeft;
-//        double deccelerationRight;
-//
-//        if (targetDistance < 0) {
-//            isNegative = true;
-//        }
-//
-//        if (!isNegative) {
-//            rotations = targetDistance / 0.028;
-//        } else {
-//            rotations = targetDistance / 0.026;
-//        }
-//
-//        fLeft.setTargetPosition((int)rotations);
-//        bLeft.setTargetPosition((int)rotations);
-//        fRight.setTargetPosition((int)rotations);
-//        bRight.setTargetPosition((int)rotations);
-//
-//        fLeft.setPower(speed);
-//        fRight.setPower(speed);
-//        bLeft.setPower(speed);
-//        bRight.setPower(speed);
-//
-//        double scaleFactor;
-//        double currentPositon;
-//
-//        double difference = 0;
-//        while((fLeft.isBusy() && fRight.isBusy()) && linearOpMode.opModeIsActive()){
-//
-//            currentPositon = Math.abs(bLeft.getCurrentPosition());
-//
-//            scaleFactor = Math.abs(Math.abs(rotations - currentPositon) / rotations);
-//
-//            difference = bLeft.getCurrentPosition() - bRight.getCurrentPosition();
-//            straightCorrection = Math.abs(difference) / 1000;
-//
-//            if(scaleFactor<0.4){
-//                scaleFactor = 0.4;
-//            }
-//
-//            deccelerationLeft = leftPower;
-//            deccelerationRight = rightPower;
-//
-//            if (!isNegative) {
-//                if (difference < 0) {
-//                    deccelerationRight -= straightCorrection;
-//                }
-//                if (difference > 0) {
-//                    deccelerationLeft += straightCorrection;
-//                }
-//            } else {
-//                if (difference > 0) {
-//                    deccelerationLeft -= straightCorrection;
-//                }
-//                if (difference < 0) {
-//                    deccelerationRight -= straightCorrection;
-//                }
-//            }
-//
-//            deccelerationLeft = deccelerationLeft * scaleFactor;
-//            deccelerationRight = deccelerationRight * scaleFactor;
-//
-//
-//
-//            telemetry.addLine("LeftPower: " + deccelerationLeft);
-//            telemetry.addLine("RightPower: " + deccelerationRight);
-//            telemetry.addLine("correction: " + straightCorrection);
-//            telemetry.addLine("Difference: " + difference);
-//
-//            telemetry.update();
-//            fLeft.setPower(deccelerationLeft);
-//            fRight.setPower(deccelerationRight);
-//            bLeft.setPower(deccelerationLeft);
-//            bRight.setPower(deccelerationRight);
-//
-//            telemetry.addLine("Target position: " + rotations);
-//
-//            telemetry.addLine("Right position: " + fRight.getCurrentPosition());
-//            telemetry.addLine("Left position: " + fLeft.getCurrentPosition());
-//            telemetry.update();
-//        }
 
         brakeRobot();
         linearOpMode.sleep(100);
-
     }
 
-    public void moveRobot(double speed, int targetPostition) {
-        moveRobot(speed, targetPostition, 10000);
-        double currentPosition;
+    public void testMoveStraight(double speed, double targetDistance){
+        //experimental don't use
+        //corrects the robot to move straight
+        //to move backwards make targetDistance negative
+        double rotations = 0;
+        if (targetDistance>0) {
+            rotations = targetDistance / 0.028;
+        } else {
+            rotations = targetDistance / 0.026;
+        }
+        moveRobot(speed,(int)(rotations));
+        changeRunModeToUsingEncoder();
+        resetEncoders();
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        rotations = targetDistance * (400/17.5);
+
+        double leftPower = speed;
+        double rightPower = speed;
+
+        double straightCorrection;
+
+        boolean isNegative = false;
+
+        double deccelerationLeft;
+        double deccelerationRight;
+
+        if (targetDistance < 0) {
+            isNegative = true;
+        }
+
+        if (!isNegative) {
+            rotations = targetDistance / 0.028;
+        } else {
+            rotations = targetDistance / 0.026;
+        }
+
+        fLeft.setTargetPosition((int)rotations);
+        bLeft.setTargetPosition((int)rotations);
+        fRight.setTargetPosition((int)rotations);
+        bRight.setTargetPosition((int)rotations);
+
+        fLeft.setPower(speed);
+        fRight.setPower(speed);
+        bLeft.setPower(speed);
+        bRight.setPower(speed);
+
+        double scaleFactor;
+        double currentPositon;
+
+        double difference = 0;
+        while((fLeft.isBusy() && fRight.isBusy()) && linearOpMode.opModeIsActive()){
+
+            currentPositon = Math.abs(bLeft.getCurrentPosition());
+
+            scaleFactor = Math.abs(Math.abs(rotations - currentPositon) / rotations);
+
+            difference = bLeft.getCurrentPosition() - bRight.getCurrentPosition();
+            straightCorrection = Math.abs(difference) / 1000;
+
+            if(scaleFactor<0.4){
+                scaleFactor = 0.4;
+            }
+
+            deccelerationLeft = leftPower;
+            deccelerationRight = rightPower;
+
+            if (!isNegative) {
+                if (difference < 0) {
+                    deccelerationRight -= straightCorrection;
+                }
+                if (difference > 0) {
+                    deccelerationLeft += straightCorrection;
+                }
+            } else {
+                if (difference > 0) {
+                    deccelerationLeft -= straightCorrection;
+                }
+                if (difference < 0) {
+                    deccelerationRight -= straightCorrection;
+                }
+            }
+
+            deccelerationLeft = deccelerationLeft * scaleFactor;
+            deccelerationRight = deccelerationRight * scaleFactor;
+
+            telemetry.addLine("LeftPower: " + deccelerationLeft);
+            telemetry.addLine("RightPower: " + deccelerationRight);
+            telemetry.addLine("correction: " + straightCorrection);
+            telemetry.addLine("Difference: " + difference);
+
+            telemetry.update();
+            fLeft.setPower(deccelerationLeft);
+            fRight.setPower(deccelerationRight);
+            bLeft.setPower(deccelerationLeft);
+            bRight.setPower(deccelerationRight);
+
+            telemetry.addLine("Target position: " + rotations);
+
+            telemetry.addLine("Right position: " + fRight.getCurrentPosition());
+            telemetry.addLine("Left position: " + fLeft.getCurrentPosition());
+            telemetry.update();
+        }
         brakeRobot();
+        linearOpMode.sleep(100);
     }
 
-    public void moveRobot(double speed, int targetPostition, long timeInMilli){
-
-        long startTime = SystemClock.elapsedRealtime();
-
+    private void moveRobot(double speed, int targetPostition){
+        //called by final move - bare bones move function
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -353,6 +363,7 @@ public class RR2 {
     }
 
     public void driveMotorsBreakZeroBehavior() {
+        //sets drive motors to brake mode
         fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -360,6 +371,7 @@ public class RR2 {
     }
 
     public void brakeRobot() {
+        //brakes robot
         driveMotorsBreakZeroBehavior();
         fLeft.setPower(0);
         fRight.setPower(0);
@@ -368,21 +380,20 @@ public class RR2 {
     }
 
     public void hangLockClose(){
+        //closes the hangLocks
         hangLockLeft.setPosition(0.32);
         hangLockRight.setPosition(0.5);
     }
 
     public void hangLockOpen(){
+        //opens the hangLocks
         hangLockLeft.setPosition(0.21);
         hangLockRight.setPosition(0.63);
     }
 
-    public void setTeamMarker(){
-        teamMarker.setPosition(0.2);
-        linearOpMode.sleep(1000);
-    }
-
     public void wallFollow(double speed, double distance){
+        //experimental - don't use
+        //follows wall
         boolean notTimeLimit = true;
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -410,31 +421,32 @@ public class RR2 {
             telemetry.addData("frontRightDistance",frontRightDistance.getDistance(MM));
             telemetry.addData("backRightDistance",backRightDistance.getDistance(MM));
             telemetry.update();
-//            if(frontDistance.getDistance(MM)<200 || frontFacingLeft.getDistance(MM)<200){
-//                fLeft.setPower(0);
-//                fRight.setPower(0);
-//                bLeft.setPower(0);
-//                bRight.setPower(0);
-//                long startTime = SystemClock.elapsedRealtime();
-//                while (((SystemClock.elapsedRealtime() - startTime) < 3000)){
-//                    if(frontDistance.getDistance(MM)>200 && frontFacingLeft.getDistance(MM)>200){
-//                        notTimeLimit = false;
-//                        break;
-//                    }else{
-//                        notTimeLimit = true;
-//                    }
-//                }
-//                if(notTimeLimit){
-//                    finalTurn(0);
-//                    wallFollow(0.7,-fLeft.getCurrentPosition()*0.028);
-//                    brakeRobot();
-//                }
-//            }
+            if(frontDistance.getDistance(MM)<200 || frontFacingLeft.getDistance(MM)<200){
+                fLeft.setPower(0);
+                fRight.setPower(0);
+                bLeft.setPower(0);
+                bRight.setPower(0);
+                long startTime = SystemClock.elapsedRealtime();
+                while (((SystemClock.elapsedRealtime() - startTime) < 3000)){
+                    if(frontDistance.getDistance(MM)>200 && frontFacingLeft.getDistance(MM)>200){
+                        notTimeLimit = false;
+                        break;
+                    }else{
+                        notTimeLimit = true;
+                    }
+                }
+                if(notTimeLimit){
+                    finalTurn(0);
+                    wallFollow(0.7,-fLeft.getCurrentPosition()*0.028);
+                    brakeRobot();
+                }
+            }
         }
         brakeRobot();
     }
 
-    public double normalizedDelta(double distance, double constant){
+    private double normalizedDelta(double distance, double constant){
+        //called in wallFollow
         double delta = distance-constant;
         if(delta>-50 && delta<50){
             delta = 0;
@@ -442,7 +454,8 @@ public class RR2 {
         return delta;
     }
 
-    public void keepDistance(long timeLimitInMilli){
+    private void keepDistance(long timeLimitInMilli){
+        //not used
         long startTime = SystemClock.elapsedRealtime();
         double speed;
         while(SystemClock.elapsedRealtime()-startTime<timeLimitInMilli){
@@ -456,6 +469,7 @@ public class RR2 {
     }
 
     public double moveRobotKillSwitch(double speed, double distance, double backDistance){
+        //moves robot to depot and checks along the way if there is a robot in the way
         boolean notTimeLimit = true;
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -506,7 +520,9 @@ public class RR2 {
         releaseTeamMarker();
         return backDistance;
     }
+
     public void releaseTeamMarker(){
+        //releases the team marker from the intake bin
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setPower(1);
         linearOpMode.sleep(3000);
@@ -514,6 +530,7 @@ public class RR2 {
     }
 
     public void goToCrater(double speed){
+        //goes to crater using the imu and detects a change in elevation
         position = imu.getPosition();
         angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double currentPosition = angles.thirdAngle;
@@ -535,7 +552,8 @@ public class RR2 {
         brakeRobot();
     }
 
-    public void goToWall(double speed,double distance){
+    public void goToWall(double speed, double distance){
+        //goes to the wall until a certain distance is reached
         fLeft.setPower(speed);
         bLeft.setPower(speed);
         fRight.setPower(speed);
@@ -546,32 +564,4 @@ public class RR2 {
         }
         brakeRobot();
     }
-
-    public void wallFollow2(){
-        while (linearOpMode.opModeIsActive()) {
-            double distance = frontRightDistance.getDistance(DistanceUnit.CM) / 400;
-            distance = Range.clip(distance,1,5);
-            double scaledDistanced = Math.pow(distance, 0.5);
-
-
-            fLeft.setPower(scaledDistanced * 2);
-            bLeft.setPower(scaledDistanced * 2);
-            fRight.setPower(0.5 - (scaledDistanced * 2));
-            bRight.setPower(0.5 - (scaledDistanced * 2));
-        }
-    }
-
-    public void wallFollow3(){
-        while (linearOpMode.opModeIsActive()) {
-            double distance = frontRightDistance.getDistance(DistanceUnit.CM);
-
-            fLeft.setPower((distance-7)/10+0.5);
-            bLeft.setPower((distance-7)/10+0.5);
-            fRight.setPower((7-distance)/10+0.5);
-            bRight.setPower((7-distance)/10+0.5);
-        }
-        brakeRobot();
-    }
-
-
 }

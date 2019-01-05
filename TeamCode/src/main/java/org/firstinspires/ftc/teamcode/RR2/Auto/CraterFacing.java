@@ -25,12 +25,11 @@ public class CraterFacing extends AutoBase
     protected void navigateToDepotThenCrater() {
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER){
             robot.finalMove(0.5, -48);
-            //Getting to Depot
         }else {
             robot.finalMove(0.5, -55);
-            //Getting to Depot
         }
 
+        //Getting to Depot
         robot.finalTurn(70);
         robot.goToWall(0.3,38);
         robot.finalTurn(135);
@@ -39,28 +38,6 @@ public class CraterFacing extends AutoBase
         telemetry.addData("Status","done");
         telemetry.update();
     }
-
-//    protected void knockOffMineral() {
-//        objectDetection();
-//        telemetry.addLine("Mineral location: "+ tensorFlowMineralDetection.location);
-//        telemetry.update();
-//        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-//            robot.finalTurn(-40);
-//            robot.finalMove(0.5, 58);
-//            robot.finalMove(0.5, -55);
-//            //Getting to Depot
-//        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
-//            robot.finalTurn(40);
-//            robot.finalMove(0.5, 58);
-//            robot.finalMove(0.5, -55);
-//            //Getting to Depot
-//        } else {
-//            robot.finalMove(0.5, 53);
-//            robot.finalMove(0.5, -48);
-//            //Getting to Depot
-//        }
-//    }
-
 }
 
 

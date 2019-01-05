@@ -36,7 +36,6 @@ public class TensorFlowMineralDetection {
     public static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     public static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
-
     public static final String VUFORIA_KEY = "AQOQmUj/////AAABmXCrndWask2hud2XzSvIrY52Fjls7yhcRKcQMVgooTqhv7MCYikM1d8E8z5LHk0DHRlwk+Qwvhl1k+p6NIRSQ4dHtbxYxpD0nO9pEhtlY/ABsjRyS+QrC3xqImfkY+IL6zNXtySZjozAhoNmP2sIx7JBN6hcpdabhrywRplCBfOh2uUI3FLMD544Lo6BIHST42mTExPyUIRmCLf4JHEavNAa3cC19X8IRzfm7cWlKLbAJCzNls2Tkp/wkUAdRSBdDQ4156qBsiIC5XoFVhdz+M7o62+MqKlDa6bm+VcYvex8gkAwRaoiOYGyzIdVLvbnbAAdAdjApeDozBzukAjsjF3tPltcVYyIJRM5mRWeNJGj";
 
     public VuforiaLocalizer vuforia;
@@ -72,19 +71,19 @@ public class TensorFlowMineralDetection {
                                 secondSilverXPos = (int) recognition.getLeft();
                             }
                         }
-                            if (goldXPos > firstSilverXPos && isGoldInFrame) {
-                                this.location = Location.CENTER;
-                                tfod.shutdown();
-                                return location;
-                            } else if (goldXPos < firstSilverXPos && isGoldInFrame) {
-                                this.location = Location.LEFT;
-                                tfod.shutdown();
-                                return location;
-                            } else {
-                                this.location = Location.RIGHT;
-                                tfod.shutdown();
-                                return location;
-                            }
+                        if (goldXPos > firstSilverXPos && isGoldInFrame) {
+                            this.location = Location.CENTER;
+                            tfod.shutdown();
+                            return location;
+                        } else if (goldXPos < firstSilverXPos && isGoldInFrame) {
+                            this.location = Location.LEFT;
+                            tfod.shutdown();
+                            return location;
+                        } else {
+                            this.location = Location.RIGHT;
+                            tfod.shutdown();
+                            return location;
+                        }
                     }
                 }
             }
@@ -108,7 +107,6 @@ public class TensorFlowMineralDetection {
         parameters.cameraDirection = CameraDirection.BACK;
 
         this.vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
     }
 
     public void initTfod() {
@@ -117,9 +115,5 @@ public class TensorFlowMineralDetection {
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
-
-
-
-
     }
 }

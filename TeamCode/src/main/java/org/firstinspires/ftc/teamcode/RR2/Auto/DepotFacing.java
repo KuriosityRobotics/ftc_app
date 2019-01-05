@@ -30,21 +30,13 @@ public class DepotFacing extends AutoBase
             //Getting to Depot
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
             distanceToDepot = 65;
-//            robot.finalTurn(-7);
-//            robot.finalMove(0.5, 50);
-//            robot.intake.setPower(1);
-//            sleep(2500);
-//            robot.intake.setPower(0);
-//            robot.finalMove(0.5, -50);
-//            robot.finalTurn(30);
-            //Getting to Depot
         } else {
             center = true;
+            //Getting to Depot
             robot.finalMove(0.5, 52);
             robot.releaseTeamMarker();
             robot.finalMove(0.5, -100);
             robot.finalTurn(70);
-            //Getting to Depot
         }
 
         robot.goToWall(0.3,40);
@@ -57,34 +49,5 @@ public class DepotFacing extends AutoBase
 
         telemetry.addData("Status","done");
         telemetry.update();
-    }
-
-    protected void knockOffMineral() {
-        objectDetection();
-        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-            robot.finalTurn(-45);
-            robot.finalMove(0.5, 60);
-            robot.finalMove(0.5, -55);
-            robot.finalTurn(74);
-            //Getting to Depot
-        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
-            robot.finalTurn(45);
-            distanceToDepot = 65;
-//            robot.finalTurn(-7);
-//            robot.finalMove(0.5, 50);
-//            robot.intake.setPower(1);
-//            sleep(2500);
-//            robot.intake.setPower(0);
-//            robot.finalMove(0.5, -50);
-//            robot.finalTurn(30);
-            //Getting to Depot
-        } else {
-            center = true;
-            robot.finalMove(0.5, 105);
-            robot.releaseTeamMarker();
-            robot.finalMove(0.5, -100);
-            robot.finalTurn(70);
-            //Getting to Depot
-        }
     }
 }

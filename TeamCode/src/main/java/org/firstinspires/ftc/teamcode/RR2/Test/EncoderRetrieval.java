@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.RR2;
+package org.firstinspires.ftc.teamcode.RR2.Test;
 /**
  * Created by Khue on 11/10/18.
  */
@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.RR2.RR2;
 
 
 @TeleOp(name="EncoderRetrieval", group="Linear Opmode")

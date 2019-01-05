@@ -32,6 +32,7 @@ public class AutoBase extends LinearOpMode {
         waitForStart();
         runtime.reset();
     }
+
     @Override
     public void runOpMode(){
 
@@ -89,21 +90,11 @@ public class AutoBase extends LinearOpMode {
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
             robot.finalTurn(-leftRightAngle);
             robot.finalMove(0.5, 58);
-            //Getting to Depot
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
             robot.finalTurn(leftRightAngle);
             robot.finalMove(0.5, 58);
-//            robot.finalTurn(-7);
-//            robot.finalMove(0.5, 50);
-//            robot.intake.setPower(1);
-//            sleep(2500);
-//            robot.intake.setPower(0);
-//            robot.finalMove(0.5, -50);
-//            robot.finalTurn(30);
-            //Getting to Depot
         } else {
             robot.finalMove(0.5, 53);
-            //Getting to Depot
         }
     }
 }

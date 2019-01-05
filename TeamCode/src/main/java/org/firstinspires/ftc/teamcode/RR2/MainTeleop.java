@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.RR2;
 
 import android.graphics.Color;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,8 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 public class MainTeleop extends LinearOpMode {
 
     RR2 robot;
+    private boolean hornFound;
+    private boolean failFound;
 
     double fLPower;
     double fRPower;
@@ -23,15 +26,21 @@ public class MainTeleop extends LinearOpMode {
 
     boolean isHangStarted = false;
 
-
     double intakePower;
     boolean onSlowDrive, changedSlowDrive = false;
+
     public static double powerScaleFactor = 1;
+
     long startTime = 0;
+
     FtcRobotControllerActivity activity;
+
     Runnable runnableBlack;
     Runnable runnableRed;
     Runnable runnableGreen;
+
+    int hornSoundID;
+    int failSoundID;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -45,10 +54,9 @@ public class MainTeleop extends LinearOpMode {
             blockerLogic();
             pivotLogic();
             slideLogic();
-            hangLogic();
-            hookLogic();
+            hangLockLogic();
+            manualLatchLogic();
             setToHangMode();
-            hangRobot();
             hangRobot();
             dropRobot();
             movePivotToDumpPosition();
@@ -56,6 +64,17 @@ public class MainTeleop extends LinearOpMode {
     }
 
     private void initLogic(){
+        // Determine if sound resources are found.
+        // Note: Preloading is NOT required, but it's a good way to verify all your sounds are available before you run.;
+        hornSoundID = hardwareMap.appContext.getResources().getIdentifier("horn", "raw", hardwareMap.appContext.getPackageName());
+        failSoundID = hardwareMap.appContext.getResources().getIdentifier("fail", "raw", hardwareMap.appContext.getPackageName());
+        if (hornSoundID != 0){
+            hornFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, hornSoundID);
+        }
+        if (failSoundID != 0){
+            failFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, failSoundID);
+        }
+
         //Init's robot
         robot = new RR2(hardwareMap, telemetry, this);   //DO NOT DELETE
         robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -78,7 +97,6 @@ public class MainTeleop extends LinearOpMode {
         robot.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         activity = (FtcRobotControllerActivity)AppUtil.getInstance().getRootActivity();
-
 
         waitForStart();
         runtime.reset();
@@ -138,9 +156,6 @@ public class MainTeleop extends LinearOpMode {
             bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
         }
 
-
-
-
         robot.fLeft.setPower(fLPower);
         robot.fRight.setPower(fRPower);
         robot.bLeft.setPower(bLPower);
@@ -184,7 +199,7 @@ public class MainTeleop extends LinearOpMode {
         robot.slide.setPower(slidePower);
     }
 
-    private void hangLogic(){
+    private void hangLockLogic(){
         //Hang Locking
         if (gamepad2.left_bumper) {
             robot.hangLockClose();
@@ -194,7 +209,8 @@ public class MainTeleop extends LinearOpMode {
         }
     }
 
-    private void hookLogic(){
+    private void manualLatchLogic(){
+        //manual control of the latch
         if (gamepad2.a) {
             robot.hook.setPosition(0);
         }else if (gamepad2.b) {
@@ -203,6 +219,7 @@ public class MainTeleop extends LinearOpMode {
     }
 
     private void slowDriveLogic(){
+        //toggle driving speed
         if(powerScaleFactor == 0.3){
             telemetry.addData("Driving Mode","Slow");
         }else{
@@ -221,6 +238,7 @@ public class MainTeleop extends LinearOpMode {
 
 
     private void setToHangMode(){
+        //prepares robot to hang - opens latch and moves the pivot into position
         if(gamepad1.a) {
             isHangStarted = true;
             robot.hangLockOpen();
@@ -249,20 +267,20 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot2.setPower(0);
             robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-
-
     }
 
     private void hangRobot(){
-
+        //hangs the robot by pulling it up
         if(gamepad1.b) {
             robot.hook.setPosition(1);
             sleep(1000);
             if(robot.hangTouch.isPressed()){
                 activity.runOnUiThread(runnableGreen);
+                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, hornSoundID);
             }else{
                 telemetry.addData("Hang Status","Aborting hang...");
                 telemetry.update();
+                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, failSoundID);
                 activity.runOnUiThread(runnableBlack);
                 return;
             }
@@ -292,6 +310,7 @@ public class MainTeleop extends LinearOpMode {
     }
 
     private void dropRobot(){
+        //drop robot
         if(gamepad1.left_bumper && gamepad1.right_bumper){
             robot.pivot.setPower(1);
 
@@ -327,6 +346,7 @@ public class MainTeleop extends LinearOpMode {
     }
 
     private void movePivotToDumpPosition(){
+        //move pivot to 90 degreee position, not used a lot
         if(gamepad1.right_trigger>0){
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
