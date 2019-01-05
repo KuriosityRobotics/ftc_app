@@ -43,11 +43,12 @@ public class AutoBase extends LinearOpMode {
         robot.slide.setPower(0);
         tensorFlowMineralDetection.runObjectDetection();
     }
-    protected void dropDownFromLander(){
+
+    protected void dropDownFromLander() {
         robot.pivot.setPower(-1);
         robot.pivot2.setPower(1);
 
-        while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
+        while (robot.distance.getDistance(DistanceUnit.MM) > 150 && opModeIsActive()) {
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
             telemetry.update();
         }
@@ -61,7 +62,7 @@ public class AutoBase extends LinearOpMode {
         robot.pivot.setPower(1);
         robot.pivot2.setPower(-1);
 
-        while(robot.bottomDistance.getDistance(DistanceUnit.MM) >23 && opModeIsActive()){
+        while (robot.bottomDistance.getDistance(DistanceUnit.MM) > 23 && opModeIsActive()) {
             telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
             telemetry.update();
         }
@@ -75,7 +76,7 @@ public class AutoBase extends LinearOpMode {
 
         robot.pivot.setPower(-1);
         robot.pivot2.setPower(1);
-        while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
+        while (robot.distance.getDistance(DistanceUnit.MM) > 150 && opModeIsActive()) {
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
             telemetry.update();
         }
@@ -83,5 +84,26 @@ public class AutoBase extends LinearOpMode {
         robot.pivot.setPower(0);
     }
 
-
+    protected void knockOffMineral(double leftRightAngle) {
+        objectDetection();
+        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
+            robot.finalTurn(-leftRightAngle);
+            robot.finalMove(0.5, 58);
+            //Getting to Depot
+        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
+            robot.finalTurn(leftRightAngle);
+            robot.finalMove(0.5, 58);
+//            robot.finalTurn(-7);
+//            robot.finalMove(0.5, 50);
+//            robot.intake.setPower(1);
+//            sleep(2500);
+//            robot.intake.setPower(0);
+//            robot.finalMove(0.5, -50);
+//            robot.finalTurn(30);
+            //Getting to Depot
+        } else {
+            robot.finalMove(0.5, 53);
+            //Getting to Depot
+        }
+    }
 }

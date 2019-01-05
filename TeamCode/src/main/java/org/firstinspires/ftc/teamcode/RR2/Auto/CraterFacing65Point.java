@@ -16,32 +16,52 @@ public class CraterFacing65Point extends AutoBase
         initLogic();
         while (opModeIsActive()){
             dropDownFromLander();
-            knockOffMineral();
+            knockOffMineral(40);
+            navigateToCrater();
             break;
         }
     }
 
-    protected void knockOffMineral() {
-        objectDetection();
-        telemetry.addLine("Mineral location: "+ tensorFlowMineralDetection.location);
-        telemetry.update();
+    protected void navigateToCrater(){
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-            robot.finalTurn(-40);
-            robot.finalMove(0.5, 60);
-            robot.finalTurn(10);
-            robot.finalMove(0.5,20);
+            craterTurn(10);
             //Getting to Depot
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
-            robot.finalTurn(40);
-            robot.finalMove(0.5, 60);
-            robot.finalTurn(-10);
-            robot.finalMove(0.5,20);
+            craterTurn(-10);
             //Getting to Depot
         } else {
             robot.finalMove(0.5,60);
             //Getting to Depot
         }
     }
+
+    protected void craterTurn(double angle){
+        robot.finalMove(0.5, 60);
+        robot.finalTurn(angle);
+        robot.finalMove(0.5,20);
+    }
+
+//    protected void knockOffMineral() {
+//        objectDetection();
+//        telemetry.addLine("Mineral location: "+ tensorFlowMineralDetection.location);
+//        telemetry.update();
+//        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
+//            robot.finalTurn(-40);
+//            robot.finalMove(0.5, 60);
+//            robot.finalTurn(10);
+//            robot.finalMove(0.5,20);
+//            //Getting to Depot
+//        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
+//            robot.finalTurn(40);
+//            robot.finalMove(0.5, 60);
+//            robot.finalTurn(-10);
+//            robot.finalMove(0.5,20);
+//            //Getting to Depot
+//        } else {
+//            robot.finalMove(0.5,60);
+//            //Getting to Depot
+//        }
+//    }
 }
 
 

@@ -248,8 +248,8 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            robot.pivot.setTargetPosition(-4750);
-            robot.pivot2.setTargetPosition(4750);
+            robot.pivot.setTargetPosition(-4400);
+            robot.pivot2.setTargetPosition(4400);
 
             while(robot.pivot.isBusy() && opModeIsActive()&& robot.pivot2.isBusy()){
                 telemetry.addData("pivot",robot.pivot.getCurrentPosition());
