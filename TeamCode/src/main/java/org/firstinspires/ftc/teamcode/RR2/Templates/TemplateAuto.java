@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.RR2.RR2;
 @Disabled //COMMENT OUT TO MAKE PROGRAM APPEAR ON PHONE
 public class TemplateAuto extends AutoBase
 {
-    //IMPORTANT FOR THIS TO WORK MOVE THIS CLASS TO AUTO PACKAGE
     @Override
     public void runOpMode(){
         //Init's robot

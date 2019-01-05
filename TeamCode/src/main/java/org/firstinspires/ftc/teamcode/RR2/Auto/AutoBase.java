@@ -10,9 +10,9 @@ import org.firstinspires.ftc.teamcode.RR2.RR2;
 public class AutoBase extends LinearOpMode {
 
     ElapsedTime runtime = new ElapsedTime();
-    TensorFlowMineralDetection tensorFlowMineralDetection;
+    public TensorFlowMineralDetection tensorFlowMineralDetection;
 
-    RR2 robot;
+    public RR2 robot;
     public void initLogic(){
         //Init's robot
         tensorFlowMineralDetection = new TensorFlowMineralDetection(hardwareMap,telemetry,this);
