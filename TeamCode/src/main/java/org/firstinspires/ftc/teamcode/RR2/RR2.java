@@ -381,13 +381,13 @@ public class RR2 {
 
     public void hangLockClose(){
         //closes the hangLocks
-        hangLockLeft.setPosition(0.32);
+        hangLockLeft.setPosition(0.36);
         hangLockRight.setPosition(0.5);
     }
 
     public void hangLockOpen(){
         //opens the hangLocks
-        hangLockLeft.setPosition(0.21);
+        hangLockLeft.setPosition(0.25);
         hangLockRight.setPosition(0.63);
     }
 
