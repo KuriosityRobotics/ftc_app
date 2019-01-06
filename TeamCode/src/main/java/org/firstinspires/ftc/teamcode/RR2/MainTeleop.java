@@ -25,6 +25,7 @@ public class MainTeleop extends LinearOpMode {
     double bRPower;
 
     boolean isHangStarted = false;
+    boolean killSwitchForHangTouchIsHit = false;
 
     double intakePower;
     boolean onSlowDrive, changedSlowDrive = false;
@@ -246,22 +247,27 @@ public class MainTeleop extends LinearOpMode {
             activity.runOnUiThread(runnableRed);
             telemetry.addData("hook status","opening...");
             telemetry.update();
-            robot.pivot.setPower(1);
-            robot.pivot2.setPower(1);
+
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.pivot2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            telemetry.addData("pivot before",robot.pivot.getCurrentPosition());
+            telemetry.addData("pivot2 before",robot.pivot2.getCurrentPosition());
+            telemetry.update();
+            robot.pivot.setPower(1);//this
+            robot.pivot2.setPower(-1);
 
-            robot.pivot.setTargetPosition(-4400);
-            robot.pivot2.setTargetPosition(4400);
+            //robot.pivot.setTargetPosition(4400);
 
-            while(robot.pivot.isBusy() && opModeIsActive()&& robot.pivot2.isBusy()){
+            while(robot.pivot.getCurrentPosition() > -4400 && opModeIsActive()){
                 telemetry.addData("pivot",robot.pivot.getCurrentPosition());
                 telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
                 telemetry.update();
                 driveLogic();
             }
+            telemetry.addData("pivot after",robot.pivot.getCurrentPosition());
+            telemetry.addData("pivot2 after",robot.pivot2.getCurrentPosition());
+            telemetry.update();
             robot.pivot.setPower(0);
             robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.pivot2.setPower(0);
@@ -273,8 +279,11 @@ public class MainTeleop extends LinearOpMode {
         //hangs the robot by pulling it up
         if(gamepad1.b) {
             robot.hook.setPosition(1);
-            sleep(1000);
-            if(robot.hangTouch.isPressed()){
+            sleep(1500);
+            if(gamepad1.left_stick_button){
+                killSwitchForHangTouchIsHit = true;
+            }
+            if(robot.hangTouch.isPressed() && !killSwitchForHangTouchIsHit){
                 activity.runOnUiThread(runnableGreen);
                 SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, hornSoundID);
             }else{
