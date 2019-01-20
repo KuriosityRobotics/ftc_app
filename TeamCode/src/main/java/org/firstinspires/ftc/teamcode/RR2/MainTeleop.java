@@ -116,6 +116,20 @@ public class MainTeleop extends LinearOpMode {
             bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
         }
 
+        if (gamepad1.left_trigger != 0) {
+            fLPower = -gamepad1.left_trigger;
+            bLPower = gamepad1.left_trigger;
+            fRPower = gamepad1.left_trigger;
+            bRPower = -gamepad1.left_trigger;
+
+        } else if (gamepad1.right_trigger != 0) {
+            fLPower = gamepad1.right_trigger;
+            bLPower = -gamepad1.right_trigger;
+            fRPower = -gamepad1.right_trigger;
+            bRPower = gamepad1.right_trigger;
+
+        }
+
         robot.fLeft.setPower(fLPower);
         robot.fRight.setPower(fRPower);
         robot.bLeft.setPower(bLPower);
