@@ -5,7 +5,6 @@ import android.os.SystemClock;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -31,15 +30,13 @@ public class RR2 {
     public DcMotor bLeft;
     public DcMotor bRight;
 
-    public RevTouchSensor hangTouch;
     public Rev2mDistanceSensor distance;
     public Rev2mDistanceSensor bottomDistance;
     public Rev2mDistanceSensor frontRightDistance;
-    public Rev2mDistanceSensor backRightDistance;
     public Rev2mDistanceSensor frontDistance;
     public Rev2mDistanceSensor frontFacingLeft;
-    public Rev2mDistanceSensor frontLeftDistance;
-    public Rev2mDistanceSensor backLeftDistance;
+    public Rev2mDistanceSensor hangDistance;
+
 
     //Intake Motors;
     public DcMotor slide;
@@ -93,12 +90,10 @@ public class RR2 {
         distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
         bottomDistance = hardwareMap.get(Rev2mDistanceSensor.class,"bottomDistance");
         frontRightDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontRightDistance");
-        backRightDistance = hardwareMap.get(Rev2mDistanceSensor.class,"backRightDistance");
         frontDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontFacingRight");
         frontFacingLeft = hardwareMap.get(Rev2mDistanceSensor.class,"frontFacingLeft");
-        frontLeftDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontLeftDistance");
+        hangDistance = hardwareMap.get(Rev2mDistanceSensor.class,"hangDistance");
 
-        hangTouch = hardwareMap.get(RevTouchSensor.class,"hangTouch");
         //Map LinearSlide Motors
         //Set direction of drive motors
         fLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -454,21 +449,7 @@ public class RR2 {
         return delta;
     }
 
-    private void keepDistance(long timeLimitInMilli){
-        //not used
-        long startTime = SystemClock.elapsedRealtime();
-        double speed;
-        while(SystemClock.elapsedRealtime()-startTime<timeLimitInMilli){
-            speed = (frontFacingLeft.getDistance(DistanceUnit.CM)-40)/100;
-            fLeft.setPower(speed);
-            bLeft.setPower(speed);
-            fRight.setPower(speed);
-            bRight.setPower(speed);
-        }
-        brakeRobot();
-    }
-
-    public double moveRobotKillSwitch(double speed, double distance, double backDistance){
+    public void moveRobotKillSwitch(double speed, double distance, double backDistance){
         //moves robot to depot and checks along the way if there is a robot in the way
         boolean notTimeLimit = true;
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -507,7 +488,6 @@ public class RR2 {
                 if (notTimeLimit) {
                     brakeRobot();
                     releaseTeamMarker();
-                    return -fLeft.getCurrentPosition() * 0.028;
                 }
             }else{
                 fLeft.setPower(speed);
@@ -518,7 +498,6 @@ public class RR2 {
         }
         brakeRobot();
         releaseTeamMarker();
-        return backDistance;
     }
 
     public void releaseTeamMarker(){

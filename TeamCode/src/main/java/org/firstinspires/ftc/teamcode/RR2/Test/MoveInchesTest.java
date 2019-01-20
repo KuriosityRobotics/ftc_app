@@ -25,8 +25,8 @@ public class MoveInchesTest extends LinearOpMode
 
         while (opModeIsActive()){
             robot.intializeIMU();
-            robot.finalMove(0.4,20);
-            robot.finalMove(04, -20);
+//            robot.finalMove(0.4,20);
+//            robot.finalMove(04, -20);
             telemetry.addLine("Right Position: " + robot.fRight.getCurrentPosition());
             telemetry.addLine("Left Position: " + robot.fLeft.getCurrentPosition());
             telemetry.update();

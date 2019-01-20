@@ -12,12 +12,12 @@ import org.firstinspires.ftc.teamcode.RR2.RR2;
 
 @Autonomous(name="Crater Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 @Disabled //COMMENT OUT TO MAKE PROGRAM APPEAR ON PHONE
-public class TemplateAuto extends AutoBase
+public class TemplateAuto extends LinearOpMode
 {
     @Override
     public void runOpMode(){
         //Init's robot
-        initLogic();
+//        initLogic();
         while (opModeIsActive()){
             //code here when start button is pressed
             break;
