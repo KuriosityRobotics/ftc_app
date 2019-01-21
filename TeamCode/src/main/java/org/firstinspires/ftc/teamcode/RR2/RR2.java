@@ -386,59 +386,59 @@ public class RR2 {
         hangLockRight.setPosition(0.63);
     }
 
-    public void wallFollow(double speed, double distance){
-        //experimental - don't use
-        //follows wall
-        boolean notTimeLimit = true;
-        this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        fLeft.setPower(speed);
-        fRight.setPower(speed);
-        bLeft.setPower(speed);
-        bRight.setPower(speed);
-
-        fLeft.setTargetPosition((int)(distance/0.028));
-        fRight.setTargetPosition((int)(distance/0.028));
-        bLeft.setTargetPosition((int)(distance/0.028));
-        bRight.setTargetPosition((int)(distance/0.028));
-
-        while(fLeft.isBusy() && linearOpMode.opModeIsActive()){
-            double leftPower = speed+normalizedDelta(frontRightDistance.getDistance(MM),70)/1000;
-            double rightPower = speed+normalizedDelta(backRightDistance.getDistance(MM),70)/1000;
-
-            fLeft.setPower(leftPower);
-            bLeft.setPower(leftPower);
-            fRight.setPower(rightPower);
-            bRight.setPower(rightPower);
-
-            telemetry.addData("frontRightDistance",frontRightDistance.getDistance(MM));
-            telemetry.addData("backRightDistance",backRightDistance.getDistance(MM));
-            telemetry.update();
-            if(frontDistance.getDistance(MM)<200 || frontFacingLeft.getDistance(MM)<200){
-                fLeft.setPower(0);
-                fRight.setPower(0);
-                bLeft.setPower(0);
-                bRight.setPower(0);
-                long startTime = SystemClock.elapsedRealtime();
-                while (((SystemClock.elapsedRealtime() - startTime) < 3000)){
-                    if(frontDistance.getDistance(MM)>200 && frontFacingLeft.getDistance(MM)>200){
-                        notTimeLimit = false;
-                        break;
-                    }else{
-                        notTimeLimit = true;
-                    }
-                }
-                if(notTimeLimit){
-                    finalTurn(0);
-                    wallFollow(0.7,-fLeft.getCurrentPosition()*0.028);
-                    brakeRobot();
-                }
-            }
-        }
-        brakeRobot();
-    }
+//    public void wallFollow(double speed, double distance){
+//        //experimental - don't use
+//        //follows wall
+//        boolean notTimeLimit = true;
+//        this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//        fLeft.setPower(speed);
+//        fRight.setPower(speed);
+//        bLeft.setPower(speed);
+//        bRight.setPower(speed);
+//
+//        fLeft.setTargetPosition((int)(distance/0.028));
+//        fRight.setTargetPosition((int)(distance/0.028));
+//        bLeft.setTargetPosition((int)(distance/0.028));
+//        bRight.setTargetPosition((int)(distance/0.028));
+//
+//        while(fLeft.isBusy() && linearOpMode.opModeIsActive()){
+//            double leftPower = speed+normalizedDelta(frontRightDistance.getDistance(MM),70)/1000;
+//            double rightPower = speed+normalizedDelta(backRightDistance.getDistance(MM),70)/1000;
+//
+//            fLeft.setPower(leftPower);
+//            bLeft.setPower(leftPower);
+//            fRight.setPower(rightPower);
+//            bRight.setPower(rightPower);
+//
+//            telemetry.addData("frontRightDistance",frontRightDistance.getDistance(MM));
+//            telemetry.addData("backRightDistance",backRightDistance.getDistance(MM));
+//            telemetry.update();
+//            if(frontDistance.getDistance(MM)<200 || frontFacingLeft.getDistance(MM)<200){
+//                fLeft.setPower(0);
+//                fRight.setPower(0);
+//                bLeft.setPower(0);
+//                bRight.setPower(0);
+//                long startTime = SystemClock.elapsedRealtime();
+//                while (((SystemClock.elapsedRealtime() - startTime) < 3000)){
+//                    if(frontDistance.getDistance(MM)>200 && frontFacingLeft.getDistance(MM)>200){
+//                        notTimeLimit = false;
+//                        break;
+//                    }else{
+//                        notTimeLimit = true;
+//                    }
+//                }
+//                if(notTimeLimit){
+//                    finalTurn(0);
+//                    wallFollow(0.7,-fLeft.getCurrentPosition()*0.028);
+//                    brakeRobot();
+//                }
+//            }
+//        }
+//        brakeRobot();
+//    }
 
     private double normalizedDelta(double distance, double constant){
         //called in wallFollow

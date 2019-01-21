@@ -1,23 +1,15 @@
 package org.firstinspires.ftc.teamcode.RR2;
 
-import android.graphics.Color;
-
-//import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.RR2.Auto.AutoBase;
-import org.firstinspires.ftc.teamcode.RR2.Auto.CraterFacing;
 
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
 public class MainTeleop extends LinearOpMode {
     RR2 robot;
-
        //DO NOT DELETE
 
     private boolean hornFound;
@@ -39,8 +31,6 @@ public class MainTeleop extends LinearOpMode {
     long startTime = 0;
 
     private ElapsedTime runtime = new ElapsedTime();
-
-
 
     @Override
     public void runOpMode() {

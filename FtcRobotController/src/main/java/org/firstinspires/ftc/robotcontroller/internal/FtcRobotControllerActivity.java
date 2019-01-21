@@ -745,13 +745,4 @@ public class FtcRobotControllerActivity extends Activity
       wifiMuteStateMachine.consumeEvent(WifiMuteEvent.USER_ACTIVITY);
     }
   }
-
-    public void changeColor(final int color)
-    {
-      LinearLayout linearLayout = (LinearLayout) findViewById(R.id.monitorContainer);
-      linearLayout.setBackgroundColor(color);
-
-    }
-
-
 }
