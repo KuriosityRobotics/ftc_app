@@ -50,7 +50,7 @@ public class RR2 {
     public Servo hangLockLeft;
     public Servo hangLockRight;
     public Servo hook;
-    public Servo teamMarker;
+    public Servo uvcPivot;
 
     //imu
     private BNO055IMU imu;
@@ -85,7 +85,7 @@ public class RR2 {
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
         hook = hardwareMap.servo.get("hook");
-        teamMarker = hardwareMap.servo.get("teamMarker");
+        uvcPivot = hardwareMap.servo.get("uvcPivot");
 
         distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
         bottomDistance = hardwareMap.get(Rev2mDistanceSensor.class,"bottomDistance");

@@ -99,15 +99,26 @@ public class AutoBase extends LinearOpMode {
     }
 
     protected void knockOffMineral(double leftRightAngle) {
+        int currentDegree = 20;
+        boolean detected = false;
+        robot.uvcPivot.setPosition(currentDegree);
         objectDetection();
-        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-            robot.finalTurn(-leftRightAngle);
-            robot.finalMove(0.5, 58);
-        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
-            robot.finalTurn(leftRightAngle);
-            robot.finalMove(0.5, 58);
-        } else {
-            robot.finalMove(0.5, 53);
+        while (detected = true || currentDegree >= 120) {
+            if (tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT) {
+                robot.finalTurn(-leftRightAngle);
+                robot.finalMove(0.5, 58);
+                detected = true;
+            } else if (tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT) {
+                robot.finalTurn(leftRightAngle);
+                robot.finalMove(0.5, 58);
+                detected = true;
+            } else if (tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER || ) {
+                robot.finalMove(0.5, 53);
+                detected = true;
+            } else {
+                robot.uvcPivot.setPosition(currentDegree);
+                currentDegree++;
+            }
         }
     }
 }
