@@ -1,11 +1,24 @@
 package org.firstinspires.ftc.teamcode.RR2.Auto;
 
+import android.os.SystemClock;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.RR2.RR2;
+
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
 
 public class AutoBase extends LinearOpMode {
 
@@ -99,7 +112,7 @@ public class AutoBase extends LinearOpMode {
                 robot.finalTurn(leftRightAngle);
                 robot.finalMove(0.5, 58);
                 detected = true;
-            } else if (tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER || ) {
+            } else if (tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER) {
                 robot.finalMove(0.5, 53);
                 detected = true;
             } else {
@@ -107,7 +120,7 @@ public class AutoBase extends LinearOpMode {
                 currentDegree++;
             }
         }
-        if(currentDregree >= 120) {
+        if(currentDegree >= 120) {
             robot.finalMove(0.5, 53);
         }
     }
