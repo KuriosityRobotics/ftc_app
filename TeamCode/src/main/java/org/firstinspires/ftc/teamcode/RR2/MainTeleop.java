@@ -49,7 +49,6 @@ public class MainTeleop extends LinearOpMode {
             setToHangMode();
             hangRobot();
             dropRobot();
-            movePivotToDumpPosition();
             hangTouchKillSwitch();
         }
     }
@@ -83,6 +82,18 @@ public class MainTeleop extends LinearOpMode {
         fRPower = (-gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x)*powerScaleFactor;
         bLPower = (-gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x)*powerScaleFactor;
         bRPower = (-gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x)*powerScaleFactor;
+
+        if(gamepad1.left_trigger!=0){
+            fLPower = (gamepad1.left_trigger)*powerScaleFactor;
+            fRPower = (-gamepad1.left_trigger)*powerScaleFactor;
+            bLPower = (-gamepad1.left_trigger)*powerScaleFactor;
+            bRPower = (gamepad1.left_trigger)*powerScaleFactor;
+        }else if(gamepad1.right_trigger!=0){
+            fLPower = (-gamepad1.right_trigger)*powerScaleFactor;
+            fRPower = (gamepad1.right_trigger)*powerScaleFactor;
+            bLPower = (gamepad1.right_trigger)*powerScaleFactor;
+            bRPower = (-gamepad1.right_trigger)*powerScaleFactor;
+        }
         //Straight D-Pad move
         if (gamepad1.dpad_up) {
             fLPower = (gamepad1.left_stick_y)+powerScaleFactor;
@@ -303,29 +314,6 @@ public class MainTeleop extends LinearOpMode {
 
             robot.pivot.setPower(1);
             robot.pivot.setTargetPosition(0);
-        }
-    }
-
-    private void movePivotToDumpPosition(){
-        //move pivot to 90 degreee position, not used a lot
-        if(gamepad1.right_trigger>0){
-            robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.pivot.setPower(-1);
-            robot.pivot.setTargetPosition(-4750);
-            robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.pivot2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.pivot2.setPower(-1);
-            robot.pivot2.setTargetPosition(4750);
-            while (robot.pivot.isBusy() && opModeIsActive() && robot.pivot2.isBusy()){
-                driveLogic();
-                slideLogic();
-                intakeLogic();
-            }
-            robot.pivot.setPower(0);
-            robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.pivot2.setPower(0);
-            robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 }

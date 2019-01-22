@@ -32,11 +32,7 @@ public class RR2 {
 
     public Rev2mDistanceSensor distance;
     public Rev2mDistanceSensor bottomDistance;
-    public Rev2mDistanceSensor frontRightDistance;
     public Rev2mDistanceSensor frontDistance;
-    public Rev2mDistanceSensor frontFacingLeft;
-    public Rev2mDistanceSensor hangDistance;
-
 
     //Intake Motors;
     public DcMotor slide;
@@ -50,7 +46,6 @@ public class RR2 {
     public Servo hangLockLeft;
     public Servo hangLockRight;
     public Servo hook;
-    public Servo teamMarker;
 
     //imu
     private BNO055IMU imu;
@@ -64,7 +59,6 @@ public class RR2 {
 
 
     public RR2(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode){
-
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
         this.linearOpMode = linearOpMode;
@@ -78,21 +72,17 @@ public class RR2 {
 
         intake = hardwareMap.dcMotor.get("intake");
         blocker = hardwareMap.servo.get("blocker");
-
         slide = hardwareMap.dcMotor.get("slide");
+
         pivot = hardwareMap.dcMotor.get("pivot");
         pivot2 = hardwareMap.dcMotor.get("pivot2");
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
         hook = hardwareMap.servo.get("hook");
-        teamMarker = hardwareMap.servo.get("teamMarker");
 
         distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
         bottomDistance = hardwareMap.get(Rev2mDistanceSensor.class,"bottomDistance");
-        frontRightDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontRightDistance");
         frontDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontFacingRight");
-        frontFacingLeft = hardwareMap.get(Rev2mDistanceSensor.class,"frontFacingLeft");
-        hangDistance = hardwareMap.get(Rev2mDistanceSensor.class,"hangDistance");
 
         //Map LinearSlide Motors
         //Set direction of drive motors
@@ -466,7 +456,7 @@ public class RR2 {
         bLeft.setTargetPosition((int)(distance/0.028));
         bRight.setTargetPosition((int)(distance/0.028));
         while(fLeft.isBusy() && linearOpMode.opModeIsActive()) {
-            if (frontDistance.getDistance(MM) < 350 || frontFacingLeft.getDistance(MM) < 350) {
+            if (frontDistance.getDistance(MM) < 350) {
                 telemetry.addData("distance",frontDistance.getDistance(MM));
                 telemetry.update();
                 fLeft.setPower(0);
@@ -475,7 +465,7 @@ public class RR2 {
                 bRight.setPower(0);
                 long startTime = SystemClock.elapsedRealtime();
                 while (((SystemClock.elapsedRealtime() - startTime) < 2000)) {
-                    if (frontDistance.getDistance(MM) > 350 && frontFacingLeft.getDistance(MM) > 350) {
+                    if (frontDistance.getDistance(MM) > 350) {
                         notTimeLimit = false;
                         break;
                     } else {

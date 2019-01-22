@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="Test", group="Linear Opmode")
 public class Test extends LinearOpMode {
+    RobotTest robot;
 
     @Override
     public void runOpMode() {
