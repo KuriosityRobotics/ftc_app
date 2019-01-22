@@ -120,5 +120,8 @@ public class AutoBase extends LinearOpMode {
                 currentDegree++;
             }
         }
+        if(currentDregree >= 120) {
+            robot.finalMove(0.5, 53);
+        }
     }
 }
