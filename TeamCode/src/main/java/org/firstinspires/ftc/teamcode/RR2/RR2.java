@@ -47,6 +47,10 @@ public class RR2 {
     public Servo hangLockRight;
     public Servo hook;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    public Servo uvcPivot;
+>>>>>>> 373418869ea234f10db56c6a89ee22aca55e7091
 =======
     public Servo uvcPivot;
 >>>>>>> 373418869ea234f10db56c6a89ee22aca55e7091
@@ -84,6 +88,10 @@ public class RR2 {
         hangLockRight = hardwareMap.servo.get("hangLockRight");
         hook = hardwareMap.servo.get("hook");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        uvcPivot = hardwareMap.servo.get("uvcPivot");
+>>>>>>> 373418869ea234f10db56c6a89ee22aca55e7091
 =======
         uvcPivot = hardwareMap.servo.get("uvcPivot");
 >>>>>>> 373418869ea234f10db56c6a89ee22aca55e7091
