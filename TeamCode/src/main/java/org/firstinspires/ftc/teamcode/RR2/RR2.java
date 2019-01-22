@@ -382,8 +382,8 @@ public class RR2 {
 
     public void hangLockOpen(){
         //opens the hangLocks
-        hangLockLeft.setPosition(0.25);
-        hangLockRight.setPosition(0.63);
+        hangLockLeft.setPosition(0.19);
+        hangLockRight.setPosition(0.72);
     }
 
 //    public void wallFollow(double speed, double distance){
