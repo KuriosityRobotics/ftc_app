@@ -46,6 +46,10 @@ public class RR2 {
     public Servo hangLockLeft;
     public Servo hangLockRight;
     public Servo hook;
+<<<<<<< HEAD
+=======
+    public Servo uvcPivot;
+>>>>>>> 373418869ea234f10db56c6a89ee22aca55e7091
 
     //imu
     private BNO055IMU imu;
@@ -79,6 +83,10 @@ public class RR2 {
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
         hook = hardwareMap.servo.get("hook");
+<<<<<<< HEAD
+=======
+        uvcPivot = hardwareMap.servo.get("uvcPivot");
+>>>>>>> 373418869ea234f10db56c6a89ee22aca55e7091
 
         distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
         bottomDistance = hardwareMap.get(Rev2mDistanceSensor.class,"bottomDistance");
@@ -372,8 +380,8 @@ public class RR2 {
 
     public void hangLockOpen(){
         //opens the hangLocks
-        hangLockLeft.setPosition(0.25);
-        hangLockRight.setPosition(0.63);
+        hangLockLeft.setPosition(0.19);
+        hangLockRight.setPosition(0.72);
     }
 
 //    public void wallFollow(double speed, double distance){

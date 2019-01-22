@@ -27,7 +27,6 @@ public class CraterFacing extends AutoBase
 
     //private constructor.
 
-
     protected void navigateToDepotThenCrater() {
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER){
             robot.finalMove(0.5, -48);
