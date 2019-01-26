@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.Came
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaException;
+import org.firstinspires.ftc.teamcode.RR2.RR2;
 
 import java.util.List;
 
@@ -46,14 +47,18 @@ public class TensorFlowMineralDetection {
 
     boolean isGoldInFrame = false;
 
+    double position = 0.3;
+
     public Location runObjectDetection() throws VuforiaException{
+        RR2 robot = new RR2(hardwareMap,telemetry,linearOpMode);
 
         if (tfod != null) {
             tfod.activate();
         }
         long startTime = SystemClock.elapsedRealtime();
+        robot.uvcPivot.setPosition(position);
 
-        while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 3000) {
+        while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 4000) {
             if (tfod != null) {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
@@ -84,6 +89,9 @@ public class TensorFlowMineralDetection {
                             tfod.shutdown();
                             return location;
                         }
+                    }else {
+                        robot.uvcPivot.setPosition(position);
+                        position+=0.0125;
                     }
                 }
             }

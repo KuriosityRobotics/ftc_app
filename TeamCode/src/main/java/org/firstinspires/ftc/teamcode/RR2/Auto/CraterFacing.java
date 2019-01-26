@@ -18,9 +18,7 @@ public class CraterFacing extends AutoBase
         //Init's robot
         initLogic();
         while (opModeIsActive()){
-            dropDownFromLander();
-            knockOffMineral(40);
-            navigateToDepotThenCrater();
+            objectDetection();
             break;
         }
     }

@@ -53,12 +53,14 @@ public class AutoBase extends LinearOpMode {
 
     protected void objectDetection(){
         robot.intializeIMU();
-        robot.moveRobot(0.5,50);
         robot.slide.setPower(0);
-        tensorFlowMineralDetection.runObjectDetection();
+        telemetry.addLine(tensorFlowMineralDetection.runObjectDetection().toString());
+        telemetry.update();
+        sleep(2000);
     }
 
     protected void dropDownFromLander() {
+        robot.uvcPivot.setPosition(0.3);
         robot.pivot.setPower(-1);
         robot.pivot2.setPower(1);
 
