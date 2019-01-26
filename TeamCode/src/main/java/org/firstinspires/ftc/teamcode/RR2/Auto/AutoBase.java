@@ -56,7 +56,6 @@ public class AutoBase extends LinearOpMode {
         robot.slide.setPower(0);
         telemetry.addLine(tensorFlowMineralDetection.runObjectDetection().toString());
         telemetry.update();
-        sleep(2000);
     }
 
     protected void dropDownFromLander() {

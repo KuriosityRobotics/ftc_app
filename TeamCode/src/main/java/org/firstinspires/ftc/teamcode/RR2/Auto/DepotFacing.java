@@ -8,14 +8,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RR2.RR2;
 
 @Autonomous(name="Depot Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
-public class DepotFacing extends LinearOpMode
+public class DepotFacing extends AutoBase
 {
     double distanceToDepot = 95;
     boolean center = false;
     @Override
     public void runOpMode(){
-//        initLogic();
+        initLogic();
         while (opModeIsActive()){
+
 //            dropDownFromLander();
 //            knockOffMineral(45);
 //            navigateToDepotThenCrater(distanceToDepot);
