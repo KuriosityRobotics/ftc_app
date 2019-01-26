@@ -140,6 +140,42 @@ public class RR2 {
         finalTurn(targetHeading, 10000);
     }
 
+    public void cordinateMecanum(boolean isRight, int xCord, int yCord, double speed) {
+        if (isRight) {
+            int targetLength = (int)Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord));
+            fLeft.setTargetPosition(targetLength);
+            bRight.setTargetPosition(targetLength);
+            while(fLeft.isBusy()) {
+                fLeft.setPower(speed);
+                bRight.setPower(speed);
+                if (speed < 0) {
+                    fRight.setPower((yCord - xCord) * -1);
+                    bLeft.setPower((yCord - xCord) * -1);
+                } else {
+                    fRight.setPower(yCord - xCord);
+                    bLeft.setPower(yCord - xCord);
+                }
+            }
+
+        }
+        if (!isRight) {
+            int targetLength = (int)Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord));
+            fRight.setTargetPosition(targetLength);
+            bLeft.setTargetPosition(targetLength);
+            while(fLeft.isBusy()) {
+                fRight.setPower(speed);
+                bLeft.setPower(speed);
+                if (speed < 0) {
+                    fLeft.setPower((yCord - xCord) * -1);
+                    bRight.setPower((yCord - xCord) * -1);
+                } else {
+                    fLeft.setPower(yCord - xCord);
+                    bRight.setPower(yCord - xCord);
+                }
+            }
+
+        }
+    }
     //turn method with timed kill switch
     public void finalTurn(double targetHeading, long timeInMilli){
         targetHeading = Range.clip(targetHeading, -179, 179);
