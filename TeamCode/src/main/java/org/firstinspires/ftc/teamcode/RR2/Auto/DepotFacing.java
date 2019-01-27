@@ -16,11 +16,14 @@ public class DepotFacing extends AutoBase
     public void runOpMode(){
         initLogic();
         while (opModeIsActive()){
-
+            telemetry.addData("fLeft",robot.fLeft.getCurrentPosition());
+            telemetry.addData("bLeft",robot.bLeft.getCurrentPosition());
+            telemetry.addData("fRight",robot.fRight.getCurrentPosition());
+            telemetry.addData("bRight",robot.bRight.getCurrentPosition());
+            telemetry.update();
 //            dropDownFromLander();
 //            knockOffMineral(45);
 //            navigateToDepotThenCrater(distanceToDepot);
-            break;
         }
     }
 
