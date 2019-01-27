@@ -99,30 +99,34 @@ public class AutoBase extends LinearOpMode {
         robot.pivot.setPower(0);
     }
 
-    protected void knockOffMineral(double leftRightAngle) {
-        int currentDegree = 20;
-        boolean detected = false;
-        robot.uvcPivot.setPosition(currentDegree);
-        objectDetection();
-        while (detected = true || currentDegree >= 120) {
-            if (tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT) {
-                robot.cordinateMecanum(true, 4, 5, 0.5);
-                robot.cordinateMecanum(true, 4, 5, -0.5);
-                detected = true;
-            } else if (tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT) {
-                robot.cordinateMecanum(false, 4, 5, 0.5);
-                robot.cordinateMecanum(false, 4, 5, -0.5);
-                detected = true;
-            } else if (tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER) {
-                robot.finalMove(0.5, 53);
-                detected = true;
-            } else {
-                robot.uvcPivot.setPosition(currentDegree);
-                currentDegree++;
-            }
+    protected void navigateToDepotThenCrater() {
+        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER){
+            robot.finalMove(0.5, -48);
+        }else {
+            robot.finalMove(0.5, -55);
         }
-        if(currentDegree >= 120) {
+
+        //Getting to Depot
+        robot.finalTurn(65);
+        robot.goToWall(0.3,25);
+        robot.finalTurn(135);
+        robot.moveRobotKillSwitch(0.7,120,-120);
+        robot.goToCrater(-0.7);
+        telemetry.addData("Status","done");
+        telemetry.update();
+    }
+
+    protected void knockOffMineral(double leftRightAngle) {
+        objectDetection();
+        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
+            robot.finalTurn(-leftRightAngle);
+            robot.finalMove(0.5, 58);
+        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
+            robot.finalTurn(leftRightAngle);
+            robot.finalMove(0.5, 58);
+        } else {
             robot.finalMove(0.5, 53);
         }
     }
+
 }

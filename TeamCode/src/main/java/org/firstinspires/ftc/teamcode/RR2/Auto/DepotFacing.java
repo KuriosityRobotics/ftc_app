@@ -16,43 +16,39 @@ public class DepotFacing extends AutoBase
     public void runOpMode(){
         initLogic();
         while (opModeIsActive()){
-            telemetry.addData("fLeft",robot.fLeft.getCurrentPosition());
-            telemetry.addData("bLeft",robot.bLeft.getCurrentPosition());
-            telemetry.addData("fRight",robot.fRight.getCurrentPosition());
-            telemetry.addData("bRight",robot.bRight.getCurrentPosition());
-            telemetry.update();
-//            dropDownFromLander();
-//            knockOffMineral(45);
-//            navigateToDepotThenCrater(distanceToDepot);
+            dropDownFromLander();
+            knockOffMineral(45);
+            navigateToDepotThenCrater(distanceToDepot);
+            break;
         }
     }
 
-//    protected void navigateToDepotThenCrater(double distance) {
-//        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-//            finalMove(0.5, -53);
-//            finalTurn(74);
-//            //Getting to Depot
-//        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
-//            distanceToDepot = 65;
-//        } else {
-//            center = true;
-//            distance = 0;
-//            //Getting to Depot
-//            finalMove(0.5, 52);
-//            releaseTeamMarker();
-//            finalMove(0.5, -100);
-//            finalTurn(70);
-//        }
-//
-//        goToWall(0.3,25);
-//        finalTurn(-38);
-//        finalMove(0.5,distance);
-//        if(!center) {
-//            releaseTeamMarker();
-//        }
-//        goToCrater(-0.5);
-//
-//        telemetry.addData("Status","done");
-//        telemetry.update();
-//    }
+    protected void navigateToDepotThenCrater(double distance) {
+        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
+            robot.finalMove(0.5, -53);
+            robot.finalTurn(74);
+            //Getting to Depot
+        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
+            distanceToDepot = 65;
+        } else {
+            center = true;
+            distance = 0;
+            //Getting to Depot
+            robot.finalMove(0.5, 52);
+            robot.releaseTeamMarker();
+            robot.finalMove(0.5, -100);
+            robot.finalTurn(70);
+        }
+
+        robot.goToWall(0.3,25);
+        robot.finalTurn(-38);
+        robot.finalMove(0.5,distance);
+        if(!center) {
+            robot.releaseTeamMarker();
+        }
+        robot.goToCrater(-0.5);
+
+        telemetry.addData("Status","done");
+        telemetry.update();
+    }
 }

@@ -56,7 +56,6 @@ public class TensorFlowMineralDetection {
             tfod.activate();
         }
         long startTime = SystemClock.elapsedRealtime();
-        robot.uvcPivot.setPosition(position);
 
         while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 4000) {
             if (tfod != null) {
