@@ -52,14 +52,12 @@ public class AutoBase extends LinearOpMode {
     }
 
     protected void objectDetection(){
-        robot.intializeIMU();
-        robot.slide.setPower(0);
         telemetry.addLine(tensorFlowMineralDetection.runObjectDetection().toString());
         telemetry.update();
     }
 
     protected void dropDownFromLander() {
-        robot.uvcPivot.setPosition(0.3);
+        objectDetection();
         robot.pivot.setPower(-1);
         robot.pivot2.setPower(1);
 
@@ -117,13 +115,16 @@ public class AutoBase extends LinearOpMode {
     }
 
     protected void knockOffMineral(double leftRightAngle) {
-        objectDetection();
+        robot.intializeIMU();
+        robot.slide.setPower(0);
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-            robot.finalTurn(-leftRightAngle);
-            robot.finalMove(0.5, 58);
+//            robot.finalTurn(-leftRightAngle);
+//            robot.finalMove(0.5, 58);
+            robot.cordinateMecanum(true, 4, 5, 0.5);
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
-            robot.finalTurn(leftRightAngle);
-            robot.finalMove(0.5, 58);
+//            robot.finalTurn(leftRightAngle);
+//            robot.finalMove(0.5, 58);
+            robot.cordinateMecanum(false, 4, 5, 0.5);
         } else {
             robot.finalMove(0.5, 53);
         }

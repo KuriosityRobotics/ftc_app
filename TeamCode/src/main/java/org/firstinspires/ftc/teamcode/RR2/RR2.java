@@ -47,9 +47,6 @@ public class RR2 {
     public Servo hangLockRight;
     public Servo hook;
 
-    public Servo uvcPivot;
-
-
     //imu
     private BNO055IMU imu;
     private Orientation angles;
@@ -82,8 +79,6 @@ public class RR2 {
         hangLockLeft = hardwareMap.servo.get("hangLockLeft");
         hangLockRight = hardwareMap.servo.get("hangLockRight");
         hook = hardwareMap.servo.get("hook");
-
-        uvcPivot = hardwareMap.servo.get("uvcPivot");
 
         distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
         bottomDistance = hardwareMap.get(Rev2mDistanceSensor.class,"bottomDistance");
@@ -142,18 +137,18 @@ public class RR2 {
 
     public void cordinateMecanum(boolean isRight, int xCord, int yCord, double speed) {
         if (isRight) {
-            int targetLength = (int)Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord));
+            int targetLength = (int)(Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord))/ 0.028);
             fLeft.setTargetPosition(targetLength);
             bRight.setTargetPosition(targetLength);
             while(fLeft.isBusy()) {
                 fLeft.setPower(speed);
                 bRight.setPower(speed);
                 if (speed < 0) {
-                    fRight.setPower((yCord - xCord) * -1);
-                    bLeft.setPower((yCord - xCord) * -1);
+                    fRight.setPower((yCord - xCord) * (-0.01 * speed));
+                    bLeft.setPower((yCord - xCord) * (-0.01 * speed));
                 } else {
-                    fRight.setPower(yCord - xCord);
-                    bLeft.setPower(yCord - xCord);
+                    fRight.setPower(yCord - xCord * (0.01 * speed));
+                    bLeft.setPower(yCord - xCord* (0.01 * speed));
                 }
             }
 
@@ -166,11 +161,11 @@ public class RR2 {
                 fRight.setPower(speed);
                 bLeft.setPower(speed);
                 if (speed < 0) {
-                    fLeft.setPower((yCord - xCord) * -1);
-                    bRight.setPower((yCord - xCord) * -1);
+                    fLeft.setPower((yCord - xCord) * (0.01 * speed));
+                    bRight.setPower((yCord - xCord) * (0.01 * speed));
                 } else {
-                    fLeft.setPower(yCord - xCord);
-                    bRight.setPower(yCord - xCord);
+                    fLeft.setPower(yCord - xCord* (0.01 * speed));
+                    bRight.setPower(yCord - xCord * (0.01 * speed));
                 }
             }
 

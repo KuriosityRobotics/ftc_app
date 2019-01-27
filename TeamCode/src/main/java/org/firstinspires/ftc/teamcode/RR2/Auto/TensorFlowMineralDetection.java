@@ -15,6 +15,10 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaException;
 import org.firstinspires.ftc.teamcode.RR2.RR2;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class TensorFlowMineralDetection {
@@ -45,9 +49,8 @@ public class TensorFlowMineralDetection {
 
     public WebcamName webcamName;
 
-    boolean isGoldInFrame = false;
+    int goldXPos = -1;
 
-    double position = 0.3;
 
     public Location runObjectDetection() throws VuforiaException{
         RR2 robot = new RR2(hardwareMap,telemetry,linearOpMode);
@@ -56,44 +59,69 @@ public class TensorFlowMineralDetection {
             tfod.activate();
         }
         long startTime = SystemClock.elapsedRealtime();
-        robot.uvcPivot.setPosition(position);
 
         while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 4000) {
             if (tfod != null) {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    if (updatedRecognitions.size() == 2) {
-                        int goldXPos = -1;
-                        int firstSilverXPos = -1;
-                        int secondSilverXPos = -1;
-                        for (Recognition recognition : updatedRecognitions) {
-                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                goldXPos = (int) recognition.getLeft();
-                                isGoldInFrame = true;
-                            } else if (firstSilverXPos == -1) {
-                                firstSilverXPos = (int) recognition.getLeft();
-                            } else if(secondSilverXPos == -1){
-                                secondSilverXPos = (int) recognition.getLeft();
+                    if (updatedRecognitions != null && updatedRecognitions.size() >0) {
+                        //(0,0) is topLeft corner
+                        Collections.sort(updatedRecognitions, new Comparator<Recognition>() {
+                            @Override
+                            public int compare(Recognition lhs, Recognition rhs) {
+                                if(lhs.getBottom()<rhs.getBottom()){
+                                    return 1;
+                                }else if(lhs.getBottom()>rhs.getBottom()){
+                                    return -1;
+                                }else {
+                                    return 0;
+                                }
+                            }
+                        });
+
+                        ArrayList<Recognition> updated = new ArrayList<>(updatedRecognitions);
+                        List<Recognition> updatedList = updated.subList(0,Math.min(3,updated.size()));
+                        telemetry.addLine(updatedList.toString());
+                        telemetry.update();
+
+                        Collections.sort(updatedList, new Comparator<Recognition>() {
+                            @Override
+                            public int compare(Recognition lhs, Recognition rhs) {
+                                if(lhs.getLeft()<rhs.getLeft()){
+                                    return -1;
+                                }else if(lhs.getLeft()>rhs.getLeft()){
+                                    return 1;
+                                }else {
+                                    return 0;
+                                }
+                            }
+                        });
+
+                        for(int i = 0;i<updatedList.size();i++){
+                            if(updatedList.get(i).getLabel().equals(LABEL_GOLD_MINERAL)){
+                                goldXPos = i;
                             }
                         }
-                        if (goldXPos > firstSilverXPos && isGoldInFrame) {
-                            this.location = Location.CENTER;
-                            tfod.shutdown();
-                            return location;
-                        } else if (goldXPos < firstSilverXPos && isGoldInFrame) {
-                            this.location = Location.LEFT;
-                            tfod.shutdown();
-                            return location;
-                        } else {
-                            this.location = Location.RIGHT;
-                            tfod.shutdown();
-                            return location;
+
+                        telemetry.addLine(updatedList.toString());
+                        telemetry.update();
+
+                        switch (goldXPos){
+                            case 0:
+                                this.location = Location.LEFT;
+                                break;
+                            case 1:
+                                this.location = Location.CENTER;
+                                break;
+                            case 2:
+                                this.location = Location.RIGHT;
+                                break;
+                            default:
+                                this.location = Location.UNKNOWN;
+                                break;
                         }
-                    }else {
-                        robot.uvcPivot.setPosition(position);
-                        position+=0.0125;
+                        tfod.shutdown();
+                        return location;
                     }
-                }
             }
         }
         if (tfod != null) {
@@ -104,7 +132,7 @@ public class TensorFlowMineralDetection {
     }
 
     public void initVuforia() throws VuforiaException {
-        webcamName = hardwareMap.get(WebcamName.class, "Webcam");
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
