@@ -213,14 +213,9 @@ public class RR2 {
             if(scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)){
                 break;
             }
-            telemetry.addData("fLeft",power);
-            telemetry.addData("bLeft",power);
-            telemetry.addData("fRight",power);
-            telemetry.addData("bRight",power);
-            telemetry.update();
             fLeft.setPower(-power);
-            bRight.setPower(power);
-            fLeft.setPower(-power);
+            fRight.setPower(power);
+            bLeft.setPower(-power);
             bRight.setPower(power);
         }
         brakeRobot();
