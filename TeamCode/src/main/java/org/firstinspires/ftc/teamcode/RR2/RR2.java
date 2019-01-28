@@ -135,41 +135,56 @@ public class RR2 {
         finalTurn(targetHeading, 10000);
     }
 
-    public void cordinateMecanum(boolean isRight, int xCord, int yCord, double speed) {
-        if (isRight) {
-            int targetLength = (int)(Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord))/ 0.028);
-            fLeft.setTargetPosition(targetLength);
-            bRight.setTargetPosition(targetLength);
-            while(fLeft.isBusy()) {
-                fLeft.setPower(speed);
-                bRight.setPower(speed);
-                if (speed < 0) {
-                    fRight.setPower((yCord - xCord) * (-0.01 * speed));
-                    bLeft.setPower((yCord - xCord) * (-0.01 * speed));
-                } else {
-                    fRight.setPower(yCord - xCord * (0.01 * speed));
-                    bLeft.setPower(yCord - xCord* (0.01 * speed));
-                }
-            }
+    public void cordinateMecanum(int xCord, int yCord, double speed) {
 
-        }
-        if (!isRight) {
-            int targetLength = (int)Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord));
-            fRight.setTargetPosition(targetLength);
-            bLeft.setTargetPosition(targetLength);
-            while(fLeft.isBusy()) {
-                fRight.setPower(speed);
-                bLeft.setPower(speed);
-                if (speed < 0) {
-                    fLeft.setPower((yCord - xCord) * (0.01 * speed));
-                    bRight.setPower((yCord - xCord) * (0.01 * speed));
-                } else {
-                    fLeft.setPower(yCord - xCord* (0.01 * speed));
-                    bRight.setPower(yCord - xCord * (0.01 * speed));
-                }
-            }
+        intializeIMU();
 
+
+        double degrees = 1.5 * Math.PI - Math.atan2(yCord,xCord);
+        position = imu.getPosition();
+        int targetLength = (int)(Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord))/ 0.028);
+        while (linearOpMode.opModeIsActive()) {
+            fLeft.setPower((Math.sqrt(2) * Math.cos(1 / 57.29 * (degrees - 45))) * speed);
+            bRight.setPower((Math.sqrt(2) * Math.cos(1 / 57.29 * (degrees - 45))) * speed);
+            fRight.setPower((Math.sqrt(2) * Math.cos(1 / 57.29 * degrees)) * 0.5);
+            bLeft.setPower((Math.sqrt(2) * Math.cos(1 / 57.29 * degrees)) * 0.5);
         }
+
+//        if (xCord > 0 && yCord > 0) {
+//            int targetLength = (int)(Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord))/ 0.028);
+//            fLeft.setTargetPosition(targetLength);
+//            bRight.setTargetPosition(targetLength);
+//            while(fLeft.isBusy()) {
+//                fLeft.setPower(speed);
+//                bRight.setPower(speed);
+//                if (speed < 0) {
+//                    fRight.setPower((yCord - xCord) * (-0.01 * speed));
+//                    bLeft.setPower((yCord - xCord) * (-0.01 * speed));
+//                } else {
+//                    fRight.setPower(yCord - xCord * (0.01 * speed));
+//                    bLeft.setPower(yCord - xCord* (0.01 * speed));
+//                }
+//            }
+//
+//        }
+//        else {
+//            int targetLength = (int)Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord));
+//            fRight.setTargetPosition(targetLength);
+//            bLeft.setTargetPosition(targetLength);
+//            while(fLeft.isBusy()) {
+//                fRight.setPower(speed);
+//                bLeft.setPower(speed);
+//                if (speed < 0) {
+//                    fLeft.setPower((yCord - xCord) * (-0.01 * speed));
+//                    bRight.setPower((yCord - xCord) * (-0.01 * speed));
+//                } else {
+//                    fLeft.setPower(yCord - xCord* (0.01 * speed));
+//                    bRight.setPower(yCord - xCord * (0.01 * speed));
+//                }
+//            }
+//
+//        }
+
     }
     //turn method with timed kill switch
     public void finalTurn(double targetHeading, long timeInMilli){

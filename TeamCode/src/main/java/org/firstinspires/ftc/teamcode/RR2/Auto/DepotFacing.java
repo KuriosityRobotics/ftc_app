@@ -16,9 +16,12 @@ public class DepotFacing extends AutoBase
     public void runOpMode(){
         initLogic();
         while (opModeIsActive()){
-            dropDownFromLander();
-            knockOffMineral(45);
-            navigateToDepotThenCrater(distanceToDepot);
+            robot.intializeIMU();
+//            dropDownFromLander();
+//            knockOffMineral();
+            robot.cordinateMecanum(4, 5,  0.5);
+//            navigateToDepotThenCrater(distanceToDepot);
+            sleep(1000000000);
             break;
         }
     }

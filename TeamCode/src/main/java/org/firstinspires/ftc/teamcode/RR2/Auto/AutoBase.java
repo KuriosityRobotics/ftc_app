@@ -118,13 +118,15 @@ public class AutoBase extends LinearOpMode {
         robot.intializeIMU();
         robot.slide.setPower(0);
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-//            robot.finalTurn(-leftRightAngle);
-//            robot.finalMove(0.5, 58);
-            robot.cordinateMecanum(true, 4, 5, 0.5);
+            robot.finalTurn(-leftRightAngle);
+            robot.finalMove(0.5, 58);
+//            robot.cordinateMecanum(-4, 5, 0.5);
+//            robot.cordinateMecanum(4, -5, 0.5);
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
-//            robot.finalTurn(leftRightAngle);
-//            robot.finalMove(0.5, 58);
-            robot.cordinateMecanum(false, 4, 5, 0.5);
+            robot.finalTurn(leftRightAngle);
+            robot.finalMove(0.5, 58);
+//            robot.cordinateMecanum(4, 5, 0.5);
+//            robot.cordinateMecanum(-4, -5, 0.5);
         } else {
             robot.finalMove(0.5, 53);
         }
