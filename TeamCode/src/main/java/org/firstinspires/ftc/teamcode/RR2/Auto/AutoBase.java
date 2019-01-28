@@ -1,40 +1,24 @@
 package org.firstinspires.ftc.teamcode.RR2.Auto;
 
-import android.os.SystemClock;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.teamcode.RR2.RR2;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
-import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
+import org.firstinspires.ftc.teamcode.RR2.RR2;
 
 public class AutoBase extends LinearOpMode {
 
-    ElapsedTime runtime = new ElapsedTime();
     public TensorFlowMineralDetection tensorFlowMineralDetection;
-
     public RR2 robot;
+    
     public void initLogic(){
         //Init's robot
         tensorFlowMineralDetection = new TensorFlowMineralDetection(hardwareMap,telemetry,this);
         robot = new RR2(hardwareMap,telemetry,this);
 
-        robot.fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.setBrakeModeDriveMotors();
 
         robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -43,7 +27,6 @@ public class AutoBase extends LinearOpMode {
         tensorFlowMineralDetection.initTfod();
 
         waitForStart();
-        runtime.reset();
     }
 
     @Override
@@ -95,23 +78,6 @@ public class AutoBase extends LinearOpMode {
         }
         robot.pivot2.setPower(0);
         robot.pivot.setPower(0);
-    }
-
-    protected void navigateToDepotThenCrater() {
-        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER){
-            robot.finalMove(0.5, -48);
-        }else {
-            robot.finalMove(0.5, -55);
-        }
-
-        //Getting to Depot
-        robot.finalTurn(65);
-        robot.goToWall(0.3,25);
-        robot.finalTurn(135);
-        robot.moveRobotKillSwitch(0.7,120,-120);
-        robot.goToCrater(-0.7);
-        telemetry.addData("Status","done");
-        telemetry.update();
     }
 
     protected void knockOffMineral(double leftRightAngle) {

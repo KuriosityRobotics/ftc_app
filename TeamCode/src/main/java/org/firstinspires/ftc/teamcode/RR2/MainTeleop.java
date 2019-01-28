@@ -3,17 +3,13 @@ package org.firstinspires.ftc.teamcode.RR2;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
 public class MainTeleop extends LinearOpMode {
     RR2 robot;
-       //DO NOT DELETE
-
-    private boolean hornFound;
-    private boolean failFound;
+    //DO NOT DELETE
 
     double fLPower;
     double fRPower;
@@ -28,15 +24,10 @@ public class MainTeleop extends LinearOpMode {
 
     public static double powerScaleFactor = 1;
 
-    long startTime = 0;
-
-    private ElapsedTime runtime = new ElapsedTime();
-
     @Override
     public void runOpMode() {
         resetRobot();
         waitForStart();
-        runtime.reset();
         while (opModeIsActive()) {
             slowDriveLogic();
             driveLogic();
@@ -115,20 +106,6 @@ public class MainTeleop extends LinearOpMode {
             bRPower = (gamepad1.right_stick_y)+powerScaleFactor;
             fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
             bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
-        }
-
-        if (gamepad1.left_trigger != 0) {
-            fLPower = -gamepad1.left_trigger;
-            bLPower = gamepad1.left_trigger;
-            fRPower = gamepad1.left_trigger;
-            bRPower = -gamepad1.left_trigger;
-
-        } else if (gamepad1.right_trigger != 0) {
-            fLPower = gamepad1.right_trigger;
-            bLPower = -gamepad1.right_trigger;
-            fRPower = -gamepad1.right_trigger;
-            bRPower = gamepad1.right_trigger;
-
         }
 
         robot.fLeft.setPower(fLPower);
@@ -262,7 +239,6 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot.setPower(-1);
             robot.pivot2.setPower(1);
             while(robot.distance.getDistance(DistanceUnit.MM)>70 && opModeIsActive()){
-
                 if(gamepad2.right_bumper){
                     telemetry.addData("Hang Status","Aborting hang...");
                     telemetry.update();
@@ -285,7 +261,6 @@ public class MainTeleop extends LinearOpMode {
         //drop robot
         if(gamepad1.left_bumper && gamepad1.right_bumper){
             robot.pivot.setPower(1);
-
             while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
                 telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
                 telemetry.update();

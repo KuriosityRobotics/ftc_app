@@ -1,11 +1,5 @@
 package org.firstinspires.ftc.teamcode.RR2.Auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.RR2.RR2;
 
 @Autonomous(name="Depot Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 public class DepotFacing extends AutoBase
@@ -16,12 +10,9 @@ public class DepotFacing extends AutoBase
     public void runOpMode(){
         initLogic();
         while (opModeIsActive()){
-            robot.intializeIMU();
-//            dropDownFromLander();
-//            knockOffMineral();
-            robot.cordinateMecanum(4, 5,  0.5);
-//            navigateToDepotThenCrater(distanceToDepot);
-            sleep(1000000000);
+            dropDownFromLander();
+            knockOffMineral(45);
+            navigateToDepotThenCrater(distanceToDepot);
             break;
         }
     }

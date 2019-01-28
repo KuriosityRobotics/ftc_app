@@ -53,14 +53,12 @@ public class TensorFlowMineralDetection {
 
 
     public Location runObjectDetection() throws VuforiaException{
-        RR2 robot = new RR2(hardwareMap,telemetry,linearOpMode);
-
         if (tfod != null) {
             tfod.activate();
         }
         long startTime = SystemClock.elapsedRealtime();
 
-        while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 4000) {
+        while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 2000) {
             if (tfod != null) {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null && updatedRecognitions.size() >0) {
