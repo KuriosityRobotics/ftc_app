@@ -61,65 +61,65 @@ public class TensorFlowMineralDetection {
         while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 2000) {
             if (tfod != null) {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null && updatedRecognitions.size() >0) {
-                        //(0,0) is topLeft corner
-                        Collections.sort(updatedRecognitions, new Comparator<Recognition>() {
-                            @Override
-                            public int compare(Recognition lhs, Recognition rhs) {
-                                if(lhs.getBottom()<rhs.getBottom()){
-                                    return 1;
-                                }else if(lhs.getBottom()>rhs.getBottom()){
-                                    return -1;
-                                }else {
-                                    return 0;
-                                }
-                            }
-                        });
-
-                        ArrayList<Recognition> updated = new ArrayList<>(updatedRecognitions);
-                        List<Recognition> updatedList = updated.subList(0,Math.min(3,updated.size()));
-                        telemetry.addLine(updatedList.toString());
-                        telemetry.update();
-
-                        Collections.sort(updatedList, new Comparator<Recognition>() {
-                            @Override
-                            public int compare(Recognition lhs, Recognition rhs) {
-                                if(lhs.getLeft()<rhs.getLeft()){
-                                    return -1;
-                                }else if(lhs.getLeft()>rhs.getLeft()){
-                                    return 1;
-                                }else {
-                                    return 0;
-                                }
-                            }
-                        });
-
-                        for(int i = 0;i<updatedList.size();i++){
-                            if(updatedList.get(i).getLabel().equals(LABEL_GOLD_MINERAL)){
-                                goldXPos = i;
+                if (updatedRecognitions != null && updatedRecognitions.size() >0) {
+                    //(0,0) is topLeft corner
+                    Collections.sort(updatedRecognitions, new Comparator<Recognition>() {
+                        @Override
+                        public int compare(Recognition lhs, Recognition rhs) {
+                            if(lhs.getBottom()<rhs.getBottom()){
+                                return 1;
+                            }else if(lhs.getBottom()>rhs.getBottom()){
+                                return -1;
+                            }else {
+                                return 0;
                             }
                         }
+                    });
 
-                        telemetry.addLine(updatedList.toString());
-                        telemetry.update();
+                    ArrayList<Recognition> updated = new ArrayList<>(updatedRecognitions);
+                    List<Recognition> updatedList = updated.subList(0,Math.min(3,updated.size()));
+                    telemetry.addLine(updatedList.toString());
+                    telemetry.update();
 
-                        switch (goldXPos){
-                            case 0:
-                                this.location = Location.LEFT;
-                                break;
-                            case 1:
-                                this.location = Location.CENTER;
-                                break;
-                            case 2:
-                                this.location = Location.RIGHT;
-                                break;
-                            default:
-                                this.location = Location.UNKNOWN;
-                                break;
+                    Collections.sort(updatedList, new Comparator<Recognition>() {
+                        @Override
+                        public int compare(Recognition lhs, Recognition rhs) {
+                            if(lhs.getLeft()<rhs.getLeft()){
+                                return -1;
+                            }else if(lhs.getLeft()>rhs.getLeft()){
+                                return 1;
+                            }else {
+                                return 0;
+                            }
                         }
-                        tfod.shutdown();
-                        return location;
+                    });
+
+                    for(int i = 0;i<updatedList.size();i++){
+                        if(updatedList.get(i).getLabel().equals(LABEL_GOLD_MINERAL)){
+                            goldXPos = i;
+                        }
                     }
+
+                    telemetry.addLine(updatedList.toString());
+                    telemetry.update();
+
+                    switch (goldXPos){
+                        case 0:
+                            this.location = Location.LEFT;
+                            break;
+                        case 1:
+                            this.location = Location.CENTER;
+                            break;
+                        case 2:
+                            this.location = Location.RIGHT;
+                            break;
+                        default:
+                            this.location = Location.UNKNOWN;
+                            break;
+                    }
+                    tfod.shutdown();
+                    return location;
+                }
             }
         }
         if (tfod != null) {

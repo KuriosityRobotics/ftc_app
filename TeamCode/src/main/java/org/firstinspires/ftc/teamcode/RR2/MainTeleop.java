@@ -122,11 +122,11 @@ public class MainTeleop extends LinearOpMode {
     private void blockerLogic(){
         //blocker for outtake
         if(gamepad2.x){
-            robot.blocker.setPosition(0.5);
+            robot.blocker.setPosition(1);
             intakePower = -1;
         }else{
             intakePower = -gamepad2.left_stick_y;
-            robot.blocker.setPosition(0.1);
+            robot.blocker.setPosition(0.5);
         }
     }
 

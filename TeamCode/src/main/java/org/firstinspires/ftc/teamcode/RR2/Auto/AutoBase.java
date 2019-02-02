@@ -12,7 +12,7 @@ public class AutoBase extends LinearOpMode {
 
     public TensorFlowMineralDetection tensorFlowMineralDetection;
     public RR2 robot;
-    
+
     public void initLogic(){
         //Init's robot
         tensorFlowMineralDetection = new TensorFlowMineralDetection(hardwareMap,telemetry,this);
@@ -72,10 +72,12 @@ public class AutoBase extends LinearOpMode {
 
         robot.pivot.setPower(-1);
         robot.pivot2.setPower(1);
+
         while (robot.distance.getDistance(DistanceUnit.MM) > 150 && opModeIsActive()) {
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
             telemetry.update();
         }
+
         robot.pivot2.setPower(0);
         robot.pivot.setPower(0);
     }
