@@ -132,7 +132,7 @@ public class RR2 {
 
     //normal use method default 10 second kill time
     public void finalTurn(double targetHeading){
-        finalTurn(targetHeading, 10000);
+        finalTurn(targetHeading, 5000);
     }
 
     public void cordinateMecanum(int xCord, int yCord, double speed) {
@@ -542,10 +542,8 @@ public class RR2 {
     }
 
     public void releaseTeamMarker(){
-        //releases the team marker from the intake bin
-        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intake.setPower(1);
-        linearOpMode.sleep(3000);
+        linearOpMode.sleep(2000);
         intake.setPower(0);
     }
 

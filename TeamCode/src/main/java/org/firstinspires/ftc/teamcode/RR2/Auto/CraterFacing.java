@@ -19,17 +19,17 @@ public class CraterFacing extends AutoBase
     //private constructor.
     protected void navigateToDepotThenCrater() {
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER){
-            robot.finalMove(0.6, -48);
+            robot.finalMove(0.75, -48);
         }else {
-            robot.finalMove(0.6, -55);
+            robot.finalMove(0.75, -55);
         }
 
         //Getting to Depot
         robot.finalTurn(65);
-        robot.goToWall(0.6,25);
+        robot.goToWall(0.75,25);
         robot.finalTurn(135);
-        robot.moveRobotKillSwitch(0.7,120,-120);
-        robot.goToCrater(-0.7);
+        robot.moveRobotKillSwitch(0.75,120,-120);
+        robot.goToCrater(-0.75);
         telemetry.addData("Status","done");
         telemetry.update();
     }

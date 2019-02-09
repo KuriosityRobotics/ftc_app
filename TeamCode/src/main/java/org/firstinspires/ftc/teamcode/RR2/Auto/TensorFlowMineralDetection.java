@@ -61,7 +61,7 @@ public class TensorFlowMineralDetection {
         while (this.location != Location.UNKNOWN && linearOpMode.opModeIsActive() && (SystemClock.elapsedRealtime() - startTime) < 2000) {
             if (tfod != null) {
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null && updatedRecognitions.size() >0) {
+                if (updatedRecognitions != null && updatedRecognitions.size() > 0) {
                     //(0,0) is topLeft corner
                     Collections.sort(updatedRecognitions, new Comparator<Recognition>() {
                         @Override

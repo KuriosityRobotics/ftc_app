@@ -28,6 +28,7 @@ public class MainTeleop extends LinearOpMode {
     public void runOpMode() {
         resetRobot();
         waitForStart();
+        robot.hangLockOpen();
         while (opModeIsActive()) {
             slowDriveLogic();
             driveLogic();
@@ -74,16 +75,16 @@ public class MainTeleop extends LinearOpMode {
         bLPower = (-gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x)*powerScaleFactor;
         bRPower = (-gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x)*powerScaleFactor;
 
-        if(gamepad1.left_trigger!=0){
-            fLPower = (gamepad1.left_trigger)*powerScaleFactor;
-            fRPower = (-gamepad1.left_trigger)*powerScaleFactor;
-            bLPower = (-gamepad1.left_trigger)*powerScaleFactor;
-            bRPower = (gamepad1.left_trigger)*powerScaleFactor;
-        }else if(gamepad1.right_trigger!=0){
-            fLPower = (-gamepad1.right_trigger)*powerScaleFactor;
-            fRPower = (gamepad1.right_trigger)*powerScaleFactor;
-            bLPower = (gamepad1.right_trigger)*powerScaleFactor;
-            bRPower = (-gamepad1.right_trigger)*powerScaleFactor;
+        if(gamepad1.right_trigger!=0){
+            fLPower = (gamepad1.right_trigger)*powerScaleFactor;
+            fRPower = (-gamepad1.right_trigger)*powerScaleFactor;
+            bLPower = (-gamepad1.right_trigger)*powerScaleFactor;
+            bRPower = (gamepad1.right_trigger)*powerScaleFactor;
+        }else if(gamepad1.left_trigger!=0){
+            fLPower = (-gamepad1.left_trigger)*powerScaleFactor;
+            fRPower = (gamepad1.left_trigger)*powerScaleFactor;
+            bLPower = (gamepad1.left_trigger)*powerScaleFactor;
+            bRPower = (-gamepad1.left_trigger)*powerScaleFactor;
         }
         //Straight D-Pad move
         if (gamepad1.dpad_up) {
@@ -116,17 +117,16 @@ public class MainTeleop extends LinearOpMode {
 
     private void intakeLogic(){
         //Intake Control
+        intakePower = -gamepad2.left_stick_y;
         robot.intake.setPower(intakePower);
     }
 
     private void blockerLogic(){
         //blocker for outtake
-        if(gamepad2.x){
-            robot.blocker.setPosition(1);
-            intakePower = -1;
+        if(gamepad2.right_bumper){
+            robot.blocker.setPosition(0);
         }else{
-            intakePower = -gamepad2.left_stick_y;
-            robot.blocker.setPosition(0.5);
+            robot.blocker.setPosition(0.325);
         }
     }
 
@@ -232,8 +232,8 @@ public class MainTeleop extends LinearOpMode {
     private void hangRobot(){
         //hangs the robot by pulling it up
         if(gamepad1.b) {
-            robot.hook.setPosition(1);
-            sleep(1500);
+//            robot.hook.setPosition(1);
+//            sleep(1500);
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setPower(-1);
