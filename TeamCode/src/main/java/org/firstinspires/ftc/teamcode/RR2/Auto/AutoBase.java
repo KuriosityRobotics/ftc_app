@@ -53,7 +53,7 @@ public class AutoBase extends LinearOpMode {
         robot.pivot2.setPower(0);
 
         robot.hangLockOpen();
-        sleep(2000);
+        sleep(1000);
 
         robot.pivot.setPower(1);
         robot.pivot2.setPower(-1);
@@ -68,7 +68,7 @@ public class AutoBase extends LinearOpMode {
         robot.pivot2.setPower(0);
 
         robot.hook.setPosition(0); //open
-        sleep(1000);
+        robot.intializeIMU();
 
         robot.pivot.setPower(-1);
         robot.pivot2.setPower(1);
@@ -83,7 +83,6 @@ public class AutoBase extends LinearOpMode {
     }
 
     protected void knockOffMineral(double leftRightAngle) {
-        robot.intializeIMU();
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
             robot.finalTurn(-leftRightAngle);
             robot.finalMove(0.75, 58);

@@ -132,7 +132,7 @@ public class RR2 {
 
     //normal use method default 10 second kill time
     public void finalTurn(double targetHeading){
-        finalTurn(targetHeading, 5000);
+        finalTurn(targetHeading, 2000);
     }
 
     public void cordinateMecanum(int xCord, int yCord, double speed) {
