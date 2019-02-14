@@ -35,11 +35,20 @@ public class DepotFacing extends AutoBase
         }
 
         robot.goToWall(0.3,25);
-        robot.finalTurn(-38);
-        robot.finalMove(0.5,distance);
+
         if(!center) {
+            robot.finalTurn(-42);
+            robot.finalMove(0.3,distance);
             robot.releaseTeamMarker();
+            robot.goToCrater(-0.5);
         }
+        if (center) {
+            robot.finalTurn(132);
+            robot.finalMove(0.5, 40);
+            robot.slide.setTargetPosition(200);
+            robot.slide.setPower(-0.7);
+        }
+
         robot.goToCrater(-0.5);
 
         telemetry.addData("Status","done");

@@ -15,6 +15,8 @@ public class MainTeleop extends LinearOpMode {
     double fRPower;
     double bLPower;
     double bRPower;
+    boolean blockIntake = false;
+    boolean blockIsPressed = false;
 
     boolean isHangStarted = false;
     boolean killSwitchForHangTouchIsHit = false;
@@ -118,16 +120,19 @@ public class MainTeleop extends LinearOpMode {
     private void intakeLogic(){
         //Intake Control
         intakePower = -gamepad2.left_stick_y;
-        robot.intake.setPower(intakePower);
     }
 
     private void blockerLogic(){
         //blocker for outtake
         if(gamepad2.right_bumper){
             robot.blocker.setPosition(0);
-        }else{
+            intakePower = 1;
+        }
+        else{
+            blockIsPressed = false;
             robot.blocker.setPosition(0.325);
         }
+        robot.intake.setPower(intakePower);
     }
 
     private void pivotLogic(){
