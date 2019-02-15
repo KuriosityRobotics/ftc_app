@@ -238,6 +238,19 @@ public class RR2 {
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+    public void allWheelDrive(double fLpower,double fRpower, double bLpower, double bRpower) {
+        fLeft.setPower(fLpower);
+        fRight.setPower(fRpower);
+        bLeft.setPower(bLpower);
+        bRight.setPower(bRpower);
+    }
+
+    public void resetMotor(DcMotor motor) {
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     public void finalMove(double speed, double targetDistance) {
         //move robot function
         //to move backwards make targetDistance negative

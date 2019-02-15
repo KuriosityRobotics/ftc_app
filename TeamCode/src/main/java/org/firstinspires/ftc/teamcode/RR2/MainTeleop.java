@@ -56,21 +56,15 @@ public class MainTeleop extends LinearOpMode {
         robot = new RR2(hardwareMap, telemetry, this);
 
         robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.pivot2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.resetMotor(robot.pivot);
+        robot.resetMotor(robot.pivot2);
+        robot.resetMotor(robot.slide);
 
         robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        robot.slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
@@ -116,10 +110,7 @@ public class MainTeleop extends LinearOpMode {
             bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
         }
 
-        robot.fLeft.setPower(fLPower);
-        robot.fRight.setPower(fRPower);
-        robot.bLeft.setPower(bLPower);
-        robot.bRight.setPower(bRPower);
+        robot.allWheelDrive(fLPower, fRPower, bLPower, bRPower);
     }
 
     private void intakeLogic(){
