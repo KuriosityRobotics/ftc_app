@@ -12,7 +12,7 @@ public class CraterFacing extends AutoBase
         initLogic();
         while (opModeIsActive()){
             dropDownFromLander();
-            knockOffMineral(40);
+            knockOffMineral(50);
             navigateToDepotThenCrater();
             break;
 //            telemetry.addData("encoder value of Pivot", robot.bottomDistance.getDistance(DistanceUnit.MM));

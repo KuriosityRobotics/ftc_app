@@ -560,7 +560,7 @@ public class RR2 {
         bLeft.setPower(speed);
         bRight.setPower(speed);
 
-        while(linearOpMode.opModeIsActive() && Math.abs(angles.thirdAngle - currentPosition)<2.5 ){
+        while(linearOpMode.opModeIsActive() && Math.abs(angles.thirdAngle - currentPosition)<1 ){
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             telemetry.addData("X",angles.thirdAngle);
             telemetry.addData("Y",angles.secondAngle);

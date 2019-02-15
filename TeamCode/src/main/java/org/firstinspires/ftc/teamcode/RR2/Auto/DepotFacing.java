@@ -4,14 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Autonomous(name="Depot Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 public class DepotFacing extends AutoBase
 {
-    double distanceToDepot = 95;
+    double distanceToDepot = 70;
     boolean center = false;
     @Override
     public void runOpMode(){
         initLogic();
+//        tensorFlowMineralDetection.location = TensorFlowMineralDetection.Location.RIGHT;
         while (opModeIsActive()){
             dropDownFromLander();
-            knockOffMineral(45);
+            knockOffMineral(35);
             navigateToDepotThenCrater(distanceToDepot);
             break;
         }
@@ -19,8 +20,8 @@ public class DepotFacing extends AutoBase
 
     protected void navigateToDepotThenCrater(double distance) {
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-            robot.finalMove(0.5, -53);
-            robot.finalTurn(74);
+            robot.finalMove(0.7, -53);
+            robot.finalTurn(75);
             //Getting to Depot
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
             distanceToDepot = 65;
@@ -28,28 +29,33 @@ public class DepotFacing extends AutoBase
             center = true;
             distance = 0;
             //Getting to Depot
-            robot.finalMove(0.5, 52);
+            robot.finalMove(0.7, 39);
             robot.releaseTeamMarker();
-            robot.finalMove(0.5, -100);
+            robot.finalMove(0.7, -87);
             robot.finalTurn(70);
         }
 
-        robot.goToWall(0.3,25);
+        robot.goToWall(0.7,25);
 
         if(!center) {
-            robot.finalTurn(-42);
-            robot.finalMove(0.3,distance);
+            robot.finalTurn(-60);
+            robot.finalMove(0.7,distance);
             robot.releaseTeamMarker();
             robot.goToCrater(-0.5);
         }
         if (center) {
             robot.finalTurn(132);
-            robot.finalMove(0.5, 40);
-            robot.slide.setTargetPosition(200);
-            robot.slide.setPower(-0.7);
+            robot.finalMove(0.7, 30);
+            robot.pivot.setPower(1);
+            robot.pivot2.setPower(-1);
+            sleep(500);
+            robot.pivot2.setPower(0);
+            robot.pivot.setPower(0);
+            robot.slide.setPower(-1);
+            sleep(1000);
+            robot.slide.setPower(0);
         }
 
-        robot.goToCrater(-0.5);
 
         telemetry.addData("Status","done");
         telemetry.update();
