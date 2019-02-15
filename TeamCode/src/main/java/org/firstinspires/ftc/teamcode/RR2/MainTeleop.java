@@ -143,12 +143,12 @@ public class MainTeleop extends LinearOpMode {
     private void pivotLogic(){
         //Pivoting Slide For Outtake
         if (gamepad1.y) {
-            robot.pivot.setPower(1);
-            robot.pivot2.setPower(-1);
+            robot.pivot.setPower(0.8);
+            robot.pivot2.setPower(-0.8);
         }
         else if (gamepad1.x && robot.distance.getDistance(DistanceUnit.MM)>150) {
-            robot.pivot.setPower(-1);
-            robot.pivot2.setPower(1);
+            robot.pivot.setPower(-0.8);
+            robot.pivot2.setPower(0.8);
         } else {
             robot.pivot.setPower(0);
             robot.pivot2.setPower(0);
