@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -33,6 +34,9 @@ public class RR2 {
     public Rev2mDistanceSensor distance;
     public Rev2mDistanceSensor bottomDistance;
     public Rev2mDistanceSensor frontDistance;
+
+    public Rev2mDistanceSensor slideDistance;
+
 
     //Intake Motors;
     public DcMotor slide;
@@ -83,6 +87,7 @@ public class RR2 {
         distance = hardwareMap.get(Rev2mDistanceSensor.class,"distance");
         bottomDistance = hardwareMap.get(Rev2mDistanceSensor.class,"bottomDistance");
         frontDistance = hardwareMap.get(Rev2mDistanceSensor.class,"frontFacingRight");
+        slideDistance = hardwareMap.get(Rev2mDistanceSensor.class,"slideDistance");
 
         //Map LinearSlide Motors
         //Set direction of drive motors

@@ -3,20 +3,25 @@ package org.firstinspires.ftc.teamcode.RR2;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
 public class MainTeleop extends LinearOpMode {
     RR2 robot;
-    //DO NOT DELETE
 
     double fLPower;
     double fRPower;
     double bLPower;
     double bRPower;
-    boolean blockIntake = false;
+
+    double distance;
+
     boolean blockIsPressed = false;
+
+    boolean isXPressed = false;
+    boolean isYPressed = false;
 
     boolean isHangStarted = false;
     boolean killSwitchForHangTouchIsHit = false;
@@ -126,7 +131,7 @@ public class MainTeleop extends LinearOpMode {
         //blocker for outtake
         if(gamepad2.right_bumper){
             robot.blocker.setPosition(0);
-            intakePower = 1;
+            intakePower = -1;
         }
         else{
             blockIsPressed = false;
@@ -151,9 +156,29 @@ public class MainTeleop extends LinearOpMode {
     }
 
     private void slideLogic(){
-        //Controlling the Slide with Gamepad2
         double slidePower = gamepad2.right_stick_y;
+        if(gamepad2.x){
+            isXPressed = true;
+        }
+        if(gamepad1.y){
+            isYPressed = true;
+        }
+        if(isXPressed){
+            distance = robot.slideDistance.getDistance(DistanceUnit.MM);
+            slidePower = (distance-25)/200;
+            if(Double.isNaN(distance)){
+                slidePower = 1;
+            }
+            if(isYPressed){
+                slidePower = (distance - 380) / 400;
+            }
+        }
+
         robot.slide.setPower(slidePower);
+        if(gamepad2.right_stick_y!=0){
+            isXPressed = false;
+            isYPressed = false;
+        }
     }
 
     private void hangLockLogic(){
