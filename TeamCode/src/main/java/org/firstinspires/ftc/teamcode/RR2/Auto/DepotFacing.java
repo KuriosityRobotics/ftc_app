@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Autonomous(name="Depot Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 public class DepotFacing extends AutoBase
 {
-    double distanceToDepot = 70;
+    double distanceToDepot = 77;
     boolean center = false;
     @Override
     public void runOpMode(){
@@ -25,6 +25,7 @@ public class DepotFacing extends AutoBase
             //Getting to Depot
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
             distanceToDepot = 65;
+            robot.finalTurn(65,5000);
         } else {
             center = true;
             distance = 0;
@@ -35,10 +36,11 @@ public class DepotFacing extends AutoBase
             robot.finalTurn(70);
         }
 
-        robot.goToWall(0.7,25);
+        robot.goToWall(0.7, 25);
+
 
         if(!center) {
-            robot.finalTurn(-60);
+            robot.finalTurn(-65);
             robot.finalMove(0.7,distance);
             robot.releaseTeamMarker();
             robot.goToCrater(-0.5);
