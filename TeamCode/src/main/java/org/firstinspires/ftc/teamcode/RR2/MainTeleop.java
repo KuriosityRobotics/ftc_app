@@ -17,6 +17,9 @@ public class MainTeleop extends LinearOpMode {
     double bRPower;
 
     double distance;
+    double slideScaleFactor;
+    double extendDistance;
+    double slidePower;
 
     boolean blockIsPressed = false;
 
@@ -147,7 +150,9 @@ public class MainTeleop extends LinearOpMode {
     }
 
     private void slideLogic(){
-        double slidePower = gamepad2.right_stick_y;
+        slidePower = gamepad2.right_stick_y;
+        slideScaleFactor = 200;
+        extendDistance = 25;
         if(gamepad2.x){
             isXPressed = true;
         }
@@ -156,20 +161,21 @@ public class MainTeleop extends LinearOpMode {
         }
         if(isXPressed){
             distance = robot.slideDistance.getDistance(DistanceUnit.MM);
-            slidePower = (distance-25)/200;
             if(Double.isNaN(distance)){
                 slidePower = 1;
             }
             if(isYPressed){
-                slidePower = (distance - 380) / 400;
+                extendDistance = 380;
+                slideScaleFactor = 400;
             }
+            slidePower = (distance-extendDistance)/slideScaleFactor;
         }
-
-        robot.slide.setPower(slidePower);
         if(gamepad2.right_stick_y!=0){
             isXPressed = false;
             isYPressed = false;
         }
+
+        robot.slide.setPower(slidePower);
     }
 
     private void hangLockLogic(){
