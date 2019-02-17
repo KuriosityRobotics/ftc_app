@@ -9,7 +9,6 @@ public class DepotFacing extends AutoBase
     @Override
     public void runOpMode(){
         initLogic();
-//        tensorFlowMineralDetection.location = TensorFlowMineralDetection.Location.RIGHT;
         while (opModeIsActive()){
             dropDownFromLander();
             knockOffMineral(35);
@@ -38,7 +37,6 @@ public class DepotFacing extends AutoBase
 
         robot.goToWall(0.7, 25);
 
-
         if(!center) {
             robot.finalTurn(-65);
             robot.finalMove(0.7,distance);
@@ -56,8 +54,9 @@ public class DepotFacing extends AutoBase
             robot.slide.setPower(-1);
             sleep(1000);
             robot.slide.setPower(0);
+            robot.intake.setPower(-1);
+            sleep(2000);
         }
-
 
         telemetry.addData("Status","done");
         telemetry.update();

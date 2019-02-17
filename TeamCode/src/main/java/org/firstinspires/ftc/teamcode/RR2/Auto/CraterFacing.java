@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.RR2.Auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 @Autonomous(name="Crater Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 public class CraterFacing extends AutoBase
 {
@@ -12,11 +10,9 @@ public class CraterFacing extends AutoBase
         initLogic();
         while (opModeIsActive()){
             dropDownFromLander();
-            knockOffMineral(50);
+            knockOffMineral(35);
             navigateToDepotThenCrater();
             break;
-//            telemetry.addData("encoder value of Pivot", robot.bottomDistance.getDistance(DistanceUnit.MM));
-//            telemetry.update();
         }
     }
 
@@ -29,7 +25,7 @@ public class CraterFacing extends AutoBase
         }
 
         //Getting to Depot
-        robot.finalTurn(65);
+        robot.finalTurn(65,3250);
         robot.goToWall(0.75,25);
         robot.finalTurn(135);
         robot.moveRobotKillSwitch(0.6,120,-120);

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.RR2.Auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -86,16 +85,11 @@ public class AutoBase extends LinearOpMode {
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
             robot.finalTurn(-leftRightAngle);
             robot.finalMove(0.75, 58);
-//            robot.cordinateMecanum(-4, 5, 0.5);
-//            robot.cordinateMecanum(4, -5, 0.5);
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
             robot.finalTurn(leftRightAngle);
             robot.finalMove(0.75, 58);
-//            robot.cordinateMecanum(4, 5, 0.5);
-//            robot.cordinateMecanum(-4, -5, 0.5);
         } else {
             robot.finalMove(0.75, 53);
         }
     }
-
 }

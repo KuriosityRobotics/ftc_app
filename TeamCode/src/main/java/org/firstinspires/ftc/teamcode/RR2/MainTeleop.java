@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.RR2;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -16,15 +15,9 @@ public class MainTeleop extends LinearOpMode {
     double bLPower;
     double bRPower;
 
-    double distance;
-    double slideScaleFactor;
-    double extendDistance;
     double slidePower;
 
     boolean blockIsPressed = false;
-
-    boolean isXPressed = false;
-    boolean isYPressed = false;
 
     boolean isHangStarted = false;
     boolean killSwitchForHangTouchIsHit = false;
@@ -137,8 +130,8 @@ public class MainTeleop extends LinearOpMode {
     private void pivotLogic(){
         //Pivoting Slide For Outtake
         if (gamepad1.y) {
-            robot.pivot.setPower(0.8);
-            robot.pivot2.setPower(-0.8);
+            robot.pivot.setPower(0.9);
+            robot.pivot2.setPower(-0.9);
         }
         else if (gamepad1.x && robot.distance.getDistance(DistanceUnit.MM)>150) {
             robot.pivot.setPower(-0.8);
@@ -151,30 +144,6 @@ public class MainTeleop extends LinearOpMode {
 
     private void slideLogic(){
         slidePower = gamepad2.right_stick_y;
-        slideScaleFactor = 200;
-        extendDistance = 25;
-        if(gamepad2.x){
-            isXPressed = true;
-        }
-        if(gamepad1.y){
-            isYPressed = true;
-        }
-        if(isXPressed){
-            distance = robot.slideDistance.getDistance(DistanceUnit.MM);
-            if(Double.isNaN(distance)){
-                slidePower = 1;
-            }
-            if(isYPressed){
-                extendDistance = 380;
-                slideScaleFactor = 400;
-            }
-            slidePower = (distance-extendDistance)/slideScaleFactor;
-        }
-        if(gamepad2.right_stick_y!=0){
-            isXPressed = false;
-            isYPressed = false;
-        }
-
         robot.slide.setPower(slidePower);
     }
 
@@ -224,15 +193,12 @@ public class MainTeleop extends LinearOpMode {
             telemetry.update();
 
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            //robot.pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             telemetry.addData("pivot before",robot.pivot.getCurrentPosition());
             telemetry.addData("pivot2 before",robot.pivot2.getCurrentPosition());
             telemetry.update();
             robot.pivot.setPower(1);//this
             robot.pivot2.setPower(-1);
-
-            //robot.pivot.setTargetPosition(4400);
 
             while(robot.pivot.getCurrentPosition() > -4400 && opModeIsActive()){
                 telemetry.addData("pivot",robot.pivot.getCurrentPosition());

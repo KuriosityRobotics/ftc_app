@@ -13,10 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.Came
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaException;
-import org.firstinspires.ftc.teamcode.RR2.RR2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +22,10 @@ import java.util.List;
 public class TensorFlowMineralDetection {
     public enum Location{
         CENTER,LEFT,RIGHT,UNKNOWN;
+    }
+
+    public enum MineralViewType{
+        ALL3, LEFT2, RIGHT2;
     }
 
     public HardwareMap hardwareMap;
@@ -34,6 +36,7 @@ public class TensorFlowMineralDetection {
     }
 
     public Location location;
+    public MineralViewType mineralViewType;
     public Telemetry telemetry;
     public LinearOpMode linearOpMode;
 
@@ -50,7 +53,8 @@ public class TensorFlowMineralDetection {
     public WebcamName webcamName;
 
     int goldXPos = -1;
-
+    double scale = 0;
+    int skipFirstMineral = 0;
 
     public Location runObjectDetection() throws VuforiaException{
         if (tfod != null) {
@@ -94,9 +98,56 @@ public class TensorFlowMineralDetection {
                         }
                     });
 
+                    telemetry.addData("List RAW", updatedList);
+                    telemetry.update();
+
+                    for(int i = 0;i<updatedList.size()-1;i++){
+                        if(updatedList.get(i).getBottom()/updatedList.get(i+1).getBottom() > 1.25){
+                            updatedList.remove(i+1);
+                        }else if(updatedList.get(i+1).getBottom()/updatedList.get(i).getBottom() > 1.25){
+                            updatedList.remove(i);
+                        }
+                    }
+
+                    if(updatedList.size() == 2){
+                        scale = updatedList.get(0).getLeft()/(800-updatedList.get(1).getLeft());
+                        if(scale<1){
+                            this.mineralViewType = MineralViewType.LEFT2;
+                            goldXPos = 2;
+                        }else{
+                            this.mineralViewType = MineralViewType.RIGHT2;
+                            goldXPos = 0;
+                            skipFirstMineral= 1;
+                        }
+                    }else if(updatedList.size() == 1){
+                        Recognition recognition = updatedList.get(0);
+                        if(recognition.getLeft()<300){
+                            this.location = Location.LEFT;
+                        }else if(recognition.getLeft()>500){
+                            this.location = Location.RIGHT;
+                        }else{
+                            this.location = Location.CENTER;
+                        }
+
+                        if(recognition.getLabel().equals(LABEL_GOLD_MINERAL)){
+                            return this.location;
+                        }else{
+                            if(this.location == Location.RIGHT){
+                                return Location.LEFT;
+                            }else if(this.location == Location.LEFT){
+                                return Location.RIGHT;
+                            }else{
+                                return Location.LEFT;
+                            }
+                        }
+                    }
+                    telemetry.addData("List ", updatedList);
+                    telemetry.addData("Scale", scale);
+                    telemetry.update();
+
                     for(int i = 0;i<updatedList.size();i++){
                         if(updatedList.get(i).getLabel().equals(LABEL_GOLD_MINERAL)){
-                            goldXPos = i;
+                            goldXPos = i+skipFirstMineral;
                         }
                     }
 
