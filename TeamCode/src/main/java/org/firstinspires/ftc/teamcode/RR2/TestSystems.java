@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name="MainTeleOp", group="Linear Opmode")
-public class MainTeleop extends LinearOpMode {
+@TeleOp(name="Test Systems", group="Linear Opmode")
+public class TestSystems extends LinearOpMode {
     RR2 robot;
     boolean isRightStick = false;
     boolean facts = false;
@@ -36,6 +36,31 @@ public class MainTeleop extends LinearOpMode {
         waitForStart();
         robot.hangLockOpen();
         while (opModeIsActive()) {
+            telemetry.addLine("fLeft: " + Double.toString(robot.fLeft.getPower()));
+            telemetry.addLine("bLeft: " + Double.toString(robot.bLeft.getPower()));
+            telemetry.addLine("fRight: " + Double.toString(robot.fRight.getPower()));
+            telemetry.addLine("bRight: " + Double.toString(robot.bRight.getPower()));
+
+            telemetry.addLine("fLeft position: " + Double.toString(robot.fLeft.getCurrentPosition()));
+            telemetry.addLine("bLeft position: " + Double.toString(robot.bLeft.getCurrentPosition()));
+            telemetry.addLine("fRight position: " + Double.toString(robot.fRight.getCurrentPosition()));
+            telemetry.addLine("bRight position: " + Double.toString(robot.bRight.getCurrentPosition()));
+
+            telemetry.addLine("pivot position: " + Integer.toString(robot.pivot.getCurrentPosition()));
+            telemetry.addLine("pivot power: " + Double.toString(robot.pivot.getPower()));
+            telemetry.addLine("slide power: " + Double.toString(robot.slide.getPower()));
+            telemetry.addLine("intake power: " + Double.toString(robot.intake.getPower()));
+            telemetry.addLine("hook position: " + Double.toString(robot.hook.getPosition()));
+            telemetry.addLine("hangLockLeft position: " + Double.toString(robot.hangLockLeft.getPosition()));
+            telemetry.addLine("hangLockRight position: " + Double.toString(robot.hangLockRight.getPosition()));
+            telemetry.addLine("hook position: " + Double.toString(robot.hook.getPosition()));
+            telemetry.addLine("blocker position: " + Double.toString(robot.blocker.getPosition()));
+
+            telemetry.addLine("distance (MM): " + Double.toString(robot.distance.getDistance(DistanceUnit.MM)));
+            telemetry.addLine("frontDistance (CM): " + Double.toString(robot.frontDistance.getDistance(DistanceUnit.CM)));
+            telemetry.addLine("bottomDistance (MM): " + Double.toString(robot.bottomDistance.getDistance(DistanceUnit.MM)));
+
+            telemetry.update();
             slowDriveLogic();
             driveLogic();
             intakeLogic();
@@ -133,9 +158,6 @@ public class MainTeleop extends LinearOpMode {
     private void pivotLogic(){
         //Pivoting Slide For Outtake
         robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        telemetry.addLine(Integer.toString(robot.pivot.getCurrentPosition()));
-        telemetry.addLine(Double.toString(robot.pivot.getPower()));
-        telemetry.update();
 
         if(robot.pivot.getCurrentPosition()<=-2000 && !facts){
             sign*=-1;
@@ -192,12 +214,6 @@ public class MainTeleop extends LinearOpMode {
     }
 
     private void slowDriveLogic(){
-        //toggle driving speed
-        if(powerScaleFactor == 0.3){
-            telemetry.addData("Driving Mode","Slow");
-        }else{
-            telemetry.addData("Driving Mode","Normal");
-        }
         if(gamepad1.left_bumper && !changedSlowDrive){
             powerScaleFactor = (onSlowDrive) ? 0.8 : 0.3;
             onSlowDrive = !onSlowDrive;
@@ -205,7 +221,6 @@ public class MainTeleop extends LinearOpMode {
         }else if(!gamepad1.left_bumper){
             changedSlowDrive = false;
         }
-        telemetry.update();
     }
 
     private void setToHangMode(){
@@ -214,26 +229,18 @@ public class MainTeleop extends LinearOpMode {
             isHangStarted = true;
             robot.hangLockOpen();
             robot.hook.setPosition(0);
-            telemetry.addData("hook status","opening...");
-            telemetry.update();
 
             robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            telemetry.addData("pivot before",robot.pivot.getCurrentPosition());
-            telemetry.addData("pivot2 before",robot.pivot2.getCurrentPosition());
-            telemetry.update();
+
             robot.pivot.setPower(1);//this
             robot.pivot2.setPower(-1);
 
             while(robot.pivot.getCurrentPosition() > -4400 && opModeIsActive()){
-                telemetry.addData("pivot",robot.pivot.getCurrentPosition());
-                telemetry.addData("pivot2",robot.pivot2.getCurrentPosition());
-                telemetry.update();
+
                 driveLogic();
             }
-            telemetry.addData("pivot after",robot.pivot.getCurrentPosition());
-            telemetry.addData("pivot2 after",robot.pivot2.getCurrentPosition());
-            telemetry.update();
+
             robot.pivot.setPower(0);
             robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.pivot2.setPower(0);
@@ -258,20 +265,16 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot2.setPower(1);
             while(robot.distance.getDistance(DistanceUnit.MM)>70 && opModeIsActive()){
                 if(gamepad2.right_bumper){
-                    telemetry.addData("Hang Status","Aborting hang...");
-                    telemetry.update();
+
                     return;
                 }else{
-                    telemetry.addData("Hang Status","Hanging...");
-                    telemetry.update();
+
                 }
             }
             sleep(500);
             robot.pivot.setPower(0);
             robot.pivot2.setPower(0);
             robot.hangLockClose();
-            telemetry.addData("Hang Status","Hang successful");
-            telemetry.update();
         }
     }
 
@@ -280,10 +283,8 @@ public class MainTeleop extends LinearOpMode {
         if(gamepad1.left_bumper && gamepad1.right_bumper){
             robot.pivot.setPower(1);
             while(robot.distance.getDistance(DistanceUnit.MM)>150 && opModeIsActive()){
-                telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
-                telemetry.update();
+
             }
-            telemetry.addData("done", "done");
             robot.pivot.setPower(0);
 
             robot.hangLockOpen();
@@ -296,11 +297,9 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot.setTargetPosition(-4000);
 
             while(robot.pivot.isBusy() && opModeIsActive()){
-                telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
-                telemetry.update();
+
             }
 
-            telemetry.update();
             robot.pivot.setPower(0);
 
             robot.hook.setPosition(0); //open

@@ -555,9 +555,15 @@ public class RR2 {
         bLeft.setPower(speed);
         fRight.setPower(speed);
         bRight.setPower(speed);
+        double currentvalue = 0;
         while(frontDistance.getDistance(DistanceUnit.CM)>distance && linearOpMode.opModeIsActive()){
             telemetry.addData("distance",frontDistance.getDistance(CM));
             telemetry.update();
+            currentvalue = frontDistance.getDistance(CM);
+            linearOpMode.sleep(100);
+            if(frontDistance.getDistance(DistanceUnit.CM) > currentvalue){
+                linearOpMode.stop();
+            }
         }
         brakeRobot();
     }
