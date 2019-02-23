@@ -119,31 +119,7 @@ public class TensorFlowMineralDetection {
                             goldXPos = 0;
                             skipFirstMineral= 1;
                         }
-                    }else if(updatedList.size() == 1){
-                        Recognition recognition = updatedList.get(0);
-                        if(recognition.getLeft()<300){
-                            this.location = Location.LEFT;
-                        }else if(recognition.getLeft()>500){
-                            this.location = Location.RIGHT;
-                        }else{
-                            this.location = Location.CENTER;
-                        }
-
-                        if(recognition.getLabel().equals(LABEL_GOLD_MINERAL)){
-                            return this.location;
-                        }else{
-                            if(this.location == Location.RIGHT){
-                                return Location.LEFT;
-                            }else if(this.location == Location.LEFT){
-                                return Location.RIGHT;
-                            }else{
-                                return Location.LEFT;
-                            }
-                        }
                     }
-                    telemetry.addData("List ", updatedList);
-                    telemetry.addData("Scale", scale);
-                    telemetry.update();
 
                     for(int i = 0;i<updatedList.size();i++){
                         if(updatedList.get(i).getLabel().equals(LABEL_GOLD_MINERAL)){
@@ -168,12 +144,40 @@ public class TensorFlowMineralDetection {
                             this.location = Location.UNKNOWN;
                             break;
                     }
+
+                    telemetry.addData("List ", updatedList);
+                    telemetry.addData("Scale", scale);
+                    telemetry.update();
+
+                    if(updatedList.size() == 1){
+                        Recognition recognition = updatedList.get(0);
+                        if(recognition.getLabel().equals(LABEL_GOLD_MINERAL)){
+                            if(recognition.getLeft()<300){
+                                this.location = Location.LEFT;
+                            }else if(recognition.getLeft()>500){
+                                this.location = Location.RIGHT;
+                            }else{
+                                this.location = Location.CENTER;
+                            }
+                        }else{
+                            if(this.location == Location.RIGHT){
+                                this.location = Location.LEFT;
+                            }else if(this.location == Location.LEFT){
+                                this.location = Location.RIGHT;
+                            }else{
+                               this.location = Location.LEFT;
+                            }
+                        }
+                    }
+
+                    tfod.deactivate();
                     tfod.shutdown();
                     return location;
                 }
             }
         }
         if (tfod != null) {
+            tfod.deactivate();
             tfod.shutdown();
         }
         location = Location.UNKNOWN;
@@ -200,5 +204,6 @@ public class TensorFlowMineralDetection {
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+        tfodParameters.minimumConfidence = 0.5;
     }
 }
