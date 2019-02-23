@@ -130,8 +130,29 @@ public class MainTeleop extends LinearOpMode {
     private void pivotLogic(){
         //Pivoting Slide For Outtake
         if (gamepad1.y) {
+            robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setPower(0.9);
             robot.pivot2.setPower(-0.9);
+            while (robot.pivot.getCurrentPosition() < 120) {
+                if (gamepad1.x) {
+                    robot.slide.setPower(-0.1);
+                } else if (gamepad1.y) {
+                    robot.slide.setPower(0.1);
+                }
+                else{
+                    robot.slide.setPower(0);
+                }
+            }
+            while (robot.pivot.getCurrentPosition() > 120) {
+                if (gamepad1.x && robot.pivot.getCurrentPosition() < 250) {
+                    robot.slide.setPower(0.1);
+                } else if (gamepad1.y) {
+                    robot.slide.setPower(-0.1);
+                }
+                else {
+                    robot.slide.setPower(0);
+                }
+            }
         }
         else if (gamepad1.x && robot.distance.getDistance(DistanceUnit.MM)>150) {
             robot.pivot.setPower(-0.8);
