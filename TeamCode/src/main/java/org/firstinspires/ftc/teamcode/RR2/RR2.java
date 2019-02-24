@@ -555,13 +555,14 @@ public class RR2 {
         bLeft.setPower(speed);
         fRight.setPower(speed);
         bRight.setPower(speed);
-        double currentvalue = 0;
+        long startTime = SystemClock.elapsedRealtime();
+        double currentvalue = frontDistance.getDistance(CM);
         while(frontDistance.getDistance(DistanceUnit.CM)>distance && linearOpMode.opModeIsActive()){
             telemetry.addData("distance",frontDistance.getDistance(CM));
             telemetry.update();
-            currentvalue = frontDistance.getDistance(CM);
-            linearOpMode.sleep(100);
-            if(frontDistance.getDistance(DistanceUnit.CM) > currentvalue){
+            if(SystemClock.elapsedRealtime()-startTime >=1500 && frontDistance.getDistance(CM) == currentvalue){
+                telemetry.addLine("KILL SWITCH ACTIVATED");
+                telemetry.update();
                 linearOpMode.stop();
             }
         }

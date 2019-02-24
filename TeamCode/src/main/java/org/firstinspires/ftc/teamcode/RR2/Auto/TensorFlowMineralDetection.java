@@ -98,8 +98,7 @@ public class TensorFlowMineralDetection {
                         }
                     });
 
-                    telemetry.addData("List RAW", updatedList);
-                    telemetry.update();
+                    telemetry.addLine("LIST RAW: "+ updatedList.toString());
 
                     for(int i = 0;i<updatedList.size()-1;i++){
                         if(updatedList.get(i).getBottom()/updatedList.get(i+1).getBottom() > 1.25){
@@ -111,10 +110,16 @@ public class TensorFlowMineralDetection {
 
                     if(updatedList.size() == 2){
                         scale = updatedList.get(0).getLeft()/(800-updatedList.get(1).getLeft());
-                        if(scale<1){
+
+                        if(scale<0.9 && scale>0.2){
+                            this.location = Location.CENTER;
+                            return Location.CENTER;
+                        }
+                        else if(scale < 0.4){
                             this.mineralViewType = MineralViewType.LEFT2;
                             goldXPos = 2;
-                        }else{
+
+                        }else if(scale>1.1){
                             this.mineralViewType = MineralViewType.RIGHT2;
                             goldXPos = 0;
                             skipFirstMineral= 1;
@@ -145,9 +150,8 @@ public class TensorFlowMineralDetection {
                             break;
                     }
 
-                    telemetry.addData("List ", updatedList);
-                    telemetry.addData("Scale", scale);
-                    telemetry.update();
+                    telemetry.addLine(updatedList.toString());
+                    telemetry.addLine("Scale: " + Double.toString(scale));
 
                     if(updatedList.size() == 1){
                         Recognition recognition = updatedList.get(0);
@@ -204,6 +208,5 @@ public class TensorFlowMineralDetection {
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
-        tfodParameters.minimumConfidence = 0.3;
     }
 }

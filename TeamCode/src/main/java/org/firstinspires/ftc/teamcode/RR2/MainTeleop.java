@@ -20,8 +20,6 @@ public class MainTeleop extends LinearOpMode {
 
     double slidePower;
 
-    boolean blockIsPressed = false;
-
     boolean isHangStarted = false;
     boolean killSwitchForHangTouchIsHit = false;
 
@@ -122,9 +120,7 @@ public class MainTeleop extends LinearOpMode {
         if(gamepad2.right_bumper){
             robot.blocker.setPosition(0.325);
             intakePower = -1;
-        }
-        else{
-            blockIsPressed = false;
+        }else{
             robot.blocker.setPosition(0.7);
         }
         robot.intake.setPower(intakePower);

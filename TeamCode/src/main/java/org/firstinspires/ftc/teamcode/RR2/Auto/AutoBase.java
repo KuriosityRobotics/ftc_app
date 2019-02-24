@@ -22,6 +22,8 @@ public class AutoBase extends LinearOpMode {
         robot.pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        robot.blocker.setPosition(0.7);
+
         tensorFlowMineralDetection.initVuforia();
         tensorFlowMineralDetection.initTfod();
 
