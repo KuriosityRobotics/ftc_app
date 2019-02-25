@@ -19,12 +19,24 @@ public class CraterFacing65Point extends AutoBase
     protected void navigateToCrater(){
         //go to crater
         if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-            craterTurn(10);
+            craterTurn(7);
+            robot.finalMove(0.5,4);
         }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.LEFT){
-            craterTurn(-10);
+            craterTurn(-7);
+            robot.finalMove(0.5,4);
         } else {
             robot.finalMove(0.5,4);
         }
+        robot.pivot.setPower(1);
+        robot.pivot2.setPower(-1);
+        sleep(800);
+        robot.pivot2.setPower(0);
+        robot.pivot.setPower(0);
+        robot.slide.setPower(-1);
+        sleep(1300);
+        robot.slide.setPower(0);
+        robot.intake.setPower(-1);
+        sleep(2000);
     }
 
     protected void craterTurn(double angle){

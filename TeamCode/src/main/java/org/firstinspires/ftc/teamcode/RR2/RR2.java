@@ -425,13 +425,13 @@ public class RR2 {
     public void hangLockClose(){
         //closes the hangLocks
         hangLockLeft.setPosition(0.49);
-        hangLockRight.setPosition(0.35);
+        hangLockRight.setPosition(0.45);
     }
 
     public void hangLockOpen(){
         //opens the hangLocks
         hangLockLeft.setPosition(0.35);
-        hangLockRight.setPosition(0.5);
+        hangLockRight.setPosition(0.6);
     }
 
     public void wallFollow(double speed, double distance){
@@ -522,7 +522,7 @@ public class RR2 {
 
     public void releaseTeamMarker(){
         intake.setPower(1);
-        linearOpMode.sleep(2000);
+        linearOpMode.sleep(1000);
         intake.setPower(0);
     }
 

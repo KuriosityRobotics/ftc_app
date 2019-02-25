@@ -128,32 +128,31 @@ public class MainTeleop extends LinearOpMode {
 
     private void pivotLogic(){
         //Pivoting Slide For Outtake
-        robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        telemetry.addLine(Integer.toString(robot.pivot.getCurrentPosition()));
-        telemetry.addLine(Double.toString(robot.pivot.getPower()));
-        telemetry.update();
-
-        if(robot.pivot.getCurrentPosition()<=-2000 && !facts){
-            sign*=-1;
-            facts = true;
-        }
-
-        if(robot.pivot.getCurrentPosition()>=-2000 && facts){
-            sign*=-1;
-            facts = false;
-        }
-
-        if(facts && !isRightStick && gamepad2.right_stick_y==0){
-            slidePower = (robot.pivot.getPower()*sign)/1.05;
-        }
-
-        robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+//        robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        telemetry.addLine(Integer.toString(robot.pivot.getCurrentPosition()));
+//        telemetry.addLine(Double.toString(robot.pivot.getPower()));
+//        telemetry.update();
+//
+//        if(robot.pivot.getCurrentPosition()<=-2000 && !facts){
+//            sign*=-1;
+//            facts = true;
+//        }
+//
+//        if(robot.pivot.getCurrentPosition()>=-2000 && facts){
+//            sign*=-1;
+//            facts = false;
+//        }
+//
+//        if(facts && !isRightStick && gamepad2.right_stick_y==0){
+//            slidePower = (robot.pivot.getPower()*sign)/1.05;
+//        }
+//
+//        robot.pivot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//
         if (gamepad1.y) {
             robot.pivot.setPower(0.9);
             robot.pivot2.setPower(-0.9);
-        }
-        else if (gamepad1.x && robot.distance.getDistance(DistanceUnit.MM)>150) {
+        } else if (gamepad1.x && robot.distance.getDistance(DistanceUnit.MM)>150) {
             robot.pivot.setPower(-0.8);
             robot.pivot2.setPower(0.8);
         } else {
@@ -252,7 +251,7 @@ public class MainTeleop extends LinearOpMode {
             robot.pivot2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.pivot.setPower(-1);
             robot.pivot2.setPower(1);
-            while(robot.distance.getDistance(DistanceUnit.MM)>70 && opModeIsActive()){
+            while(robot.distance.getDistance(DistanceUnit.MM)>170 && opModeIsActive()){
                 if(gamepad2.right_bumper){
                     telemetry.addData("Hang Status","Aborting hang...");
                     telemetry.update();

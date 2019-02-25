@@ -18,20 +18,12 @@ public class DepotFacing65Point extends AutoBase
     }
 
     private void navigateToCrater() {
-        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.RIGHT){
-            robot.finalMove(0.5, -53);
-            robot.finalTurn(74);
-            //Getting to Depot
-        }else if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER){
-            robot.finalMove(0.5, 52);
+        if(tensorFlowMineralDetection.location == TensorFlowMineralDetection.Location.CENTER){
+            robot.finalMove(0.5, 35);
             robot.releaseTeamMarker();
-            robot.finalMove(0.5, -100);
-            robot.finalTurn(70);
         }
 
-        robot.goToWall(0.3,40);
-        robot.finalTurn(-38);
-        robot.goToCrater(-0.5);
+        robot.finalMove(0.5, -60);
 
         telemetry.addData("Status","done");
         telemetry.update();
