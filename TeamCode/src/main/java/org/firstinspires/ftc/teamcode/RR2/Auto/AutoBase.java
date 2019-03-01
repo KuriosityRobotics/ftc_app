@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RR2.Auto;
 
+import android.os.SystemClock;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -47,7 +49,8 @@ public class AutoBase extends LinearOpMode {
         robot.resetEncoders();
         robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //Move robot to relase hanglocks
-        while (robot.distance.getDistance(DistanceUnit.MM) > 170 && opModeIsActive() ) {
+        long startTime = SystemClock.elapsedRealtime();
+        while (robot.distance.getDistance(DistanceUnit.MM) > 170 && opModeIsActive() && SystemClock.elapsedRealtime()-startTime<1500 && robot.pivot.getCurrentPosition()>-500) {
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
             telemetry.update();
         }
@@ -61,8 +64,9 @@ public class AutoBase extends LinearOpMode {
         robot.pivot.setPower(1);
         robot.pivot2.setPower(-1);
         //Brings Robot Down From Lander
+        startTime = SystemClock.elapsedRealtime();
         while (robot.bottomDistance.getDistance(DistanceUnit.MM) > 23 &&
-                opModeIsActive() && robot.pivot.getCurrentPosition() > -4550) {
+                opModeIsActive() && robot.pivot.getCurrentPosition() > -4550 && SystemClock.elapsedRealtime()-startTime<4000) {
             telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
             telemetry.update();
         }
@@ -76,8 +80,9 @@ public class AutoBase extends LinearOpMode {
 
         robot.pivot.setPower(-1);
         robot.pivot2.setPower(1);
+        startTime = SystemClock.elapsedRealtime();
         //Pivots down after unhook
-        while (robot.distance.getDistance(DistanceUnit.MM) > 170 && opModeIsActive() ) {
+        while (robot.distance.getDistance(DistanceUnit.MM) > 170 && opModeIsActive() && robot.pivot.getCurrentPosition() >200 && SystemClock.elapsedRealtime()-startTime<2000) {
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
             telemetry.update();
         }
