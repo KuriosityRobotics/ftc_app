@@ -294,7 +294,6 @@ public class MainTeleop extends LinearOpMode {
                 telemetry.addData("encoder value of Pivot", robot.pivot.getCurrentPosition());
                 telemetry.update();
             }
-
             telemetry.update();
             robot.pivot.setPower(0);
 

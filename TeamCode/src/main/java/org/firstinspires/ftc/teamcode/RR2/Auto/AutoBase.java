@@ -50,7 +50,8 @@ public class AutoBase extends LinearOpMode {
         robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //Move robot to relase hanglocks
         long startTime = SystemClock.elapsedRealtime();
-        while (robot.distance.getDistance(DistanceUnit.MM) > 170 && opModeIsActive() && SystemClock.elapsedRealtime()-startTime<1500 && robot.pivot.getCurrentPosition()>-500) {
+        while (robot.distance.getDistance(DistanceUnit.MM) > 170 && opModeIsActive() &&
+                SystemClock.elapsedRealtime()-startTime<1500 ) {
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
             telemetry.update();
         }
@@ -82,7 +83,7 @@ public class AutoBase extends LinearOpMode {
         robot.pivot2.setPower(1);
         startTime = SystemClock.elapsedRealtime();
         //Pivots down after unhook
-        while (robot.distance.getDistance(DistanceUnit.MM) > 170 && opModeIsActive() && robot.pivot.getCurrentPosition() >200 && SystemClock.elapsedRealtime()-startTime<2000) {
+        while (robot.distance.getDistance(DistanceUnit.MM) > 170 && opModeIsActive() && robot.pivot.getCurrentPosition() < -200 && SystemClock.elapsedRealtime()-startTime<2000) {
             telemetry.addData("encoder value of Pivot", robot.distance.getDistance(DistanceUnit.MM));
             telemetry.update();
         }
