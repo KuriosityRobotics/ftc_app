@@ -10,6 +10,7 @@ public class CraterFacing extends AutoBase
         initLogic();
         while (opModeIsActive()){
             dropDownFromLander();
+            robot.intake.setPower(-0.6);
             knockOffMineral(35);
             navigateToDepotThenCrater();
             break;

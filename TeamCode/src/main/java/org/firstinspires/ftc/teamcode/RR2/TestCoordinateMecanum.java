@@ -17,7 +17,8 @@ public class TestCoordinateMecanum extends AutoBase {
             robot = new RR2(hardwareMap,telemetry,this);
             waitForStart();
             while (opModeIsActive()) {
-                robot.polarMovement(10, 90);
+                robot.polarMovement(0.8,10, 45);
+
                 break;
             }
         }

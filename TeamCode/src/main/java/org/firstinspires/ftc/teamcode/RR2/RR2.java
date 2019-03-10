@@ -576,33 +576,56 @@ public class RR2 {
         bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void polarMovement(double radius, double degrees){
+    public void polarMovement(double speed, double radius, double degrees){
+
+        setBrakeModeDriveMotors();
+
+        double radians = Math.toRadians(degrees);
 
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        double fR = Math.sqrt(2) * Math.cos(radians + 3.14159/4);
+        double fL = Math.sqrt(2) * Math.cos(radians - 3.14159/4);
 
-
-        double fR = Math.sqrt(2) * Math.cos((Math.toRadians(degrees)) + 45);
-        double fL = Math.sqrt(2) * Math.cos((Math.toRadians(degrees)) - 45);
 
         fR = Range.clip(fR,-1,1);
         fL = Range.clip(fL,-1,1);
 
-        fRight.setPower(fR);
-        fLeft.setPower(fL);
-        bLeft.setPower(fR);
-        bRight.setPower(fL);
+//         -1*Math.abs(Math.sin(4*(degrees+0.39269)))+1; formula
 
-        fRight.setTargetPosition((int)((fR * radius) / 0.014));
-        fLeft.setTargetPosition((int)((fL * radius) / 0.014));
-        bLeft.setTargetPosition((int)((fR * radius) / 0.014));
-        bRight.setTargetPosition((int)((fL * radius) / 0.014));
+//        fRight.setPower(fR*speed);
+//        fLeft.setPower(fL*speed);
+//        bLeft.setPower(fR*speed);
+//        bRight.setPower(fL*speed);
 
-        while(linearOpMode.opModeIsActive() && fLeft.isBusy()){
+        fRight.setPower(speed);
+        fLeft.setPower(speed);
+        bLeft.setPower(speed);
+        bRight.setPower(speed);
 
+        fRight.setTargetPosition((int)((fR * radius) * 119.05));
+        fLeft.setTargetPosition((int)((fL * radius) * 119.05));
+        bLeft.setTargetPosition((int)((fR * radius) * 119.05));
+        bRight.setTargetPosition((int)((fL * radius) * 119.05));
+
+//        fRight.setPower(0);
+//        fLeft.setPower(1);
+//        bLeft.setPower(0);
+//        bRight.setPower(1);
+//
+//        fRight.setTargetPosition(0);
+//        fLeft.setTargetPosition(1190);
+//        bLeft.setTargetPosition(0);
+//        bRight.setTargetPosition(1190);
+
+        while(linearOpMode.opModeIsActive() && ((fLeft.isBusy() && bRight.isBusy()) || (fRight.isBusy() && bLeft.isBusy()))){
+            telemetry.addLine("fRight: " + Integer.toString(fRight.getCurrentPosition()));
+            telemetry.addLine("bLeft: " + Integer.toString(bLeft.getCurrentPosition()));
+            telemetry.update();
         }
         brakeRobot();
     }
+
 }
