@@ -57,6 +57,9 @@ public class RR2 {
     private HardwareMap hardwareMap;
     private LinearOpMode linearOpMode;
 
+    //PID (concept only)
+
+
 
     public RR2(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode){
         this.telemetry = telemetry;
@@ -576,39 +579,31 @@ public class RR2 {
         bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void polarMovement(double speed, double radius, double degrees){
+    public void polarMovement(double speed, double radiusInches, double degrees){
 
         setBrakeModeDriveMotors();
-
-        double radians = Math.toRadians(degrees);
 
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        double fR = Math.sqrt(2) * Math.cos(radians + 3.14159/4);
-        double fL = Math.sqrt(2) * Math.cos(radians - 3.14159/4);
+        double radiusEncoders = radiusInches * 119.05;
+        double radians = Math.toRadians(degrees);
+        double y = radiusEncoders/Math.sin(radians);
+        double x = radiusEncoders/Math.cos(radians);
 
-
-        fR = Range.clip(fR,-1,1);
-        fL = Range.clip(fL,-1,1);
-
-//         -1*Math.abs(Math.sin(4*(degrees+0.39269)))+1; formula
-
-//        fRight.setPower(fR*speed);
-//        fLeft.setPower(fL*speed);
-//        bLeft.setPower(fR*speed);
-//        bRight.setPower(fL*speed);
+        double fL = y - x;
+        double fR = y + x;
 
         fRight.setPower(speed);
         fLeft.setPower(speed);
         bLeft.setPower(speed);
         bRight.setPower(speed);
 
-        fRight.setTargetPosition((int)((fR * radius) * 119.05));
-        fLeft.setTargetPosition((int)((fL * radius) * 119.05));
-        bLeft.setTargetPosition((int)((fR * radius) * 119.05));
-        bRight.setTargetPosition((int)((fL * radius) * 119.05));
+        fRight.setTargetPosition((int)(fR * radiusEncoders));
+        fLeft.setTargetPosition((int)(fL * radiusEncoders));
+        bLeft.setTargetPosition((int)(fR * radiusEncoders));
+        bRight.setTargetPosition((int)(fL * radiusEncoders));
 
 //        fRight.setPower(0);
 //        fLeft.setPower(1);
