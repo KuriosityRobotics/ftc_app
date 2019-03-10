@@ -103,7 +103,6 @@ public class JuniorTeleOp extends LinearOpMode {
             // Comment out the method that's not used.  The default below is POV.
 
             // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
             drive = gamepad1.left_stick_y * driveMultiplier;
             turn  =  gamepad1.right_stick_x * turnMultiplier;
             leftPower    = Range.clip(drive - turn, -1.0, 1.0) ;

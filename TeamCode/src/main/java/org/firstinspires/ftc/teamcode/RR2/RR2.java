@@ -575,4 +575,34 @@ public class RR2 {
         bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
+
+    public void polarMovement(double radius, double degrees){
+
+        this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+
+        double fR = Math.sqrt(2) * Math.cos((Math.toRadians(degrees)) + 45);
+        double fL = Math.sqrt(2) * Math.cos((Math.toRadians(degrees)) - 45);
+
+        fR = Range.clip(fR,-1,1);
+        fL = Range.clip(fL,-1,1);
+
+        fRight.setPower(fR);
+        fLeft.setPower(fL);
+        bLeft.setPower(fR);
+        bRight.setPower(fL);
+
+        fRight.setTargetPosition((int)((fR * radius) / 0.014));
+        fLeft.setTargetPosition((int)((fL * radius) / 0.014));
+        bLeft.setTargetPosition((int)((fR * radius) / 0.014));
+        bRight.setTargetPosition((int)((fL * radius) / 0.014));
+
+        while(linearOpMode.opModeIsActive() && fLeft.isBusy()){
+
+        }
+        brakeRobot();
+    }
 }
