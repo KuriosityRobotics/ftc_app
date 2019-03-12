@@ -15,9 +15,20 @@ public class TestCoordinateMecanum extends AutoBase {
         @Override
         public void runOpMode() {
             robot = new RR2(hardwareMap,telemetry,this);
+            initLogic();
+            robot.intializeIMU();
             waitForStart();
             while (opModeIsActive()) {
-                robot.polarMovement(0.8,10, 45);
+
+                robot.resetEncoders();
+                robot.finalTurn(90);
+                telemetry.addLine("fLeft: " + robot.fLeft.getCurrentPosition());
+                telemetry.addLine("fRight: " + robot.fRight.getCurrentPosition());
+                telemetry.addLine("bLeft: " + robot.bLeft.getCurrentPosition());
+                telemetry.addLine("bRight: " + robot.bRight.getCurrentPosition());
+
+                sleep(10000);
+                //robot.polarMovement(0.8,10, 45);
 
                 break;
             }

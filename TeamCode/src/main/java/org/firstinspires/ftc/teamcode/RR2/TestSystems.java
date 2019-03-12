@@ -49,6 +49,8 @@ public class TestSystems extends LinearOpMode {
             telemetry.addLine("pivot position: " + Integer.toString(robot.pivot.getCurrentPosition()));
             telemetry.addLine("pivot power: " + Double.toString(robot.pivot.getPower()));
             telemetry.addLine("slide power: " + Double.toString(robot.slide.getPower()));
+            telemetry.addLine("slide Position: " + Double.toString(robot.slide.getCurrentPosition()));
+
             telemetry.addLine("intake power: " + Double.toString(robot.intake.getPower()));
             telemetry.addLine("hook position: " + Double.toString(robot.hook.getPosition()));
             telemetry.addLine("hangLockLeft position: " + Double.toString(robot.hangLockLeft.getPosition()));
@@ -88,6 +90,7 @@ public class TestSystems extends LinearOpMode {
         robot.pivot2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.pivot2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         robot.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }

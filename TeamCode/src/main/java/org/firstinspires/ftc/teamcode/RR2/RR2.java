@@ -691,76 +691,32 @@ public class RR2 {
 
     }
 
-    public static void calCoeff(double x[], double y[], double a[], double b[]){
+    public static double[] calculateSpline (double[] xGiven, double[] yGiven, double u){
 
+        double x = (-4.5 * Math.pow(u, 3) + 9 * Math.pow(u, 2) - 5.5 * u + 1) * xGiven[0] + (13.5 * Math.pow(u, 3) - 22.5 * Math.pow(u, 2) + 9 * u) * xGiven[1] + (-13.5 * Math.pow(u, 3) + 18 * Math.pow(u, 2) - 4.5 * u) * xGiven[2] + (4.5 * Math.pow(u, 3) - 4.5 * Math.pow(u, 2) + u) * xGiven[3];
+        double y = (-4.5 * Math.pow(u, 3) + 9 * Math.pow(u, 2) - 5.5 * u + 1) * yGiven[0] + (13.5 * Math.pow(u, 3) - 22.5 * Math.pow(u, 2) + 9 * u) * yGiven[1] + (-13.5 * Math.pow(u, 3) + 18 * Math.pow(u, 2) - 4.5 * u) * yGiven[2] + (4.5 * Math.pow(u, 3) - 4.5 * Math.pow(u, 2) + u) * yGiven[3];
+        double dydt = yGiven[0] *(-13.5 * Math.pow(u, 2) + 18 * u - 5.5) + yGiven[1] * (40.5 * Math.pow(u, 2) - 45 * u + 9) + yGiven[2] * (-40.5 * Math.pow(u, 2) + 36 * u - 4.5) + yGiven[3] * (13.5 * Math.pow(u, 2) - 9 * u + 1);
+        double dxdt = xGiven[0] *(-13.5 * Math.pow(u, 2) + 18 * u - 5.5) + xGiven[1] * (40.5 * Math.pow(u, 2) - 45 * u + 9) + xGiven[2] * (-40.5 * Math.pow(u, 2) + 36 * u - 4.5) + xGiven[3] * (13.5 * Math.pow(u, 2) - 9 * u +1);
+        double slope = dydt / dxdt;
+        double hyp = Math.sqrt(1 + Math.pow(slope, 2));
+        double heading;
 
-        int r1 = 3, c1 = 1;
-        int r2 = 1, c2 = 3;
-        //double[][] prod = new double[r1][r2];
-        double[] prod = new double[3];
-
-        int i, j, k;
-        double det = 0;
-
-        double a_11 = 2 / (x[1] - x[0]);
-        double a_12 = 1 / (x[1] - x[0]);
-        double a_21 = 1 / (x[1] - x[0]);
-        double a_22 = 2 * (1/(x[1] - x[0]) + 1/(x[2] - x[1]));
-        double a_23 = 1 / (x[2] - x[1]);
-        double a_32 = 1 / (x[2] - x[1]);
-        double a_33 = 2 / (x[2] - x[1]);
-
-        double[] [] mat = {{a_11, a_12, 0}, {a_21, a_22, a_23}, {0, a_32, a_33}};
-        double invMat[] [] = new double[3][3];
-
-        double[] mat2 = new double[3];
-        mat2[0] = 3 * (y[1] - y[0]) / ((x[1] - x[0]) * (x[1] - x[0]));
-        mat2[1] = 3 * ((y[1]- y[0]) / ((x[1] - x[0]) * (x[1] - x[0])) + (y[2] - y[1]) / ((x[2] - x[1]) * (x[2] - x[1])));
-        mat2[2] = 3* (y[2] - y[1]) / ((x[2] - x[1]) * (x[2] - x[1]));
-
-        for(i = 0; i < 3; i++)
-            det = det + (mat[0][i] * (mat[1][(i+1)%3] * mat[2][(i+2)%3] - mat[1][(i+2)%3] * mat[2][(i+1)%3]));
-
-        for(i = 0; i < 3; ++i) {
-            for (j = 0; j < 3; ++j)
-                invMat[i][j] = (((mat[(j + 1) % 3][(i + 1) % 3] * mat[(j + 2) % 3][(i + 2) % 3]) - (mat[(j + 1) % 3][(i + 2) % 3] * mat[(j + 2) % 3][(i + 1) % 3])) / det);
-        }
-
-        for(i = 0; i < r1; i++) {
-            prod[i] = 0;
-            for (j = 0; j < c2; j++) {
-                prod[i] += invMat[i][j] * mat2[j];
+        if (dydt > 0){
+            if (dxdt > 0){
+                heading = 90 - Math.toDegrees(Math.acos(1 / hyp));
+            }else{
+                heading = 360 - (90 - Math.toDegrees(Math.acos(1 / hyp)));
+            }
+        }else{
+            if (dxdt > 0){
+                heading = 180 - (90 - Math.toDegrees(Math.acos(1 / hyp)));
+            }else{
+                heading = 180 + (90 - Math.toDegrees(Math.acos(1 / hyp)));
             }
         }
 
-        double k0 = prod[0];
-        double k1 = prod[1];
-        double k2 = prod[2];
+        return new double[] {x, y, heading};
 
-        a[0] = k0 * (x[1] - x[0]) - (y[1] - y[0]);
-        b[0] = -k1 * (x[1] - x[0]) + (y[1] - y[0]);
-        a[1] = k1 * (x[2] - x[1]) - (y[2] - y[1]);
-        b[1] = -k2 * (x[2] - x[1]) + (y[2] - y[1]);
-
-    }
-
-    public static double evalSpline(double x, double a[], double b[], double xData[], double yData[]){
-
-        double y, t;
-
-        if (x < xData[1]){ //on left
-
-            t = (x - xData[0]) / (xData[1] - xData[0]);
-            y = (1 - t) * yData[0] + t * yData[1] + t * (1 - t) * (a[0] * (1 - t) + b[0] * t);
-
-        } else {
-
-            t = (x - xData[1]) / (xData[2] - xData[1]);
-            y = (1 - t) * yData[1] + t * yData[2] + t * (1 - t) * (a[1] * (1 - t) + b[1] * t);
-
-        }
-
-        return y;
     }
 
 }
