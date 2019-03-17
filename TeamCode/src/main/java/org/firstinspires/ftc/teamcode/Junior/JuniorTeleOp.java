@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.RR2.Test;
+package org.firstinspires.ftc.teamcode.Junior;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;

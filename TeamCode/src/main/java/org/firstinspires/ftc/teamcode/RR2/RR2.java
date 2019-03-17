@@ -19,6 +19,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import java.util.Timer;
+
+import java.util.Timer;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
@@ -623,99 +626,94 @@ public class RR2 {
         brakeRobot();
     }
 
-    public static void testSpline(){
+    public void timeMove (double[][] data){
 
-        int r1 = 3, c1 = 1;
-        int r2 = 1, c2 = 3;
-        //double[][] prod = new double[r1][r2];
-        double[] prod = new double[3];
 
-        int i, j, k;
-        double det = 0;
+        long startTime = SystemClock.elapsedRealtime();
 
-        double x0 = -1;
-        double x1 = 0;
-        double x2 = 3;
-        double y0 = 0.5;
-        double y1 = 0;
-        double y2 = 3;
+        fRight.setPower(1);
+        fLeft.setPower(1);
+        bLeft.setPower(1);
+        bRight.setPower(1);
 
-        double a_11 = 2 / (x1 - x0);
-        double a_12 = 1 / (x1 - x0);
-        double a_21 = 1 / (x1 - x0);
-        double a_22 = 2 * (1/(x1 - x0) + 1/(x2 - x1));
-        double a_23 = 1 / (x2 - x1);
-        double a_32 = 1 / (x2 - x1);
-        double a_33 = 2 / (x2 - x1);
-
-        double[] [] mat = {{a_11, a_12, 0}, {a_21, a_22, a_23}, {0, a_32, a_33}};
-        double invMat[] [] = new double[3][3];
-
-        double[] mat2 = new double[3];
-        mat2[0] = 3 * (y1 - y0) / ((x1 - x0) * (x1 - x0));
-        mat2[1] = 3 * ((y1- y0) / ((x1 - x0) * (x1 - x0)) + (y2 - y1) / ((x2-x1) * (x2-x1)));
-        mat2[2] = 3* (y2 - y1) / ((x2 - x1) * (x2 - x1));
-
-        for(i = 0; i < 3; i++)
-            det = det + (mat[0][i] * (mat[1][(i+1)%3] * mat[2][(i+2)%3] - mat[1][(i+2)%3] * mat[2][(i+1)%3]));
-
-        for(i = 0; i < 3; ++i) {
-            for (j = 0; j < 3; ++j)
-                invMat[i][j] = (((mat[(j + 1) % 3][(i + 1) % 3] * mat[(j + 2) % 3][(i + 2) % 3]) - (mat[(j + 1) % 3][(i + 2) % 3] * mat[(j + 2) % 3][(i + 1) % 3])) / det);
+        while(SystemClock.elapsedRealtime() - startTime < 5000){
+            linearOpMode.sleep(1);
         }
 
-        for(i = 0; i < r1; i++) {
-            prod[i] = 0;
-            for (j = 0; j < c2; j++) {
-                prod[i] += invMat[i][j] * mat2[j];
-            }
-        }
-
-        double k0 = prod[0];
-        double k1 = prod[1];
-        double k2 = prod[2];
-
-        double a1 = k0 * (x1 - x0) -(y1 - y0);
-        double b1 = -k1 * (x1 - x0) + (y1 - y0);
-        double a2 = k1 * (x2 - x1) - (y2 - y1);
-        double b2 = -k2 * (x2 - x1) + (y2 - y1);
-
-        System.out.println(k0);
-        System.out.println(k1);
-        System.out.println(k2);
-
-        System.out.println(a1);
-        System.out.println(b1);
-        System.out.println(a2);
-        System.out.println(b2);
+        fRight.setPower(0);
+        fLeft.setPower(0);
+        bLeft.setPower(0);
+        bRight.setPower(0);
 
     }
 
-    public static double[] calculateSpline (double[] xGiven, double[] yGiven, double u){
+    public void splineMove(double[][] data, double maxSpeed) {
 
-        double x = (-4.5 * Math.pow(u, 3) + 9 * Math.pow(u, 2) - 5.5 * u + 1) * xGiven[0] + (13.5 * Math.pow(u, 3) - 22.5 * Math.pow(u, 2) + 9 * u) * xGiven[1] + (-13.5 * Math.pow(u, 3) + 18 * Math.pow(u, 2) - 4.5 * u) * xGiven[2] + (4.5 * Math.pow(u, 3) - 4.5 * Math.pow(u, 2) + u) * xGiven[3];
-        double y = (-4.5 * Math.pow(u, 3) + 9 * Math.pow(u, 2) - 5.5 * u + 1) * yGiven[0] + (13.5 * Math.pow(u, 3) - 22.5 * Math.pow(u, 2) + 9 * u) * yGiven[1] + (-13.5 * Math.pow(u, 3) + 18 * Math.pow(u, 2) - 4.5 * u) * yGiven[2] + (4.5 * Math.pow(u, 3) - 4.5 * Math.pow(u, 2) + u) * yGiven[3];
-        double dydt = yGiven[0] *(-13.5 * Math.pow(u, 2) + 18 * u - 5.5) + yGiven[1] * (40.5 * Math.pow(u, 2) - 45 * u + 9) + yGiven[2] * (-40.5 * Math.pow(u, 2) + 36 * u - 4.5) + yGiven[3] * (13.5 * Math.pow(u, 2) - 9 * u + 1);
-        double dxdt = xGiven[0] *(-13.5 * Math.pow(u, 2) + 18 * u - 5.5) + xGiven[1] * (40.5 * Math.pow(u, 2) - 45 * u + 9) + xGiven[2] * (-40.5 * Math.pow(u, 2) + 36 * u - 4.5) + xGiven[3] * (13.5 * Math.pow(u, 2) - 9 * u +1);
-        double slope = dydt / dxdt;
-        double hyp = Math.sqrt(1 + Math.pow(slope, 2));
-        double heading;
+        long startTime = SystemClock.elapsedRealtime();
+        double leftSpeed, rightSpeed;
+        int inc;
 
-        if (dydt > 0){
-            if (dxdt > 0){
-                heading = 90 - Math.toDegrees(Math.acos(1 / hyp));
-            }else{
-                heading = 360 - (90 - Math.toDegrees(Math.acos(1 / hyp)));
-            }
-        }else{
-            if (dxdt > 0){
-                heading = 180 - (90 - Math.toDegrees(Math.acos(1 / hyp)));
-            }else{
-                heading = 180 + (90 - Math.toDegrees(Math.acos(1 / hyp)));
+        int i;
+
+        while (true){
+
+            double dt = SystemClock.elapsedRealtime() - startTime; //in milli
+            dt = dt / 1000; //in seconds
+
+            if (dt < data[data.length - 1][2]){
+
+                inc = -1;
+                for (i=0; i<data.length - 2; i++){
+                    if (data[i][2] <= dt && dt < data[i+1][2]){
+                        inc = i;
+                        break;
+                    }
+                }
+
+                if (inc < 0){
+
+                    fLeft.setPower(0);
+                    bLeft.setPower(0);
+                    fRight.setPower(0);
+                    bRight.setPower(0);
+                    break;
+
+                }
+
+                leftSpeed  = ((data[inc+1][0] - data[inc][0]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][0];
+                rightSpeed = ((data[inc+1][1] - data[inc][1]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][1];
+
+                leftSpeed = leftSpeed/maxSpeed;
+                rightSpeed = rightSpeed/maxSpeed;
+
+
+                fLeft.setPower(leftSpeed);
+                bLeft.setPower(leftSpeed);
+                fRight.setPower(rightSpeed);
+                bRight.setPower(rightSpeed);
+
+            } else {
+
+                fLeft.setPower(0);
+                bLeft.setPower(0);
+                fRight.setPower(0);
+                bRight.setPower(0);
+                break;
+
             }
         }
+    }
 
-        return new double[] {x, y, heading};
+    public void getData(){
+
+        fLeft.setPower(1);
+        fRight.setPower(1);
+        bLeft.setPower(1);
+        bRight.setPower(1);
+
+        linearOpMode.sleep(1000);
+
+        
 
     }
 
