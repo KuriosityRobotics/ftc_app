@@ -114,41 +114,34 @@ public class Junior {
 
     public void turn (double targetHeading){
         targetHeading  = -1 * targetHeading;
-
         targetHeading = Range.clip(targetHeading, -179,179);
-
+        double power;
         long startTime = SystemClock.elapsedRealtime();
 
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        position = imu.getPosition();
-        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double startHeading = angles.firstAngle;
-        double maxAngle = startHeading - targetHeading;
-        maxAngle = Math.abs(maxAngle);
+        double maxAngle = Math.abs(startHeading - targetHeading);
 
-        int sign = 0;
-        if(targetHeading > startHeading){
-            sign = 1;
-        }else{
-            sign = -1;
-        }
-        if(maxAngle == 0){
+        if (maxAngle < 1.0){
             return;
         }
 
         while(linearOpMode.opModeIsActive()){
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            double dAngle = Math.abs(angles.firstAngle - startHeading);
-            double scaleFactor = dAngle / maxAngle;
-            double absolutePower = 1 - scaleFactor;
-
-            if(absolutePower < 0.01){
-                absolutePower = 0.01;
+            power = (targetHeading - angles.firstAngle) / maxAngle;
+            if(Math.abs(power) < 0.01){
+                if (power > 0){
+                    power = 0.01;
+                } else if (power < 0){
+                    power = -0.01;
+                } else {
+                    break;
+                }
             }
-            double power = absolutePower * sign;
-            if(scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > 2000)){
+            if (Math.abs(angles.firstAngle - startHeading) > maxAngle || ((SystemClock.elapsedRealtime() - startTime) > 2000)){
                 break;
             }
             leftDrive.setPower(-power);
