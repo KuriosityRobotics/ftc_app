@@ -156,9 +156,13 @@ public class Junior {
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         long startTime = SystemClock.elapsedRealtime();
-        double leftSpeed, rightSpeed;
+        double refLeftSpeed, refRightSpeed;
+        double refLeftDistance, refRightDistance;
+        double leftPower, rightPower;
+        double leftDistance, rightDistance;
         int inc;
         int i;
+        double encoderToInches = 60/5150;  //5150 encoders = 60 inches
         angles  = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double startHeading = angles.firstAngle;
 
@@ -178,7 +182,7 @@ public class Junior {
             double dt = SystemClock.elapsedRealtime() - startTime; //in milli
             dt = dt / 1000; //in seconds
 
-            if (dt < data[data.length - 1][2]){
+            if (dt < data[data.length - 1][2]){                //find increment at any time to do interpolation
                 inc = -1;
                 for (i=0; i<data.length - 2; i++){
                     if (data[i][2] <= dt && dt < data[i+1][2]){
@@ -191,12 +195,29 @@ public class Junior {
                     break;
                 }
                 angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-                leftSpeed  = ((data[inc+1][0] - data[inc][0]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][0];
-                rightSpeed = ((data[inc+1][1] - data[inc][1]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][1];
-                leftSpeed = leftSpeed/maxSpeed;
-                rightSpeed = rightSpeed/maxSpeed;
-                leftDrive.setPower(leftSpeed);
-                rightDrive.setPower(rightSpeed);
+
+                // find the left and right speed by interpolation from data file
+                refLeftSpeed  = ((data[inc+1][0] - data[inc][0]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][0];
+                refRightSpeed = ((data[inc+1][1] - data[inc][1]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][1];
+
+                // find the left and right distance by interpolation from data file
+                refLeftDistance = ((data[inc+1][4] - data[inc][4]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
+                refRightDistance = ((data[inc+1][5] - data[inc][5]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
+
+                // find the left and right encoder values and convert them to distance traveled in inches
+                leftDistance = leftDrive.getCurrentPosition() * encoderToInches;
+                rightDistance = rightDrive.getCurrentPosition() * encoderToInches;
+
+                // old algorithm
+                //leftPower = refLeftSpeed/maxSpeed;
+                //rightPower = refRightSpeed/maxSpeed;
+
+                //find power
+                leftPower = refLeftSpeed/maxSpeed + (refLeftDistance - leftDistance) / 10000;
+                rightPower = refRightSpeed/maxSpeed + (refRightDistance - rightDistance) / 10000;
+
+                leftDrive.setPower(leftPower);
+                rightDrive.setPower(rightPower);
             } else {
                 brakeRobot();
                 break;
@@ -204,7 +225,6 @@ public class Junior {
         }
         telemetry.addLine("rightDrive: " + rightDrive.getCurrentPosition());
         telemetry.addLine("leftDrive: " + leftDrive.getCurrentPosition());
-        //5150 encoders = 60 inches
         telemetry.update();
         linearOpMode.sleep(5000);
     }
