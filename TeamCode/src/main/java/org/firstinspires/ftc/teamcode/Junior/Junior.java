@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Junior;
 
+import android.content.Context;
 import android.os.SystemClock;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -21,6 +22,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import java.io.FileOutputStream;
+
+import static android.content.Context.MODE_PRIVATE;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
 
@@ -153,18 +169,23 @@ public class Junior {
     }
 
     public void splineMove(double[][] data, double maxSpeed) {
+
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         long startTime = SystemClock.elapsedRealtime();
         double refLeftSpeed, refRightSpeed;
         double refLeftDistance, refRightDistance;
+        double refHeading;
         double leftPower, rightPower;
         double leftDistance, rightDistance;
+        double heading;
         int inc;
         int i;
         double encoderToInches = 60/5150;  //5150 encoders = 60 inches
         angles  = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double startHeading = angles.firstAngle;
+
+        //create file
 
         /*double maxSpeed = 0;
         for (i=0; i<data.length; i++){
@@ -204,28 +225,36 @@ public class Junior {
                 refLeftDistance = ((data[inc+1][4] - data[inc][4]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
                 refRightDistance = ((data[inc+1][5] - data[inc][5]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
 
+                // find the heading by interpolation from data file
+                refHeading =((data[inc+1][6] - data[inc][6]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][6] + startHeading;
+
                 // find the left and right encoder values and convert them to distance traveled in inches
                 leftDistance = leftDrive.getCurrentPosition() * encoderToInches;
                 rightDistance = rightDrive.getCurrentPosition() * encoderToInches;
+
+                // find the heading of robot
+                heading = angles.firstAngle;
 
                 // old algorithm
                 //leftPower = refLeftSpeed/maxSpeed;
                 //rightPower = refRightSpeed/maxSpeed;
 
-                //find power
-                leftPower = refLeftSpeed/maxSpeed + (refLeftDistance - leftDistance) / 10000;
-                rightPower = refRightSpeed/maxSpeed + (refRightDistance - rightDistance) / 10000;
+                // find power
+                leftPower =  refLeftSpeed /maxSpeed + (refLeftDistance  - leftDistance ) / 10000 + (refHeading - heading) / 100;
+                rightPower = refRightSpeed/maxSpeed + (refRightDistance - rightDistance) / 10000 + (refHeading - heading) / 100;
 
+                // set power
                 leftDrive.setPower(leftPower);
                 rightDrive.setPower(rightPower);
+
+                //write to file
+
+
             } else {
                 brakeRobot();
                 break;
             }
         }
-        telemetry.addLine("rightDrive: " + rightDrive.getCurrentPosition());
-        telemetry.addLine("leftDrive: " + leftDrive.getCurrentPosition());
-        telemetry.update();
-        linearOpMode.sleep(5000);
+
     }
 }
