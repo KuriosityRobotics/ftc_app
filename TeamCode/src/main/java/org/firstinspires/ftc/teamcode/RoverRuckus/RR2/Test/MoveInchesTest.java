@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.RR2.Test;
+package org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Test;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.RR2.RR2;
+import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
 
 
 @Autonomous(name="MoveInches test", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto

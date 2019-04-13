@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.RR2.Auto;
+package org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Auto;
 
 import android.os.SystemClock;
 
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import org.firstinspires.ftc.teamcode.RR2.RR2;
+import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
 
 public class AutoBase extends LinearOpMode {
 

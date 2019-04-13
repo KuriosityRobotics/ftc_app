@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.RR2.Templates;
+package org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Templates;
 
 import android.graphics.Color;
 
@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.RR2.RR2;
+import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
 
 @TeleOp(name="Template Teleop", group="Linear Opmode")
 @Disabled //COMMENT OUT TO MAKE PROGRAM APPEAR ON PHONE

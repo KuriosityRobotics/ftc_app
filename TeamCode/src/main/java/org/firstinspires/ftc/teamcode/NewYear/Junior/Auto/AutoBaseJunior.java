@@ -1,14 +1,8 @@
-package org.firstinspires.ftc.teamcode.Junior.Auto;
-
-import android.os.SystemClock;
+package org.firstinspires.ftc.teamcode.NewYear.Junior.Auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import org.firstinspires.ftc.teamcode.Junior.Junior;
-import org.firstinspires.ftc.teamcode.RR2.RR2;
+import org.firstinspires.ftc.teamcode.NewYear.Junior.Junior;
 
 public class AutoBaseJunior extends LinearOpMode {
 
