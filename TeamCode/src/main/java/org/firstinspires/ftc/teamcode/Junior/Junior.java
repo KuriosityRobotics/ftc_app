@@ -248,8 +248,9 @@ public class Junior {
                 rightDrive.setPower(rightPower);
 
                 //write to file
-
-
+                telemetry.addLine(dt+ " - LeftDistance:" + (refLeftDistance-leftDistance) + " RightDistance:" + (refRightDistance-rightDistance) + " leftPower:" + (refLeftSpeed-leftPower) + " rightPower:" + (refRightSpeed-rightPower) + " heading:" + (refHeading - heading) );
+                telemetry.update();
+                
             } else {
                 brakeRobot();
                 break;
