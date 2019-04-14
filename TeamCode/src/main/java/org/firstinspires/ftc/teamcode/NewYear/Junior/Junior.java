@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.NewYear.Junior;
 
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -147,6 +148,8 @@ public class Junior {
 
     public void splineMove(double[][] data, double maxSpeed) {
 
+        final String TAG = "splineMove";
+
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         long startTime = SystemClock.elapsedRealtime();
@@ -175,7 +178,7 @@ public class Junior {
         }
         */
 
-        while (true){
+        while (linearOpMode.opModeIsActive()){
 
             double dt = SystemClock.elapsedRealtime() - startTime; //in milli
             dt = dt / 1000; //in seconds
@@ -192,7 +195,7 @@ public class Junior {
                     brakeRobot();
                     break;
                 }
-                angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
                 // find the left and right speed by interpolation from data file
                 refLeftSpeed  = ((data[inc+1][0] - data[inc][0]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][0];
@@ -217,16 +220,17 @@ public class Junior {
                 //rightPower = refRightSpeed/maxSpeed;
 
                 // find power
-                leftPower =  refLeftSpeed /maxSpeed + (refLeftDistance  - leftDistance ) / 10000 + (refHeading - heading) / 100;
-                rightPower = refRightSpeed/maxSpeed + (refRightDistance - rightDistance) / 10000 + (refHeading - heading) / 100;
+                leftPower =  refLeftSpeed /maxSpeed - (refHeading - heading) / 30;   //(refLeftDistance  - leftDistance ) / 1000
+                rightPower = refRightSpeed/maxSpeed  + (refHeading - heading) / 30;  //+ (refRightDistance - rightDistance) / 1000
 
                 // set power
                 leftDrive.setPower(leftPower);
                 rightDrive.setPower(rightPower);
 
                 //write to file
-                telemetry.addLine(dt+ " - LeftDistance:" + (refLeftDistance-leftDistance) + " RightDistance:" + (refRightDistance-rightDistance) + " leftPower:" + (refLeftSpeed-leftPower) + " rightPower:" + (refRightSpeed-rightPower) + " heading:" + (refHeading - heading) );
-                telemetry.update();
+                telemetry.addLine(dt+ " - LeftDistance: " + (refLeftDistance-leftDistance) + " RightDistance: " + (refRightDistance-rightDistance) + " leftPower: " + (refLeftSpeed-leftPower) + " rightPower: " + (refRightSpeed-rightPower) + " heading: " + (refHeading - heading));
+                telemetry.addLine();
+                Log.i(TAG, "Time: " + dt + " leftError: " + (refLeftDistance-leftDistance) + " rightError: " + (refRightDistance-rightDistance) + " leftPower: " + (refLeftSpeed-leftPower) + " rightPower: " + (refRightSpeed-rightPower) + " heading: " + (refHeading-heading));
 
             } else {
                 brakeRobot();

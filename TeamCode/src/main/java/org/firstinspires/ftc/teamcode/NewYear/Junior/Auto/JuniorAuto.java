@@ -922,10 +922,9 @@ public class JuniorAuto extends AutoBaseJunior
     initLogic();
         while (opModeIsActive()){
             robot.intializeIMU();
-            robot.turn(90);
-            robot.splineMove(move90, 26.5);
-            robot.turn(45);
-            while (!gamepad1.x){
+            robot.splineMove(doubleLoop, 26.5);
+            telemetry.update();
+            while (!gamepad1.x && this.opModeIsActive()){
 
             }
             break;
