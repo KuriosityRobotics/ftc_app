@@ -17,6 +17,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.robotcore.internal.android.dx.rop.cst.CstArray;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Junior {
 
@@ -144,6 +149,31 @@ public class Junior {
         brakeRobot();
         linearOpMode.sleep(100);
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void splineCalculation(double[][] waypoints){
+
+        int i;
+
+        final double distWheels = 10; //inches
+        int numdata = waypoints[0].length;
+        int Nu = 100;
+        List uV = new ArrayList();
+        for (i=0; i<= numdata-1; i += 1/Nu){
+            uV.add(i/Nu);
+        }
+
+        List<Double> xV = new ArrayList<>();
+        List<Double> yV = new ArrayList<>();
+        List<Double> dxdu = new ArrayList<>();
+        List<Double> dydu = new ArrayList<>();
+        double[][] leftWheel = new double[uV.size()][2];
+        double[][] rightWheel = new double[uV.size()][2];
+
+        for(i=0; i<=numdata; i += 1/00 ){
+
+        }
+
     }
 
     public void splineMove(double[][] data, double maxSpeed) {
