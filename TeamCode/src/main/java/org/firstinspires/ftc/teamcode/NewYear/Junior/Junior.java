@@ -21,6 +21,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.rop.cst.CstArray;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 
 public class Junior {
@@ -153,25 +154,59 @@ public class Junior {
 
     public void splineCalculation(double[][] waypoints){
 
-        int i;
-
         final double distWheels = 10; //inches
         int numdata = waypoints[0].length;
-        int Nu = 100;
-        List uV = new ArrayList();
-        for (i=0; i<= numdata-1; i += 1/Nu){
-            uV.add(i/Nu);
-        }
+        double Nu = 100;
+        double num = 0;
 
-        List<Double> xV = new ArrayList<>();
-        List<Double> yV = new ArrayList<>();
-        List<Double> dxdu = new ArrayList<>();
-        List<Double> dydu = new ArrayList<>();
+        ArrayList<Double> xV1 = new ArrayList<>();
+        ArrayList<Double> yV1 = new ArrayList<>();
+
+        ArrayList<Double> distance = new ArrayList<>();
+
+        ArrayList<Double> uV = new ArrayList<>();
+
+        ArrayList<Double> xV = new ArrayList<>();
+        ArrayList<Double> yV = new ArrayList<>();
+        ArrayList<Double> dxdu = new ArrayList<>();
+        ArrayList<Double> dydu = new ArrayList<>();
+
+        ArrayList<Double> dxdu1 = new ArrayList<>();
+        ArrayList<Double> dydu1 = new ArrayList<>();
         double[][] leftWheel = new double[uV.size()][2];
         double[][] rightWheel = new double[uV.size()][2];
 
-        for(i=0; i<=numdata; i += 1/00 ){
+        ArrayList<Double> u = new ArrayList<>();
+        int j =0;
 
+        while(num != 1-1/Nu){
+            num = j/Nu;
+            u.add(num);
+            j++;
+        }
+        for(int i = 1; i<numdata; i++){
+
+        }
+
+        xV.add(waypoints[waypoints.length-1][1]);
+
+        yV.add(waypoints[waypoints.length][2]);
+        distance.add(0.0);
+        for(int i = 0;i<xV.size();i++){
+            for(int k = 0;k<u.size();k++){
+                double uElement = u.get(k);
+                xV1.add((Math.pow(uElement,3)*2-3 * Math.pow(uElement,2)+1) * waypoints[i][1] + (-2 + Math.pow(uElement,3) + 3 * Math.pow(uElement,2)) * waypoints[i+1][1] + (Math.pow(uElement,3)-2 * Math.pow(uElement,2) + uElement) * waypoints[i][3] + (Math.pow(uElement,3)-Math.pow(uElement,2)) * waypoints[i+1][3]);
+                yV1.add((Math.pow(uElement,3)*2-3 * Math.pow(uElement,2)+1) * waypoints[i][2] + (-2 + Math.pow(uElement,3) + 3 * Math.pow(uElement,2)) * waypoints[i+1][2] + (Math.pow(uElement,3)-2 * Math.pow(uElement,2) + uElement) * waypoints[i][4] + (Math.pow(uElement,3)-Math.pow(uElement,2)) * waypoints[i+1][4]);
+
+                dxdu1.add((6* Math.pow(uElement,2)-6*uElement) * (waypoints[i][1]-waypoints[i+1][1]) + waypoints[i][3] * (3 * Math.pow(uElement,2)-4 * uElement +1) + waypoints[i+1][3] * (3* Math.pow(uElement,2) -2 * uElement));
+                dydu1.add((6* Math.pow(uElement,2)-6*uElement) * (waypoints[i][2]-waypoints[i+1][2]) + waypoints[i][4] * (3 * Math.pow(uElement,2)-4 * uElement +1) + waypoints[i+1][4] * (3* Math.pow(uElement,2) -2 * uElement));
+
+                uV.add((i-1)*Nu+1);
+
+
+            }
+
+            for()
         }
 
     }
