@@ -1,4 +1,4 @@
-//package org.firstinspires.ftc.teamcode.NewYear.Junior.Auto;
+//package org.firstinspires.ftc.teamcode.NewYear.Junior.Junior.Auto;
 //
 //import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 //
