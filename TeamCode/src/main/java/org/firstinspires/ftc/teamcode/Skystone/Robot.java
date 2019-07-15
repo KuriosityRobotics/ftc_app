@@ -564,19 +564,38 @@ public class Robot {
 
     public void splineMove(double[][] data, double maxSpeed) {
 
+        resetEncoders();
+        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         long startTime = SystemClock.elapsedRealtime();
-        double leftSpeed, rightSpeed;
+        double refLeftSpeed, refRightSpeed;
+        double refLeftDistance, refRightDistance;
+        double refHeading;
+        double leftPower, rightPower;
+        double leftDistance, rightDistance;
+        double heading;
         int inc;
-
         int i;
+        double encoderToInches = 60/5150;  //5150 encoders = 60 inches
+        angles  = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double startHeading = angles.firstAngle;
 
-        while (true){
+        /*double maxSpeed = 0;
+        for (i=0; i<data.length; i++){
+            if (maxSpeed < data[i][0]){
+                maxSpeed = data[i][0];
+            }
+            if (maxSpeed < data[i][1]){
+                maxSpeed = data[i][1];
+            }
+        }
+        */
+
+        while (linearOpMode.opModeIsActive()){
 
             double dt = SystemClock.elapsedRealtime() - startTime; //in milli
             dt = dt / 1000; //in seconds
 
-            if (dt < data[data.length - 1][2]){
-
+            if (dt < data[data.length - 1][2]){                //find increment at any time to do interpolation
                 inc = -1;
                 for (i=0; i<data.length - 2; i++){
                     if (data[i][2] <= dt && dt < data[i+1][2]){
@@ -584,39 +603,53 @@ public class Robot {
                         break;
                     }
                 }
-
                 if (inc < 0){
-
-                    fLeft.setPower(0);
-                    bLeft.setPower(0);
-                    fRight.setPower(0);
-                    bRight.setPower(0);
+                    brakeRobot();
                     break;
-
                 }
+                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-                leftSpeed  = ((data[inc+1][0] - data[inc][0]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][0];
-                rightSpeed = ((data[inc+1][1] - data[inc][1]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][1];
+                // find the left and right speed by interpolation from data file
+                refLeftSpeed  = ((data[inc+1][0] - data[inc][0]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][0];
+                refRightSpeed = ((data[inc+1][1] - data[inc][1]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][1];
 
-                leftSpeed = leftSpeed/maxSpeed;
-                rightSpeed = rightSpeed/maxSpeed;
+                // find the left and right distance by interpolation from data file
+                refLeftDistance = ((data[inc+1][4] - data[inc][4]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
+                refRightDistance = ((data[inc+1][5] - data[inc][5]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
 
+                // find the heading by interpolation from data file
+                refHeading =((data[inc+1][6] - data[inc][6]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][6] + startHeading;
 
-                fLeft.setPower(leftSpeed);
-                bLeft.setPower(leftSpeed);
-                fRight.setPower(rightSpeed);
-                bRight.setPower(rightSpeed);
+                // find the left and right encoder values and convert them to distance traveled in inches
+                leftDistance = fLeft.getCurrentPosition() * encoderToInches;
+                rightDistance = fRight.getCurrentPosition() * encoderToInches;
 
+                // find the heading of robot
+                heading = angles.firstAngle;
+
+                // old algorithm
+                //leftPower = refLeftSpeed/maxSpeed;
+                //rightPower = refRightSpeed/maxSpeed;
+
+                // find power
+                leftPower =  refLeftSpeed /maxSpeed - (refHeading - heading) / 30 + (refLeftDistance  - leftDistance ) / 2000;
+                rightPower = refRightSpeed/maxSpeed  + (refHeading - heading) / 30 + (refRightDistance - rightDistance) / 2000;
+
+                // set power
+                fLeft.setPower(leftPower);
+                bLeft.setPower(leftPower);
+                fRight.setPower(rightPower);
+                bRight.setPower(rightPower);
+
+                //write to file
+                telemetry.addLine(dt+ " - LeftDistance: " + (refLeftDistance-leftDistance) + " RightDistance: " + (refRightDistance-rightDistance) + " leftPower: " + (refLeftSpeed-leftPower) + " rightPower: " + (refRightSpeed-rightPower) + " heading: " + (refHeading - heading));
+                telemetry.addLine();
             } else {
-
-                fLeft.setPower(0);
-                bLeft.setPower(0);
-                fRight.setPower(0);
-                bRight.setPower(0);
+                brakeRobot();
                 break;
-
             }
         }
+
     }
 
     public void getData(){
