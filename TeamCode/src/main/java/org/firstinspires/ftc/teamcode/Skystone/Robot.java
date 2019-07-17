@@ -116,7 +116,7 @@ public class Robot {
         finalTurn(targetHeading, 2000);
     }
 
-    public void cordinateMecanum(int xCord, int yCord, double speed) {
+    public void coordinateMecanum(int xCord, int yCord, double speed) {
         intializeIMU();
         double degrees = 1.5 * Math.PI - Math.atan2(yCord,xCord);
         position = imu.getPosition();
@@ -227,9 +227,9 @@ public class Robot {
         //to move backwards make targetDistance negative
         double rotations = 0;
         if (targetDistance>0) {
-            rotations = targetDistance / 0.028;
+            rotations = targetDistance / 0.0168;
         } else {
-            rotations = targetDistance / 0.026;
+            rotations = targetDistance / 0.0156;
         }
         moveRobot(speed,(int)(rotations));
 
@@ -562,7 +562,7 @@ public class Robot {
 
     }
 
-    public void splineMove(double[][] data, double maxSpeed) {
+    public void splineMove(double[][] data) {
 
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -575,7 +575,7 @@ public class Robot {
         double heading;
         int inc;
         int i;
-        double encoderToInches = 60/5150;  //5150 encoders = 60 inches
+        double encoderToInches = 0.156;  //515 encoders = 8 inches
         angles  = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double startHeading = angles.firstAngle;
 
@@ -589,6 +589,7 @@ public class Robot {
             }
         }
         */
+
 
         while (linearOpMode.opModeIsActive()){
 
@@ -627,23 +628,15 @@ public class Robot {
                 // find the heading of robot
                 heading = angles.firstAngle;
 
-                // old algorithm
-                //leftPower = refLeftSpeed/maxSpeed;
-                //rightPower = refRightSpeed/maxSpeed;
-
                 // find power
-                leftPower =  refLeftSpeed /maxSpeed - (refHeading - heading) / 30 + (refLeftDistance  - leftDistance ) / 2000;
-                rightPower = refRightSpeed/maxSpeed  + (refHeading - heading) / 30 + (refRightDistance - rightDistance) / 2000;
+                leftPower  = refLeftSpeed;
+                rightPower = refRightSpeed;
 
                 // set power
                 fLeft.setPower(leftPower);
                 bLeft.setPower(leftPower);
                 fRight.setPower(rightPower);
                 bRight.setPower(rightPower);
-
-                //write to file
-                telemetry.addLine(dt+ " - LeftDistance: " + (refLeftDistance-leftDistance) + " RightDistance: " + (refRightDistance-rightDistance) + " leftPower: " + (refLeftSpeed-leftPower) + " rightPower: " + (refRightSpeed-rightPower) + " heading: " + (refHeading - heading));
-                telemetry.addLine();
             } else {
                 brakeRobot();
                 break;
