@@ -44,6 +44,16 @@ public class Robot {
     private HardwareMap hardwareMap;
     private LinearOpMode linearOpMode;
 
+    //for odometry
+    double xPosGlobal = 0;
+    double yPosGlobal = 0;
+    double angleGlobal = 0;
+
+    double fLeftOLD;
+    double fRightOLD;
+    double bLeftOLD;
+    double bRightOLD;
+
     //PID (concept only)
 
 
@@ -644,6 +654,73 @@ public class Robot {
         }
 
     }
+
+    public double[] getPos() {
+        double[] positions = new double[3];
+        final double radius = 2;
+        final double encoderPerRevolution = 537.6;
+        final double l = 7;
+        final double b = 6.5;
+
+        double fl = 2 * Math.PI * fLeft.getCurrentPosition() / encoderPerRevolution; //radians each motor has travelled
+        double fr = 2 * Math.PI * fRight.getCurrentPosition() / encoderPerRevolution;
+        double bl = 2 * Math.PI * bLeft.getCurrentPosition() / encoderPerRevolution;
+        double br = 2 * Math.PI * bRight.getCurrentPosition() / encoderPerRevolution;
+
+        double xPos = radius/4 * (fl + bl + br + fr);
+        double yPos = radius/4 * (-fl + bl - br + fr);
+        double angle = radius/4 *(-fl/(l+b) - bl/(l+b) + br/(l+b) + fr/(l+b));
+        angle = angle * 180/(2*Math.PI);
+
+        positions[0] = xPos;
+        positions[1] = yPos;
+        positions[2] = angle;
+        return positions;
+    }
+
+    public double[] odometry() {
+
+        final double radius = 2;
+        final double encoderPerRevolution = 806.4;
+        final double l = 7;
+        final double w = 6.5;
+
+        // find robot position
+        double fl = 2 * Math.PI * fLeft.getCurrentPosition() / encoderPerRevolution; //radians each motor has travelled
+        double fr = 2 * Math.PI * fRight.getCurrentPosition() / encoderPerRevolution;
+        double bl = 2 * Math.PI * bLeft.getCurrentPosition() / encoderPerRevolution;
+        double br = 2 * Math.PI * bRight.getCurrentPosition() / encoderPerRevolution;
+
+        double xPosRobot = radius/4 * (fl + bl + br + fr);
+        double yPosRobot = radius/4 * (-fl + bl - br + fr);
+        double angleRobot = radius/4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
+
+        //converting to global frame
+        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleRobot) - (Math.cos(angleRobot) - 1) * Math.sin(angleGlobal)) * xPosRobot / angleRobot + (Math.cos(angleGlobal) * (Math.cos(angleRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleRobot)) * yPosRobot / angleRobot;
+        yPosGlobal += ((Math.cos(angleRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleRobot)) * yPosRobot / angleRobot + (Math.cos(angleGlobal) * (Math.cos(angleRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleRobot)) * xPosRobot / angleRobot;
+        angleGlobal += angleRobot;
+
+        fLeftOLD = fLeft.getCurrentPosition();
+        fRightOLD = fRight.getCurrentPosition();
+        bLeftOLD = bLeft.getCurrentPosition();
+        bRightOLD = bRight.getCurrentPosition();
+
+        //inserting into return array
+        return new double[] { xPosGlobal, yPosGlobal, angleGlobal };
+    }
+
+    public double getxPosGlobal() {
+        return xPosGlobal;
+    }
+
+    public double getyPosGlobal() {
+        return yPosGlobal;
+    }
+
+    public double getAngleGlobal() {
+        return angleGlobal;
+    }
+
 
     public void getData(){
 
