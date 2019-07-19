@@ -698,18 +698,53 @@ public class Robot {
         double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
         double br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
 
-        double xPosRobot = radius/4 * (fl + bl + br + fr);
-        double yPosRobot = radius/4 * (-fl + bl - br + fr);
-        double angleRobot = radius/4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
+        double xDeltaRobot = radius/4 * (fl + bl + br + fr);
+        double yDeltaRobot = radius/4 * (-fl + bl - br + fr);
+        double angleDeltaRobot = radius/4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
 
-        xPosGlobal += xPosRobot * Math.cos(angleGlobal) - yPosRobot * Math.sin(angleGlobal);
-        yPosGlobal += xPosRobot * Math.sin(angleGlobal) + yPosRobot * Math.cos(angleGlobal);
-        angleGlobal += angleRobot;
+        xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
+        yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
+        angleGlobal += angleDeltaRobot;
 
 //        //converting to global frame
-//        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleRobot) - (Math.cos(angleRobot) - 1) * Math.sin(angleGlobal)) * xPosRobot / angleRobot + (Math.cos(angleGlobal) * (Math.cos(angleRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleRobot)) * yPosRobot / angleRobot;
-//        yPosGlobal += ((Math.cos(angleRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleRobot)) * yPosRobot / angleRobot + (Math.cos(angleGlobal) * (Math.cos(angleRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleRobot)) * xPosRobot / angleRobot;
-//        angleGlobal += angleRobot;
+//        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleDeltaRobot) - (Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal)) * xDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot;
+//        yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
+//        angleGlobal += angleDeltaRobot;
+
+        fLeftOLD = fLeftNEW;
+        fRightOLD = fRightNEW;
+        bLeftOLD = bLeftNEW;
+        bRightOLD = bRightNEW;
+    }
+
+    public void constantVelocityOdometry() {
+        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double fLeftNEW = fLeft.getCurrentPosition();
+        double fRightNEW = fRight.getCurrentPosition();
+        double bLeftNEW = bLeft.getCurrentPosition();
+        double bRightNEW = bRight.getCurrentPosition();
+
+        // find robot position
+        double fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / encoderPerRevolution;
+        double fr = 2 * Math.PI * (fRightNEW - fRightOLD) / encoderPerRevolution;
+        double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
+        double br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
+
+        double xDeltaRobot = radius/4 * (fl + bl + br + fr);
+        double yDeltaRobot = radius/4 * (-fl + bl - br + fr);
+        double angleDeltaRobot = radius/4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
+
+        //converting to global frame
+        if (angleDeltaRobot == 0){
+            xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
+            yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
+            angleGlobal += angleDeltaRobot;
+        } else {
+            xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleDeltaRobot) - (Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal)) * xDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot;
+            yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
+            angleGlobal += angleDeltaRobot;
+        }
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;
