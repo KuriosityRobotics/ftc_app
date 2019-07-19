@@ -54,6 +54,12 @@ public class Robot {
     double bLeftOLD = 0;
     double bRightOLD = 0;
 
+    //dimensions
+    final double radius = 2;
+    final double encoderPerRevolution = 806.4;
+    final double l = 7;
+    final double w = 6.5;
+
     //PID (concept only)
 
 
@@ -679,10 +685,7 @@ public class Robot {
     }
 
     public void odometry() {
-        final double radius = 2;
-        final double encoderPerRevolution = 806.4;
-        final double l = 7;
-        final double w = 6.5;
+        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         double fLeftNEW = fLeft.getCurrentPosition();
         double fRightNEW = fRight.getCurrentPosition();
@@ -690,19 +693,23 @@ public class Robot {
         double bRightNEW = bRight.getCurrentPosition();
 
         // find robot position
-        double fl = 2 * Math.PI * (fLeftNEW-fLeftOLD) / encoderPerRevolution;
-        double fr = 2 * Math.PI * (fRightNEW-fRightOLD) / encoderPerRevolution;
-        double bl = 2 * Math.PI * (bLeftNEW-bLeftOLD) / encoderPerRevolution;
-        double br = 2 * Math.PI * (bRightNEW-bRightOLD) / encoderPerRevolution;
+        double fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / encoderPerRevolution;
+        double fr = 2 * Math.PI * (fRightNEW - fRightOLD) / encoderPerRevolution;
+        double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
+        double br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
 
         double xPosRobot = radius/4 * (fl + bl + br + fr);
         double yPosRobot = radius/4 * (-fl + bl - br + fr);
         double angleRobot = radius/4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
 
-        //converting to global frame
-        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleRobot) - (Math.cos(angleRobot) - 1) * Math.sin(angleGlobal)) * xPosRobot / angleRobot + (Math.cos(angleGlobal) * (Math.cos(angleRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleRobot)) * yPosRobot / angleRobot;
-        yPosGlobal += ((Math.cos(angleRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleRobot)) * yPosRobot / angleRobot + (Math.cos(angleGlobal) * (Math.cos(angleRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleRobot)) * xPosRobot / angleRobot;
+        xPosGlobal += xPosRobot * Math.cos(angleGlobal) - yPosRobot * Math.sin(angleGlobal);
+        yPosGlobal += xPosRobot * Math.sin(angleGlobal) + yPosRobot * Math.cos(angleGlobal);
         angleGlobal += angleRobot;
+
+//        //converting to global frame
+//        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleRobot) - (Math.cos(angleRobot) - 1) * Math.sin(angleGlobal)) * xPosRobot / angleRobot + (Math.cos(angleGlobal) * (Math.cos(angleRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleRobot)) * yPosRobot / angleRobot;
+//        yPosGlobal += ((Math.cos(angleRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleRobot)) * yPosRobot / angleRobot + (Math.cos(angleGlobal) * (Math.cos(angleRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleRobot)) * xPosRobot / angleRobot;
+//        angleGlobal += angleRobot;
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;
@@ -722,6 +729,16 @@ public class Robot {
         return angleGlobal;
     }
 
+    public double[] inverseKinematics(double x, double y, double angle){
+        double[] endRadians = new double[4];
+
+        endRadians[0] = x-y+angle * (-l-w);
+        endRadians[1] = x+y+angle * (-l-w);
+        endRadians[2] = x-y+angle * (l+w);
+        endRadians[3] = x+y+angle * (l+w);
+
+        return endRadians;
+    }
 
     public void getData(){
 
