@@ -5,27 +5,18 @@ import android.os.SystemClock;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import java.util.Timer;
-
-import java.util.Timer;
-
-import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
-import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
 
 public class Robot {
     //Drive Motors
@@ -54,8 +45,15 @@ public class Robot {
     double bLeftOLD = 0;
     double bRightOLD = 0;
 
+
+
+    double angleDeltaRobot;
+    double xDeltaRobot;
+    double yDeltaRobot;
+
     //dimensions
-    final double radius = 2;
+    double wheelRadius = 2;
+    final double wheelCircumference = 4 * Math.PI;
     final double encoderPerRevolution = 806.4;
     final double l = 7;
     final double w = 6.5;
@@ -684,32 +682,62 @@ public class Robot {
         return positions;
     }
 
-    public void odometry() {
-        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//    public void odometry() {
+//        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//
+//        double fLeftNEW = fLeft.getCurrentPosition();
+//        double fRightNEW = fRight.getCurrentPosition();
+//        double bLeftNEW = bLeft.getCurrentPosition();
+//        double bRightNEW = bRight.getCurrentPosition();
+//
+//        // find robot position
+//        double fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / encoderPerRevolution;
+//        double fr = 2 * Math.PI * (fRightNEW - fRightOLD) / encoderPerRevolution;
+//        double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
+//        double br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
+//
+//        double xDeltaRobot = wheelRadius /4 * (fl + bl + br + fr);
+//        double yDeltaRobot = wheelRadius /4 * (-fl + bl - br + fr);
+//        double angleDeltaRobot = wheelRadius /4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
+//
+//        xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
+//        yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
+//        angleGlobal += angleDeltaRobot;
+//
+////        //converting to global frame
+////        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleDeltaRobot) - (Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal)) * xDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot;
+////        yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
+////        angleGlobal += angleDeltaRobot;
+//
+//        fLeftOLD = fLeftNEW;
+//        fRightOLD = fRightNEW;
+//        bLeftOLD = bLeftNEW;
+//        bRightOLD = bRightNEW;
+//    }
 
+    public void odometryUsingCircles() {
         double fLeftNEW = fLeft.getCurrentPosition();
         double fRightNEW = fRight.getCurrentPosition();
         double bLeftNEW = bLeft.getCurrentPosition();
         double bRightNEW = bRight.getCurrentPosition();
+        double r;
 
-        // find robot position
-        double fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / encoderPerRevolution;
-        double fr = 2 * Math.PI * (fRightNEW - fRightOLD) / encoderPerRevolution;
-        double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
-        double br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
+        double deltaLeft = wheelCircumference * (fLeftNEW-fLeftOLD)/encoderPerRevolution;
+        double deltaRight = wheelCircumference * (fRightNEW-fRightOLD)/encoderPerRevolution;
 
-        double xDeltaRobot = radius/4 * (fl + bl + br + fr);
-        double yDeltaRobot = radius/4 * (-fl + bl - br + fr);
-        double angleDeltaRobot = radius/4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
+        if (deltaRight == deltaLeft){
+            yDeltaRobot = deltaRight;
+        } else {
+            r = l * (deltaRight / (deltaLeft-deltaRight) + 1/2);
+            angleDeltaRobot = (deltaLeft-deltaRight)/l;
+            xDeltaRobot = r * (1 - Math.cos(angleDeltaRobot));
+            yDeltaRobot = r * Math.sin(angleDeltaRobot);
+        }
 
+        //converting to global frame
         xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
         yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
         angleGlobal += angleDeltaRobot;
-
-//        //converting to global frame
-//        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleDeltaRobot) - (Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal)) * xDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot;
-//        yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
-//        angleGlobal += angleDeltaRobot;
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;
@@ -731,9 +759,9 @@ public class Robot {
         double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
         double br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
 
-        double xDeltaRobot = radius/4 * (fl + bl + br + fr);
-        double yDeltaRobot = radius/4 * (-fl + bl - br + fr);
-        double angleDeltaRobot = radius/4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
+        double xDeltaRobot = wheelRadius /4 * (fl + bl + br + fr);
+        double yDeltaRobot = wheelRadius /4 * (-fl + bl - br + fr);
+        double angleDeltaRobot = wheelRadius /4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
 
         //converting to global frame
         if (angleDeltaRobot == 0){

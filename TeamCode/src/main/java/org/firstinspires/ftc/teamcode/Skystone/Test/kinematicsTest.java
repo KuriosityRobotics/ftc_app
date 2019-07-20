@@ -26,7 +26,7 @@ public class kinematicsTest extends LinearOpMode
 
         while (opModeIsActive()){
 
-            robot.odometry();
+            robot.constantVelocityOdometry();
 
             fLPower = (-gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x)*powerScaleFactor;
             fRPower = (-gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x)*powerScaleFactor;
@@ -69,6 +69,7 @@ public class kinematicsTest extends LinearOpMode
                 telemetry.addLine("x " + robot.getxPosGlobal());
                 telemetry.addLine("y " + robot.getyPosGlobal());
                 telemetry.addLine("angle: " + robot.getAngleGlobal());
+                telemetry.addLine("a is pressed");
                 telemetry.update();
             }
 
