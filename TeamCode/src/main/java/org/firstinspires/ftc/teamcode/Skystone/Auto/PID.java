@@ -40,7 +40,8 @@ public class PID extends AutoBase
             telemetry.update();
         }
         while (opModeIsActive()){
-            robot.setDrivePower(control(robot.fLeft.getCurrentPosition(), goal));
+            //FIX THIS
+            //robot.setDrivePower(control(robot.fLeft.getCurrentPosition(), goal));
             telemetry.addLine("fLeft : " +  control(robot.fLeft.getCurrentPosition(), goal));
             telemetry.update();
         }

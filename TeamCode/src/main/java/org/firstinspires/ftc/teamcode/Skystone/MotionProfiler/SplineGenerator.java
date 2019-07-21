@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Skystone.MotionProfiler;
 
-import java.io.IOException;
 import java.util.Vector;
 
 /**
@@ -10,7 +9,7 @@ public class SplineGenerator {
     double[][] outputData;
 
     public SplineGenerator(double[][] data){
-        VehiclePath v = new VehiclePath(data);
+        Profiler v = new Profiler(data);
         v.vehiclePath();
         v.vehicleTraj();
         this.outputData = v.generateOutput();
@@ -21,7 +20,7 @@ public class SplineGenerator {
     }
 }
 
-class VehiclePath {
+class Profiler {
     double[][] data;
     Vector<Double> uV = new Vector<>();
     Vector<Double> xV = new Vector<>();
@@ -52,7 +51,7 @@ class VehiclePath {
     double totalDist;
     double totalTime;
 
-    public VehiclePath(double[][] data){
+    public Profiler(double[][] data){
         this.data = data;
     }
 
