@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.Skystone.Odometry;
 
+import android.app.Activity;
+import android.util.Log;
+
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.Skystone.Robot;
 
 public class Position2D{
@@ -10,13 +15,19 @@ public class Position2D{
     double xPose;
     double yPose;
     double anglePose;
-
+    FtcRobotControllerActivity activity;
     public Position2D() {
-        Odometry v = new Odometry();
-        v.constantVelocityOdometry();
+        final Odometry v = new Odometry();
         this.xPose = v.xPosGlobal;
         this.yPose = v.yPosGlobal;
         this.anglePose = v.angleGlobal;
+        activity = (FtcRobotControllerActivity) AppUtil.getInstance().getRootActivity();
+
+        activity.runOnUiThread(new Runnable() {
+            public void run() {
+                v.constantVelocityOdometry();
+            }
+        });
     }
 
     public double getxPose() { return xPose; }
