@@ -85,7 +85,7 @@ public class MathFunctions {
         int rowsInA = a.length;
         int columnsInA = a[0].length; // same as rows in B
         int columnsInB = b[0].length;
-        double[][] c = new int[rowsInA][columnsInB];
+        double[][] c = new double[rowsInA][columnsInB];
         for (int i = 0; i < rowsInA; i++) {
             for (int j = 0; j < columnsInB; j++) {
                 for (int k = 0; k < columnsInA; k++) {
