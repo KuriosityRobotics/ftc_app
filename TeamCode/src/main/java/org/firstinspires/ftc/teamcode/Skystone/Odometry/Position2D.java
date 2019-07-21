@@ -11,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.Skystone.Robot;
 
+import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.AngleWrap;
+
 public class Position2D{
 
     double xPose;
@@ -41,7 +43,7 @@ public class Position2D{
 
     public double getyPose() { return xPose; }
 
-    public double getAnglePose() { return Math.toDegrees(xPose); }
+    public double getAnglePose() { return Math.toDegrees(AngleWrap(xPose)); }
 
 }
 
@@ -72,7 +74,6 @@ class Odometry{
     double bl;
     double br;
 
-    //dimensions
     double wheelRadius = 2;
     final double wheelCircumference = 4 * Math.PI;
     final double encoderPerRevolution = 806.4;

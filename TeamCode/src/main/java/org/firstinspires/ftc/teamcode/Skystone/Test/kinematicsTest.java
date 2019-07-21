@@ -4,14 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Skystone.Odometry.Position2D;
 import org.firstinspires.ftc.teamcode.Skystone.Robot;
 
 @Autonomous(name="kinematics Test", group="Linear Opmode")
 public class kinematicsTest extends LinearOpMode
 {
     @Override
+
     public void runOpMode(){
         Robot robot = new Robot(hardwareMap,telemetry,this);
+        Position2D position2D = new Position2D();
         robot.resetEncoders();
         waitForStart();
         robot.intializeIMU();
@@ -26,7 +29,7 @@ public class kinematicsTest extends LinearOpMode
 
         while (opModeIsActive()){
 
-            robot.odometryUsingCircles();
+            //position2D.getxPose();
 
             fLPower = (-gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x)*powerScaleFactor;
             fRPower = (-gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x)*powerScaleFactor;
@@ -66,10 +69,10 @@ public class kinematicsTest extends LinearOpMode
                 fLPower = (gamepad1.left_stick_y)-powerScaleFactor;
                 bLPower = (gamepad1.left_stick_y)-powerScaleFactor;
             } else if (gamepad1.a){
-                telemetry.addLine("x " + robot.getxPosGlobal());
-                telemetry.addLine("y " + robot.getyPosGlobal());
-                telemetry.addLine("angle: " + robot.getAngleGlobal());
-                telemetry.addLine("a is pressed");
+                telemetry.addLine("x " + position2D.getxPose());
+                telemetry.addLine("y " + position2D.getyPose());
+                telemetry.addLine("angle: " + position2D.getAnglePose());
+                telemetry.addLine("a is peressed");
                 telemetry.update();
             }
 
