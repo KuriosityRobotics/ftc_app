@@ -78,7 +78,6 @@ class Odometry{
     public Odometry(Robot robot){
         this.robot = robot;
     }
-
     public void constantVelocityOdometry() {
 
         fLeftNEW = robot.fLeft.getCurrentPosition();

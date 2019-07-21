@@ -14,7 +14,7 @@ public class kinematicsTest extends LinearOpMode
 
     public void runOpMode(){
         Robot robot = new Robot(hardwareMap,telemetry,this);
-        Position2D position2D = new Position2D();
+        Position2D position2D = new Position2D(robot);
         robot.resetEncoders();
         waitForStart();
         robot.intializeIMU();
