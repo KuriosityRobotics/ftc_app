@@ -2,6 +2,12 @@ package org.firstinspires.ftc.teamcode.Skystone.MotionProfiler;
 
 import java.util.Vector;
 
+import org.firstinspires.ftc.teamcode.Skystone.MathFunctions;
+
+import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.getArrayOfRow;
+import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.normalize;
+import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.subtractVectors;
+
 /**
  * Created by sam on 7/20/19.
  */
@@ -134,7 +140,6 @@ class Profiler {
     }
 
     public void vehicleTraj() {
-        printArray(distance);
         System.out.println(distance[distance.length-1]);
         totalDist = distance[distance.length - 1];
         System.out.println(totalDist);
@@ -218,36 +223,8 @@ class Profiler {
         }
         System.out.println(t);
     }
-    public Vector<Double> getArrayOfRow(double[][] matrix, int row){
-        Vector<Double> out = new Vector<>();
-        for(int i = 0;i<matrix[row].length;i++){
-            out.add(matrix[row][i]);
-        }
-        return out;
-    }
 
-    public Vector<Double> subtractVectors(Vector<Double> one, Vector<Double> two){
-        Vector<Double> out = new Vector<>();
 
-        for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)-two.get(i));
-        }
-        return out;
-    }
-
-    public void printArray(double[] array){
-        for(int i = 0;i<array.length;i++){
-            System.out.print(array[i] + " ,");
-        }
-    }
-
-    public double normalize(Vector<Double> v){
-        double sum = 0;
-        for(int i = 0;i<v.size();i++){
-            sum+=Math.pow(v.get(i),2);
-        }
-        return Math.sqrt(sum);
-    }
 
     public double[][] generateOutput(){
         double[][] out = new double[leftSpeed.length][7];
