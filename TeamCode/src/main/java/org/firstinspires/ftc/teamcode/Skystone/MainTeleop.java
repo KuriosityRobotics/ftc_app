@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Skystone.MotionProfiler.SplineGenerator;
+import org.firstinspires.ftc.teamcode.Skystone.Odometry.Position2D;
 
 @TeleOp(name="MainTeleOpSky", group="Linear Opmode")
 public class MainTeleop extends LinearOpMode {
@@ -23,8 +24,13 @@ public class MainTeleop extends LinearOpMode {
     @Override
     public void runOpMode() {
         resetRobot();
+        Position2D position2D = new Position2D(robot);
         waitForStart();
+        position2D.runOnUiThread();
         while (opModeIsActive()) {
+            telemetry.addLine("X POS: " + position2D.getxPose());
+            telemetry.addLine("Y POS: " + position2D.getyPose());
+            telemetry.addLine("ANGLE: " + position2D.getAnglePose());
             telemetry.addLine("fLeft: " + Double.toString(robot.fLeft.getPower()));
             telemetry.addLine("bLeft: " + Double.toString(robot.bLeft.getPower()));
             telemetry.addLine("fRight: " + Double.toString(robot.fRight.getPower()));

@@ -8,23 +8,39 @@ import org.firstinspires.ftc.teamcode.Skystone.Robot;
 
 import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.AngleWrap;
 
+class MyThread extends Thread{
+    boolean running;
+    @Override
+    public void run() {
+        while (running){
+
+        }
+    }
+}
+
 public class Position2D{
 
     double xPose;
+    Odometry odometry;
     double yPose;
     double anglePose;
     FtcRobotControllerActivity activity;
     public Position2D(Robot robot) {
         final Odometry v = new Odometry(robot);
-        this.xPose = v.xPosGlobal;
-        this.yPose = v.yPosGlobal;
-        this.anglePose = v.angleGlobal;
+        odometry = v;
+    }
+
+    public void runOnUiThread(){
+
         activity = (FtcRobotControllerActivity) AppUtil.getInstance().getRootActivity();
 
         activity.runOnUiThread(new Runnable() {
             public void run() {
                 try {
-                    v.constantVelocityOdometry();
+                    odometry.constantVelocityOdometry();
+                    xPose = odometry.xPosGlobal;
+                    yPose = odometry.yPosGlobal;
+                    anglePose = odometry.angleGlobal;
                     Looper.prepare();
                     Looper.loop();
                 }catch (Exception e){
@@ -36,10 +52,9 @@ public class Position2D{
 
     public double getxPose() { return xPose; }
 
-    public double getyPose() { return xPose; }
+    public double getyPose() { return yPose; }
 
-    public double getAnglePose() { return Math.toDegrees(AngleWrap(xPose)); }
-
+    public double getAnglePose() { return Math.toDegrees(AngleWrap(anglePose)); }
 }
 
 class Odometry{
