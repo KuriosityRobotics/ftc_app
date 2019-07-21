@@ -18,75 +18,59 @@ public class MathFunctions {
         return out;
     }
     public static Vector<Double> addToVector(Vector<Double> one, double two){
-        Vector<Double> out = new Vector<>();
-
         for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)+two);
+            one.set(i,one.get(i)+two);
         }
-        return out;
+        return one;
     }
 
     public static Vector<Double> subFromVector(Vector<Double> one, double two){
-        Vector<Double> out = new Vector<>();
-
         for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)-two);
+            one.set(i,one.get(i)-two);
         }
-        return out;
+        return one;
     }
 
     public static Vector<Double> multToVector(Vector<Double> one, double two){
-        Vector<Double> out = new Vector<>();
-
         for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)*two);
+            one.set(i,one.get(i)*two);
         }
-        return out;
+        return one;
     }
 
     public static Vector<Double> divideFromVector(Vector<Double> one, double two){
-        Vector<Double> out = new Vector<>();
-
         for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)/two);
+            one.set(i,one.get(i)/two);
         }
-        return out;
+        return one;
     }
 
     public static Vector<Double> subtractVectors(Vector<Double> one, Vector<Double> two){
-        Vector<Double> out = new Vector<>();
-
         for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)-two.get(i));
+            one.set(i,one.get(i)-two.get(i));
         }
-        return out;
+        return one;
     }
 
     public static Vector<Double> multiplyVectors(Vector<Double> one, Vector<Double> two){
-        Vector<Double> out = new Vector<>();
-
         for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)*two.get(i));
+            one.set(i,one.get(i)*two.get(i));
         }
-        return out;
+        return one;
     }
 
     public static Vector<Double> divideVectors(Vector<Double> one, Vector<Double> two){
-        Vector<Double> out = new Vector<>();
-
         for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)*two.get(i));
+            one.set(i,one.get(i)*two.get(i));
         }
-        return out;
+        return one;
     }
 
     public static Vector<Double> addVectors(Vector<Double> one, Vector<Double> two){
-        Vector<Double> out = new Vector<>();
-
         for(int i = 0;i<one.size();i++){
-            out.add(one.get(i)+two.get(i));
+            one.set(i,one.get(i)+two.get(i));
         }
-        return out;
+        return one;
     }
 
     public static double normalize(Vector<Double> v){
