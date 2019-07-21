@@ -17,8 +17,8 @@ public class Position2D{
     double yPose;
     double anglePose;
     FtcRobotControllerActivity activity;
-    public Position2D() {
-        final Odometry v = new Odometry();
+    public Position2D(Robot robot) {
+        final Odometry v = new Odometry(robot);
         this.xPose = v.xPosGlobal;
         this.yPose = v.yPosGlobal;
         this.anglePose = v.angleGlobal;
@@ -26,9 +26,14 @@ public class Position2D{
 
         activity.runOnUiThread(new Runnable() {
             public void run() {
-                v.constantVelocityOdometry();
-                Looper.prepare();
-                Looper.loop();            }
+                try {
+                    v.constantVelocityOdometry();
+                    Looper.prepare();
+                    Looper.loop();
+                }catch (Exception e){
+
+                }
+            }
         });
     }
 
@@ -73,6 +78,10 @@ class Odometry{
     final double encoderPerRevolution = 806.4;
     final double l = 7;
     final double w = 6.5;
+
+    public Odometry(Robot robot){
+        this.robot = robot;
+    }
 
     public void constantVelocityOdometry() {
 
