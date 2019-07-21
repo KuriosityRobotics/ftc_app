@@ -81,13 +81,6 @@ public class Robot {
         bRight.setDirection(DcMotor.Direction.REVERSE);
     }
 
-    public void setDrivePower(double power){
-        fLeft.setPower(power);
-        fRight.setPower(power);
-        bLeft.setPower(power);
-        bRight.setPower(power);
-    }
-
     public void intializeIMU(){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
@@ -130,53 +123,6 @@ public class Robot {
         finalTurn(targetHeading, 2000);
     }
 
-    public void coordinateMecanum(int xCord, int yCord, double speed) {
-        intializeIMU();
-        double degrees = 1.5 * Math.PI - Math.atan2(yCord,xCord);
-        position = imu.getPosition();
-        int targetLength = (int)(Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord))/ 0.028);
-        while (linearOpMode.opModeIsActive()) {
-            fLeft.setPower((Math.sqrt(2) * Math.cos(1 / 57.29 * (degrees - 45))) * speed);
-            bRight.setPower((Math.sqrt(2) * Math.cos(1 / 57.29 * (degrees - 45))) * speed);
-            fRight.setPower((Math.sqrt(2) * Math.cos(1 / 57.29 * degrees)) * 0.5);
-            bLeft.setPower((Math.sqrt(2) * Math.cos(1 / 57.29 * degrees)) * 0.5);
-        }
-
-        if (xCord > 0 && yCord > 0) {
-            targetLength = (int)(Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord))/ 0.028);
-            fLeft.setTargetPosition(targetLength);
-            bRight.setTargetPosition(targetLength);
-            while(fLeft.isBusy()) {
-                fLeft.setPower(speed);
-                bRight.setPower(speed);
-                if (speed < 0) {
-                    fRight.setPower((yCord - xCord) * (-0.01 * speed));
-                    bLeft.setPower((yCord - xCord) * (-0.01 * speed));
-                } else {
-                    fRight.setPower(yCord - xCord * (0.01 * speed));
-                    bLeft.setPower(yCord - xCord* (0.01 * speed));
-                }
-            }
-
-        }
-        else {
-            targetLength = (int)Math.sqrt(Math.pow(2, xCord) + Math.pow(2, yCord));
-            fRight.setTargetPosition(targetLength);
-            bLeft.setTargetPosition(targetLength);
-            while(fLeft.isBusy()) {
-                fRight.setPower(speed);
-                bLeft.setPower(speed);
-                if (speed < 0) {
-                    fLeft.setPower((yCord - xCord) * (-0.01 * speed));
-                    bRight.setPower((yCord - xCord) * (-0.01 * speed));
-                } else {
-                    fLeft.setPower(yCord - xCord* (0.01 * speed));
-                    bRight.setPower(yCord - xCord * (0.01 * speed));
-                }
-            }
-        }
-    }
-    //turn method with timed kill switch
     public void finalTurn(double targetHeading, long timeInMilli){
         targetHeading = Range.clip(targetHeading, -179, 179);
 
@@ -247,120 +193,6 @@ public class Robot {
         }
         moveRobot(speed,(int)(rotations));
 
-        brakeRobot();
-        linearOpMode.sleep(100);
-    }
-
-    public void testMoveStraight(double speed, double targetDistance){
-        //experimental don't use
-        //corrects the robot to move straight
-        //to move backwards make targetDistance negative
-        double rotations = 0;
-        if (targetDistance>0) {
-            rotations = targetDistance / 0.028;
-        } else {
-            rotations = targetDistance / 0.026;
-        }
-        moveRobot(speed,(int)(rotations));
-        changeRunModeToUsingEncoder();
-        resetEncoders();
-        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        rotations = targetDistance * (400/17.5);
-
-        double leftPower = speed;
-        double rightPower = speed;
-
-        double straightCorrection;
-
-        boolean isNegative = false;
-
-        double deccelerationLeft;
-        double deccelerationRight;
-
-        if (targetDistance < 0) {
-            isNegative = true;
-        }
-
-        if (!isNegative) {
-            rotations = targetDistance / 0.028;
-        } else {
-            rotations = targetDistance / 0.026;
-        }
-
-        fLeft.setTargetPosition((int)rotations);
-        bLeft.setTargetPosition((int)rotations);
-        fRight.setTargetPosition((int)rotations);
-        bRight.setTargetPosition((int)rotations);
-
-        fLeft.setPower(speed);
-        fRight.setPower(speed);
-        bLeft.setPower(speed);
-        bRight.setPower(speed);
-
-        double scaleFactor;
-        double currentPositon;
-
-        double difference = 0;
-        while((fLeft.isBusy() && fRight.isBusy()) && linearOpMode.opModeIsActive()){
-
-            currentPositon = Math.abs(bLeft.getCurrentPosition());
-
-            scaleFactor = Math.abs(Math.abs(rotations - currentPositon) / rotations);
-
-            difference = bLeft.getCurrentPosition() - bRight.getCurrentPosition();
-            straightCorrection = Math.abs(difference) / 1000;
-
-            if(scaleFactor<0.4){
-                scaleFactor = 0.4;
-            }
-
-            deccelerationLeft = leftPower;
-            deccelerationRight = rightPower;
-
-            if (!isNegative) {
-                if (difference < 0) {
-                    deccelerationRight -= straightCorrection;
-                }
-                if (difference > 0) {
-                    deccelerationLeft += straightCorrection;
-                }
-            } else {
-                if (difference > 0) {
-                    deccelerationLeft -= straightCorrection;
-                }
-                if (difference < 0) {
-                    deccelerationRight -= straightCorrection;
-                }
-            }
-
-            deccelerationLeft = deccelerationLeft * scaleFactor;
-            deccelerationRight = deccelerationRight * scaleFactor;
-
-            telemetry.addLine("LeftPower: " + deccelerationLeft);
-            telemetry.addLine("RightPower: " + deccelerationRight);
-            telemetry.addLine("correction: " + straightCorrection);
-            telemetry.addLine("Difference: " + difference);
-
-            telemetry.update();
-            fLeft.setPower(deccelerationLeft);
-            fRight.setPower(deccelerationRight);
-            bLeft.setPower(deccelerationLeft);
-            bRight.setPower(deccelerationRight);
-
-            telemetry.addLine("Target position: " + rotations);
-
-            telemetry.addLine("Right position: " + fRight.getCurrentPosition());
-            telemetry.addLine("Left position: " + fLeft.getCurrentPosition());
-            telemetry.update();
-        }
         brakeRobot();
         linearOpMode.sleep(100);
     }
@@ -480,100 +312,12 @@ public class Robot {
         }
         return delta;
     }
-    public void goToCrater(double speed){
-        //goes to crater using the imu and detects a change in elevation
-        position = imu.getPosition();
-        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double currentPosition = angles.thirdAngle;
-        telemetry.addLine(Double.toString(currentPosition));
-        telemetry.update();
-        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fLeft.setPower(speed);
-        fRight.setPower(speed);
-        bLeft.setPower(speed);
-        bRight.setPower(speed);
-
-        while(linearOpMode.opModeIsActive() && Math.abs(angles.thirdAngle - currentPosition)<1 ){
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            telemetry.addData("X",angles.thirdAngle);
-            telemetry.addData("Y",angles.secondAngle);
-            telemetry.addData("Z",angles.firstAngle);
-            telemetry.update();
-        }
-        brakeRobot();
-    }
-
 
     public void setBrakeModeDriveMotors(){
         fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    }
-
-    public void polarMovement(double speed, double radiusInches, double degrees){
-
-        setBrakeModeDriveMotors();
-
-        this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        double radiusEncoders = radiusInches * 119.05;
-        double radians = Math.toRadians(degrees);
-        double y = radiusEncoders/Math.sin(radians);
-        double x = radiusEncoders/Math.cos(radians);
-
-        double fL = y - x;
-        double fR = y + x;
-
-        fRight.setPower(speed);
-        fLeft.setPower(speed);
-        bLeft.setPower(speed);
-        bRight.setPower(speed);
-
-        fRight.setTargetPosition((int)(fR * radiusEncoders));
-        fLeft.setTargetPosition((int)(fL * radiusEncoders));
-        bLeft.setTargetPosition((int)(fR * radiusEncoders));
-        bRight.setTargetPosition((int)(fL * radiusEncoders));
-
-//        fRight.setPower(0);
-//        fLeft.setPower(1);
-//        bLeft.setPower(0);
-//        bRight.setPower(1);
-//
-//        fRight.setTargetPosition(0);
-//        fLeft.setTargetPosition(1190);
-//        bLeft.setTargetPosition(0);
-//        bRight.setTargetPosition(1190);
-
-        while(linearOpMode.opModeIsActive() && ((fLeft.isBusy() && bRight.isBusy()) || (fRight.isBusy() && bLeft.isBusy()))){
-            telemetry.addLine("fRight: " + Integer.toString(fRight.getCurrentPosition()));
-            telemetry.addLine("bLeft: " + Integer.toString(bLeft.getCurrentPosition()));
-            telemetry.update();
-        }
-        brakeRobot();
-    }
-
-    public void timeMove (double[][] data){
-
-
-        long startTime = SystemClock.elapsedRealtime();
-
-        fRight.setPower(1);
-        fLeft.setPower(1);
-        bLeft.setPower(1);
-        bRight.setPower(1);
-
-        while(SystemClock.elapsedRealtime() - startTime < 5000){
-            linearOpMode.sleep(1);
-        }
-
-        fRight.setPower(0);
-        fLeft.setPower(0);
-        bLeft.setPower(0);
-        bRight.setPower(0);
-
     }
 
     public void splineMove(double[][] data) {
@@ -659,61 +403,38 @@ public class Robot {
 
     }
 
-    public double[] getPos() {
-        double[] positions = new double[3];
-        final double radius = 2;
-        final double encoderPerRevolution = 537.6;
-        final double l = 7;
-        final double b = 6.5;
+    public void odometry() {
+        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        double fl = 2 * Math.PI * fLeft.getCurrentPosition() / encoderPerRevolution; //radians each motor has travelled
-        double fr = 2 * Math.PI * fRight.getCurrentPosition() / encoderPerRevolution;
-        double bl = 2 * Math.PI * bLeft.getCurrentPosition() / encoderPerRevolution;
-        double br = 2 * Math.PI * bRight.getCurrentPosition() / encoderPerRevolution;
+        double fLeftNEW = fLeft.getCurrentPosition();
+        double fRightNEW = fRight.getCurrentPosition();
+        double bLeftNEW = bLeft.getCurrentPosition();
+        double bRightNEW = bRight.getCurrentPosition();
 
-        double xPos = radius/4 * (fl + bl + br + fr);
-        double yPos = radius/4 * (-fl + bl - br + fr);
-        double angle = radius/4 *(-fl/(l+b) - bl/(l+b) + br/(l+b) + fr/(l+b));
-        angle = angle * 180/(2*Math.PI);
+        // find robot position
+        double fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / encoderPerRevolution;
+        double fr = 2 * Math.PI * (fRightNEW - fRightOLD) / encoderPerRevolution;
+        double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
+        double br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
 
-        positions[0] = xPos;
-        positions[1] = yPos;
-        positions[2] = angle;
-        return positions;
-    }
+        double xDeltaRobot = wheelRadius /4 * (fl + bl + br + fr);
+        double yDeltaRobot = wheelRadius /4 * (-fl + bl - br + fr);
+        double angleDeltaRobot = wheelRadius /4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
 
-//    public void odometry() {
-//        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-//
-//        double fLeftNEW = fLeft.getCurrentPosition();
-//        double fRightNEW = fRight.getCurrentPosition();
-//        double bLeftNEW = bLeft.getCurrentPosition();
-//        double bRightNEW = bRight.getCurrentPosition();
-//
-//        // find robot position
-//        double fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / encoderPerRevolution;
-//        double fr = 2 * Math.PI * (fRightNEW - fRightOLD) / encoderPerRevolution;
-//        double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
-//        double br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
-//
-//        double xDeltaRobot = wheelRadius /4 * (fl + bl + br + fr);
-//        double yDeltaRobot = wheelRadius /4 * (-fl + bl - br + fr);
-//        double angleDeltaRobot = wheelRadius /4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
-//
-//        xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
-//        yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
+        xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
+        yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
+        angleGlobal += angleDeltaRobot;
+
+//        //converting to global frame
+//        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleDeltaRobot) - (Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal)) * xDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot;
+//        yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
 //        angleGlobal += angleDeltaRobot;
-//
-////        //converting to global frame
-////        xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleDeltaRobot) - (Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal)) * xDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot;
-////        yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
-////        angleGlobal += angleDeltaRobot;
-//
-//        fLeftOLD = fLeftNEW;
-//        fRightOLD = fRightNEW;
-//        bLeftOLD = bLeftNEW;
-//        bRightOLD = bRightNEW;
-//    }
+
+        fLeftOLD = fLeftNEW;
+        fRightOLD = fRightNEW;
+        bLeftOLD = bLeftNEW;
+        bRightOLD = bRightNEW;
+    }
 
     public void odometryUsingCircles() {
         double fLeftNEW = fLeft.getCurrentPosition();
@@ -729,7 +450,7 @@ public class Robot {
             yDeltaRobot = deltaRight;
         } else {
             r = l * (deltaRight / (deltaLeft-deltaRight) + 1/2);
-            angleDeltaRobot = (deltaLeft-deltaRight)/l;
+            angleDeltaRobot = (deltaLeft-deltaRight)/14 * 0.51428571428;
             xDeltaRobot = r * (1 - Math.cos(angleDeltaRobot));
             yDeltaRobot = r * Math.sin(angleDeltaRobot);
         }
@@ -737,7 +458,7 @@ public class Robot {
         //converting to global frame
         xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
         yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
-        angleGlobal += angleDeltaRobot;
+        angleGlobal  = (wheelCircumference * (fLeftNEW)/encoderPerRevolution - wheelCircumference * (fRightNEW)/encoderPerRevolution) / 14 * 0.51428571428;
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;
@@ -767,12 +488,14 @@ public class Robot {
         if (angleDeltaRobot == 0){
             xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
             yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
-            angleGlobal += angleDeltaRobot;
+
         } else {
             xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleDeltaRobot) - (Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal)) * xDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot;
             yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
-            angleGlobal += angleDeltaRobot;
         }
+        //angleGlobal += angleDeltaRobot;
+        //this is absolute so its better
+        angleGlobal  = (wheelCircumference * (fLeftNEW)/encoderPerRevolution - wheelCircumference * (fRightNEW)/encoderPerRevolution) / 14 * 0.51428571428;
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;
@@ -780,17 +503,11 @@ public class Robot {
         bRightOLD = bRightNEW;
     }
 
-    public double getxPosGlobal() {
-        return xPosGlobal;
-    }
+    public double getxPosGlobal() { return xPosGlobal; }
 
-    public double getyPosGlobal() {
-        return yPosGlobal;
-    }
+    public double getyPosGlobal() { return yPosGlobal; }
 
-    public double getAngleGlobal() {
-        return angleGlobal;
-    }
+    public double getAngleGlobal() { return Math.toDegrees(angleGlobal); }
 
     public double[] inverseKinematics(double x, double y, double angle){
         double[] endRadians = new double[4];
@@ -802,16 +519,4 @@ public class Robot {
 
         return endRadians;
     }
-
-    public void getData(){
-
-        fLeft.setPower(1);
-        fRight.setPower(1);
-        bLeft.setPower(1);
-        bRight.setPower(1);
-
-        linearOpMode.sleep(1000);
-
-    }
-
 }

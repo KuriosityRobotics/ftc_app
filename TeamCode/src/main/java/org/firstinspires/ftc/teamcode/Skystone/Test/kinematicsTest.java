@@ -26,7 +26,7 @@ public class kinematicsTest extends LinearOpMode
 
         while (opModeIsActive()){
 
-            robot.constantVelocityOdometry();
+            robot.odometryUsingCircles();
 
             fLPower = (-gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x)*powerScaleFactor;
             fRPower = (-gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x)*powerScaleFactor;
