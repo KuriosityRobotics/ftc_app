@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Skystone.Odometry;
 
 import android.app.Activity;
+import android.os.Looper;
 import android.util.Log;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
@@ -26,7 +27,8 @@ public class Position2D{
         activity.runOnUiThread(new Runnable() {
             public void run() {
                 v.constantVelocityOdometry();
-            }
+                Looper.prepare();
+                Looper.loop();            }
         });
     }
 
