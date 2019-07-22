@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Skystone.Odometry;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Looper;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
@@ -9,36 +11,46 @@ import org.firstinspires.ftc.teamcode.Skystone.Robot;
 import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.AngleWrap;
 
 public class Position2D{
-
-    double xPose;
-    double yPose;
-    double anglePose;
     FtcRobotControllerActivity activity;
+    Robot robot;
     public Position2D(Robot robot) {
-        final Odometry v = new Odometry(robot);
-        this.xPose = v.xPosGlobal;
-        this.yPose = v.yPosGlobal;
-        this.anglePose = v.angleGlobal;
-        activity = (FtcRobotControllerActivity) AppUtil.getInstance().getRootActivity();
-
-        activity.runOnUiThread(new Runnable() {
-            public void run() {
-                try {
-                    v.constantVelocityOdometry();
-                    Looper.prepare();
-                    Looper.loop();
-                }catch (Exception e){
-
-                }
-            }
-        });
+        this.robot = robot;
     }
 
-    public double getxPose() { return xPose; }
+    public void startOdometry(){
+        Odometry v = new Odometry(robot);
+        LongRunningTask longRunningTask = new LongRunningTask(robot,v);
+        longRunningTask.execute();
+    }
+}
+class LongRunningTask extends AsyncTask<Void, Boolean, Boolean> {
+    Robot robot;
+    Odometry o;
+    public LongRunningTask(Robot robot, Odometry o){
+        this.robot = robot;
+        this.o = o;
+    }
+    @Override
+    protected Boolean doInBackground(Void... params) {
+        while(robot.linearOpMode.opModeIsActive()) {
+            o.constantVelocityOdometry();
+            robot.yPos = o.xPosGlobal;
+            robot.xPos = o.yPosGlobal;
+            robot.anglePos = o.angleGlobal;
+//            robot.telemetry.addLine("XPOS: " + robot.xPos);
+//            robot.telemetry.addLine("YPOS: " + robot.yPos);
+//            robot.telemetry.addLine("ANGPOS: " + robot.anglePos);
+//            robot.telemetry.update();
+        }
+        return true;
+    }
 
-    public double getyPose() { return xPose; }
-
-    public double getAnglePose() { return Math.toDegrees(AngleWrap(xPose)); }
+    protected void onPostExecute(Boolean result) {
+        if(result) {
+            robot.telemetry.addLine("DONE");
+            robot.telemetry.update();
+        }
+    }
 
 }
 
@@ -50,30 +62,24 @@ class Odometry{
     double yPosGlobal = 0;
     double angleGlobal = 0;
 
-    double angleDeltaRobot;
-    double xDeltaRobot;
-    double yDeltaRobot;
+    private double angleDeltaRobot;
+    private double xDeltaRobot;
+    private double yDeltaRobot;
 
-    double fLeftNEW = 0;
-    double fRightNEW = 0;
-    double bLeftNEW = 0;
-    double bRightNEW = 0;
+    private double fLeftNEW = 0;
+    private double fRightNEW = 0;
+    private double bLeftNEW = 0;
+    private double bRightNEW = 0;
 
-    double fLeftOLD = 0;
-    double fRightOLD = 0;
-    double bLeftOLD = 0;
-    double bRightOLD = 0;
+    private double fLeftOLD = 0;
+    private double fRightOLD = 0;
+    private double bLeftOLD = 0;
+    private double bRightOLD = 0;
 
-    double fl;
-    double fr;
-    double bl;
-    double br;
-
-    double wheelRadius = 2;
-    final double wheelCircumference = 4 * Math.PI;
-    final double encoderPerRevolution = 806.4;
-    final double l = 7;
-    final double w = 6.5;
+    private double fl;
+    private double fr;
+    private double bl;
+    private double br;
 
     public Odometry(Robot robot){
         this.robot = robot;
@@ -86,14 +92,14 @@ class Odometry{
         bRightNEW = robot.bRight.getCurrentPosition();
 
         // find robot position
-        fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / encoderPerRevolution;
-        fr = 2 * Math.PI * (fRightNEW - fRightOLD) / encoderPerRevolution;
-        bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / encoderPerRevolution;
-        br = 2 * Math.PI * (bRightNEW - bRightOLD) / encoderPerRevolution;
+        fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / robot.encoderPerRevolution;
+        fr = 2 * Math.PI * (fRightNEW - fRightOLD) / robot.encoderPerRevolution;
+        bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / robot.encoderPerRevolution;
+        br = 2 * Math.PI * (bRightNEW - bRightOLD) / robot.encoderPerRevolution;
 
-        xDeltaRobot = wheelRadius /4 * (fl + bl + br + fr);
-        yDeltaRobot = wheelRadius /4 * (-fl + bl - br + fr);
-        angleDeltaRobot = wheelRadius /4 *(-fl/(l+w) - bl/(l+w) + br/(l+w) + fr/(l+w));
+        xDeltaRobot = robot.wheelRadius /4 * (fl + bl + br + fr);
+        yDeltaRobot = robot.wheelRadius /4 * (-fl + bl - br + fr);
+        angleDeltaRobot = robot.wheelRadius /4 *(-fl/(robot.l+robot.w) - bl/(robot.l+robot.w) + br/(robot.l+robot.w) + fr/(robot.l+robot.w));
 
         //converting to global frame
         if (angleDeltaRobot == 0){
@@ -105,7 +111,7 @@ class Odometry{
             yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
         }
 
-        angleGlobal  = (wheelCircumference * (fLeftNEW)/encoderPerRevolution - wheelCircumference * (fRightNEW)/encoderPerRevolution) / 14 * 0.51428571428;
+        angleGlobal  = (robot.wheelCircumference * (fLeftNEW)/robot.encoderPerRevolution - robot.wheelCircumference * (fRightNEW)/robot.encoderPerRevolution) / 14 * 0.51428571428;
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;
