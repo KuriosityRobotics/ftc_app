@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
@@ -433,16 +434,17 @@ public class Robot {
             double distanceToTarget = Math.hypot(x-xPos, y-yPos);
             double absoluteAngleToTarget = Math.atan2(y - yPos, x - xPos);
 
-            double relativeAngleToPoint = MathFunctions.AngleWrap(absoluteAngleToTarget - Math.toRadians(anglePos));
+            double relativeAngleToPoint = MathFunctions.AngleWrap(absoluteAngleToTarget - (Math.toRadians(anglePos)-Math.toRadians(90)));
+
             double relativeXToPoint = Math.cos(relativeAngleToPoint) * distanceToTarget;
             double relativeYToPoint = Math.sin(relativeAngleToPoint) * distanceToTarget;
             double relativeTurnAngle = relativeAngleToPoint - Math.toRadians(90);
 
-            double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
-            double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
+            double movementXPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
+            double movementYPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
 
-            double xMovement = xPower * speedRatio;
-            double yMovement = yPower * speedRatio;
+            double xMovement = movementXPower * speedRatio;
+            double yMovement = movementYPower * speedRatio;
             double turnMovement = Range.clip(relativeTurnAngle/Math.toRadians(30), -1, 1) * turnSpeed;
 
             if(distanceToTarget < 10) { turnMovement = 0; }
@@ -462,7 +464,10 @@ public class Robot {
 //            bLeftPower *= speedRatio;
 //            bRightPower *= speedRatio;
 
-            if(distanceToTarget < 0.5) { break; }
+            if(distanceToTarget < 0.5) {
+                brakeRobot();
+                break;
+            }
 
             fLeft.setPower(fLeftPower);
             fRight.setPower(fRightPower);

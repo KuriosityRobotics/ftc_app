@@ -34,17 +34,13 @@ class LongRunningTask extends AsyncTask<Void, Boolean, Boolean> {
     protected Boolean doInBackground(Void... params) {
         while(robot.linearOpMode.opModeIsActive()) {
             o.constantVelocityOdometry();
-            robot.yPos = -1 * o.xPosGlobal;
-            robot.xPos = -1 * o.yPosGlobal;
+            robot.yPos = o.yPosGlobal;
+            robot.xPos = o.xPosGlobal;
             robot.anglePos = o.angleGlobal;
             robot.telemetry.addLine("xPOS: " + robot.xPos);
             robot.telemetry.addLine("yPOS: " + robot.yPos);
             robot.telemetry.addLine("angle: " + robot.anglePos);
             robot.telemetry.update();
-//            robot.telemetry.addLine("XPOS: " + robot.xPos);
-//            robot.telemetry.addLine("YPOS: " + robot.yPos);
-//            robot.telemetry.addLine("ANGPOS: " + robot.anglePos);
-//            robot.telemetry.update();
         }
         return true;
     }
@@ -101,8 +97,8 @@ class Odometry{
         bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / robot.encoderPerRevolution;
         br = 2 * Math.PI * (bRightNEW - bRightOLD) / robot.encoderPerRevolution;
 
-        xDeltaRobot = robot.wheelRadius /4 * (fl + bl + br + fr);
-        yDeltaRobot = robot.wheelRadius /4 * (-fl + bl - br + fr);
+        xDeltaRobot = robot.wheelRadius /4 * (-fl + bl - br + fr);
+        yDeltaRobot = robot.wheelRadius /4 * (fl + bl + br + fr);
         angleDeltaRobot = robot.wheelRadius /4 *(-fl/(robot.l+robot.w) - bl/(robot.l+robot.w) + br/(robot.l+robot.w) + fr/(robot.l+robot.w));
 
         //converting to global frame
