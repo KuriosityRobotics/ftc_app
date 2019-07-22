@@ -25,38 +25,27 @@ public class Robot {
     public DcMotor bLeft;
     public DcMotor bRight;
 
+    //positions
+    public double xPos;
+    public double yPos;
+    public double anglePos;
+
     //imu
     private BNO055IMU imu;
     private Orientation angles;
     private Position position;
 
     //Inherited classes from Op Mode
-    private Telemetry telemetry;
-    private HardwareMap hardwareMap;
-    private LinearOpMode linearOpMode;
-
-    //for odometry
-    double xPosGlobal = 0;
-    double yPosGlobal = 0;
-    double angleGlobal = 0;
-
-    double fLeftOLD = 0;
-    double fRightOLD = 0;
-    double bLeftOLD = 0;
-    double bRightOLD = 0;
-
-
-
-    double angleDeltaRobot;
-    double xDeltaRobot;
-    double yDeltaRobot;
+    public Telemetry telemetry;
+    public HardwareMap hardwareMap;
+    public LinearOpMode linearOpMode;
 
     //dimensions
-    double wheelRadius = 2;
-    final double wheelCircumference = 4 * Math.PI;
-    final double encoderPerRevolution = 806.4;
-    final double l = 7;
-    final double w = 6.5;
+    public double wheelRadius = 2;
+    public final double wheelCircumference = 4 * Math.PI;
+    public final double encoderPerRevolution = 806.4;
+    public final double l = 7;
+    public final double w = 6.5;
 
     //PID (concept only)
 
@@ -403,44 +392,82 @@ public class Robot {
 
     }
 
-    public void odometryUsingCircles() {
-        double fLeftNEW = fLeft.getCurrentPosition();
-        double fRightNEW = fRight.getCurrentPosition();
-        double bLeftNEW = bLeft.getCurrentPosition();
-        double bRightNEW = bRight.getCurrentPosition();
-        double r;
+//    public void odometryUsingCircles() {
+//        double fLeftNEW = fLeft.getCurrentPosition();
+//        double fRightNEW = fRight.getCurrentPosition();
+//        double bLeftNEW = bLeft.getCurrentPosition();
+//        double bRightNEW = bRight.getCurrentPosition();
+//        double r;
+//
+//        double deltaLeft = wheelCircumference * (fLeftNEW-fLeftOLD)/encoderPerRevolution;
+//        double deltaRight = wheelCircumference * (fRightNEW-fRightOLD)/encoderPerRevolution;
+//
+//        if (deltaRight == deltaLeft){
+//            yDeltaRobot = deltaRight;
+//        } else {
+//            r = l * (deltaRight / (deltaLeft-deltaRight) + 1/2);
+//            angleDeltaRobot = (deltaLeft-deltaRight)/14 * 0.51428571428;
+//            xDeltaRobot = r * (1 - Math.cos(angleDeltaRobot));
+//            yDeltaRobot = r * Math.sin(angleDeltaRobot);
+//        }
+//
+//        //converting to global frame
+//        xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
+//        yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
+//        angleGlobal  = (wheelCircumference * (fLeftNEW)/encoderPerRevolution - wheelCircumference * (fRightNEW)/encoderPerRevolution) / 14 * 0.51428571428;
+//
+//        fLeftOLD = fLeftNEW;
+//        fRightOLD = fRightNEW;
+//        bLeftOLD = bLeftNEW;
+//        bRightOLD = bRightNEW;
+//    }
 
-        double deltaLeft = wheelCircumference * (fLeftNEW-fLeftOLD)/encoderPerRevolution;
-        double deltaRight = wheelCircumference * (fRightNEW-fRightOLD)/encoderPerRevolution;
+    public void goToPoint(double x, double y, double speedRatio, double turnSpeed){
 
-        if (deltaRight == deltaLeft){
-            yDeltaRobot = deltaRight;
-        } else {
-            r = l * (deltaRight / (deltaLeft-deltaRight) + 1/2);
-            angleDeltaRobot = (deltaLeft-deltaRight)/14 * 0.51428571428;
-            xDeltaRobot = r * (1 - Math.cos(angleDeltaRobot));
-            yDeltaRobot = r * Math.sin(angleDeltaRobot);
+        double xPos = this.xPos;
+        double yPos = this.yPos;
+        double anglePos = this.anglePos;
+
+        while(linearOpMode.opModeIsActive()){
+
+            double distanceToTarget = Math.hypot(x-xPos, y-yPos);
+            double absoluteAngleToTarget = Math.atan2(y - yPos, x - xPos);
+
+            double relativeAngleToPoint = MathFunctions.AngleWrap(absoluteAngleToTarget - Math.toRadians(anglePos));
+            double relativeXToPoint = Math.cos(relativeAngleToPoint) * distanceToTarget;
+            double relativeYToPoint = Math.sin(relativeAngleToPoint) * distanceToTarget;
+            double relativeTurnAngle = relativeAngleToPoint - Math.toRadians(90);
+
+            double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
+            double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
+
+            double xMovement = xPower * speedRatio;
+            double yMovement = yPower * speedRatio;
+            double turnMovement = Range.clip(relativeTurnAngle/Math.toRadians(30), -1, 1) * turnSpeed;
+
+            if(distanceToTarget < 10) { turnMovement = 0; }
+
+            double fLeftPower = (-yMovement-turnMovement+xMovement*1.414);
+            double bLeftPower = (-yMovement-turnMovement-xMovement*1.414);
+            double bRightPower = (-yMovement-turnMovement-xMovement*1.414);
+            double fRightPower = (-yMovement-turnMovement+xMovement*1.414);
+
+//            double maxRawPower = Math.abs(fLeftPower);
+//            if(Math.abs(bLeftPower) > maxRawPower){ maxRawPower = Math.abs(bLeftPower);}
+//            if(Math.abs(bRightPower) > maxRawPower){ maxRawPower = Math.abs(bRightPower);}
+//            if(Math.abs(fRightPower) > maxRawPower){ maxRawPower = Math.abs(fRightPower);}
+//
+//            fLeftPower *= speedRatio;
+//            fRightPower *= speedRatio;
+//            bLeftPower *= speedRatio;
+//            bRightPower *= speedRatio;
+
+            if(distanceToTarget < 0.5) { break; }
+
+            fLeft.setPower(fLeftPower);
+            fRight.setPower(fRightPower);
+            bLeft.setPower(bLeftPower);
+            bRight.setPower(bRightPower);
         }
-
-        //converting to global frame
-        xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
-        yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
-        angleGlobal  = (wheelCircumference * (fLeftNEW)/encoderPerRevolution - wheelCircumference * (fRightNEW)/encoderPerRevolution) / 14 * 0.51428571428;
-
-        fLeftOLD = fLeftNEW;
-        fRightOLD = fRightNEW;
-        bLeftOLD = bLeftNEW;
-        bRightOLD = bRightNEW;
-    }
-
-    public double[] inverseKinematics(double x, double y, double angle){
-        double[] endRadians = new double[4];
-
-        endRadians[0] = x-y+angle * (-l-w);
-        endRadians[1] = x+y+angle * (-l-w);
-        endRadians[2] = x-y+angle * (l+w);
-        endRadians[3] = x+y+angle * (l+w);
-
-        return endRadians;
     }
 }

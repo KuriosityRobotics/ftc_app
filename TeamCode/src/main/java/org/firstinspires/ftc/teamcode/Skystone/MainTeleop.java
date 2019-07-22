@@ -24,13 +24,14 @@ public class MainTeleop extends LinearOpMode {
     @Override
     public void runOpMode() {
         resetRobot();
-        Position2D position2D = new Position2D(robot);
         waitForStart();
-        position2D.runOnUiThread();
+        Position2D position2D = new Position2D(robot);
+        position2D.startOdometry();
         while (opModeIsActive()) {
-            telemetry.addLine("X POS: " + position2D.getxPose());
-            telemetry.addLine("Y POS: " + position2D.getyPose());
-            telemetry.addLine("ANGLE: " + position2D.getAnglePose());
+            telemetry.addLine("xPOS: " + robot.xPos);
+            telemetry.addLine("yPOS: " + robot.yPos);
+            telemetry.addLine("angelPOS: " + robot.anglePos);
+
             telemetry.addLine("fLeft: " + Double.toString(robot.fLeft.getPower()));
             telemetry.addLine("bLeft: " + Double.toString(robot.bLeft.getPower()));
             telemetry.addLine("fRight: " + Double.toString(robot.fRight.getPower()));
