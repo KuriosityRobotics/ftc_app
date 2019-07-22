@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
@@ -64,10 +65,10 @@ public class Robot {
         bRight = hardwareMap.dcMotor.get("bRight");
 
         //Set direction of drive motors
-        fLeft.setDirection(DcMotor.Direction.FORWARD);
-        fRight.setDirection(DcMotor.Direction.REVERSE);
-        bLeft.setDirection(DcMotor.Direction.FORWARD);
-        bRight.setDirection(DcMotor.Direction.REVERSE);
+        fLeft.setDirection(DcMotor.Direction.REVERSE);
+        fRight.setDirection(DcMotor.Direction.FORWARD);
+        bLeft.setDirection(DcMotor.Direction.REVERSE);
+        bRight.setDirection(DcMotor.Direction.FORWARD);
     }
 
     public void intializeIMU(){

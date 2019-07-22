@@ -99,6 +99,7 @@ class Odometry{
 
         xDeltaRobot = robot.wheelRadius /4 * (fl + bl + br + fr);
         yDeltaRobot = robot.wheelRadius /4 * (-fl + bl - br + fr);
+
         angleDeltaRobot = robot.wheelRadius /4 *(-fl/(robot.l+robot.w) - bl/(robot.l+robot.w) + br/(robot.l+robot.w) + fr/(robot.l+robot.w));
 
         //converting to global frame
