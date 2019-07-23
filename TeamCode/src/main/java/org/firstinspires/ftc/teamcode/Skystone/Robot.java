@@ -423,17 +423,23 @@ public class Robot {
 //    }
 
         //OPTIMAL ANGLE WILL BE 90 ON MOST CASES BECAUSE THE OPTIMAL ANGLE IS FORWARD
-    public void goToPoint(double x, double y, double speedRatio, double turnSpeed, double optimalAngle){
+    public void goToPoint(double x, double y, double optimalAngle){
 
-        double xPos = this.xPos;
-        double yPos = this.yPos;
-        double anglePos = this.anglePos;
+        double xStart = this.xPos;
+        double yStart = this.yPos;
+        double angleStart = this.anglePos;
 
         while (linearOpMode.opModeIsActive()) {
+
+            double xPos = this.xPos;
+            double yPos = this.yPos;
+            double anglePos = this.anglePos;
+
+            double distanceTotal = Math.hypot(x-xStart,y-yStart);
             double distanceToTarget = Math.hypot(x - xPos, y - yPos);
             double absoluteAngleToTarget = Math.atan2(y - yPos, x - xPos);
 
-            double relativeAngleToPoint = MathFunctions.AngleWrap(absoluteAngleToTarget - (Math.toRadians(anglePos)) - Math.toRadians(90));
+            double relativeAngleToPoint = MathFunctions.AngleWrap(absoluteAngleToTarget - (Math.toRadians(anglePos)));
             double relativeXToPoint = Math.cos(relativeAngleToPoint) * distanceToTarget;
             double relativeYToPoint = Math.sin(relativeAngleToPoint) * distanceToTarget;
             double relativeTurnAngle = relativeAngleToPoint - Math.toRadians(180) + Math.toRadians(optimalAngle);
@@ -441,12 +447,17 @@ public class Robot {
             double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
             double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
 
-            double xMovement = xPower * speedRatio;
-            double yMovement = yPower * speedRatio;
-            double turnMovement = Range.clip(relativeTurnAngle / Math.toRadians(30), -1, 1) * turnSpeed;
+            double xMovement = xPower * 1;
+            double yMovement = yPower * 1;
+            double turnMovement = Range.clip(relativeTurnAngle / Math.toRadians(30), -1, 1) * 0.4;
 
-            if (distanceToTarget < 10) {
+            if (distanceToTarget < 5) {
                 turnMovement = 0;
+            }
+
+            if (distanceToTarget < 0.5) {
+                brakeRobot();
+                return;
             }
 
             //the signs need tweaking
@@ -455,17 +466,30 @@ public class Robot {
             double fRightPower = (yMovement - turnMovement + xMovement * 1.414);
             double bRightPower = (-yMovement - turnMovement + xMovement * 1.414);
 
-            // op scaling
-            // try this later: use true maximum speed by finding the largest of each motor's powers and generalizing that to 1
-//            double maxRawPower = Math.abs(fLeftPower);
-//            if(Math.abs(bLeftPower) > maxRawPower){ maxRawPower = Math.abs(bLeftPower);}
-//            if(Math.abs(bRightPower) > maxRawPower){ maxRawPower = Math.abs(bRightPower);}
-//            if(Math.abs(fRightPower) > maxRawPower){ maxRawPower = Math.abs(fRightPower);}
-//
-//            fLeftPower *= speedRatio;
-//            fRightPower *= speedRatio;
-//            bLeftPower *= speedRatio;
-//            bRightPower *= speedRatio;
+            telemetry.addLine("XPOS: " + xPos);
+            telemetry.addLine("YPOS: " + yPos);
+            telemetry.addLine("ANGPOS: " + Math.toDegrees(anglePos));
+            telemetry.update();
+
+            //op scaling
+            double maxPower = Math.abs(fLeftPower);
+            if(Math.abs(bLeftPower) > maxPower){ maxPower = Math.abs(bLeftPower);}
+            if(Math.abs(bRightPower) > maxPower){ maxPower = Math.abs(bRightPower);}
+            if(Math.abs(fRightPower) > maxPower){ maxPower = Math.abs(fRightPower);}
+
+            fLeftPower *= Range.clip(distanceToTarget/distanceTotal,-1,1);
+            fRightPower *= Range.clip(distanceToTarget/distanceTotal,-1,1);
+            bLeftPower *= Range.clip(distanceToTarget/distanceTotal,-1,1);
+            bRightPower *= Range.clip(distanceToTarget/distanceTotal,-1,1);
+
+            double scaleDownAmount = 1.0;
+            if(maxPower > 1.0){
+                scaleDownAmount = 1.0/maxPower;
+            }
+            fLeftPower *= scaleDownAmount;
+            fRightPower *= scaleDownAmount;
+            bLeftPower *= scaleDownAmount;
+            bRightPower *= scaleDownAmount;
 
             fLeft.setPower(fLeftPower);
             fRight.setPower(fRightPower);

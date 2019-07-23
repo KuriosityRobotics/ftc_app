@@ -116,9 +116,5 @@ class Odometry{
         fRightOLD = fRightNEW;
         bLeftOLD = bLeftNEW;
         bRightOLD = bRightNEW;
-        robot.telemetry.addLine("XPOS: " + xPosGlobal);
-        robot.telemetry.addLine("YPOS: " + yPosGlobal);
-        robot.telemetry.addLine("ANGPOS: " + Math.toDegrees(angleGlobal));
-        robot.telemetry.update();
     }
 }

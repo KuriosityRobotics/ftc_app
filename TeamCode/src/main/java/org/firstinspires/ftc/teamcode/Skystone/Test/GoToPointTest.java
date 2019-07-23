@@ -21,7 +21,8 @@ public class GoToPointTest extends LinearOpMode
         Position2D position2D = new Position2D(robot);
         position2D.startOdometry();
         while (opModeIsActive()){
-            robot.goToPoint(10,10,0.5, 0.3,Math.toRadians(90));
+            robot.goToPoint(20,0,0.4, 0.3,Math.toRadians(0));
+            sleep(5000);
             break;
         }
     }
