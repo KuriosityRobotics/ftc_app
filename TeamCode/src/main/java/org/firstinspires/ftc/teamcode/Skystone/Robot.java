@@ -65,10 +65,10 @@ public class Robot {
         bRight = hardwareMap.dcMotor.get("bRight");
 
         //Set direction of drive motors
-        fLeft.setDirection(DcMotor.Direction.REVERSE);
-        fRight.setDirection(DcMotor.Direction.FORWARD);
-        bLeft.setDirection(DcMotor.Direction.REVERSE);
-        bRight.setDirection(DcMotor.Direction.FORWARD);
+        fLeft.setDirection(DcMotor.Direction.FORWARD);
+        fRight.setDirection(DcMotor.Direction.REVERSE);
+        bLeft.setDirection(DcMotor.Direction.FORWARD);
+        bRight.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public void intializeIMU(){
@@ -324,7 +324,7 @@ public class Robot {
         int inc;
         int i;
         double encoderToInches = 0.156;  //515 encoders = 8 inches
-        angles  = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double startHeading = angles.firstAngle;
 
         /*double maxSpeed = 0;
@@ -339,35 +339,35 @@ public class Robot {
         */
 
 
-        while (linearOpMode.opModeIsActive()){
+        while (linearOpMode.opModeIsActive()) {
 
             double dt = SystemClock.elapsedRealtime() - startTime; //in milli
             dt = dt / 1000; //in seconds
 
-            if (dt < data[data.length - 1][2]){                //find increment at any time to do interpolation
+            if (dt < data[data.length - 1][2]) {                //find increment at any time to do interpolation
                 inc = -1;
-                for (i=0; i<data.length - 2; i++){
-                    if (data[i][2] <= dt && dt < data[i+1][2]){
+                for (i = 0; i < data.length - 2; i++) {
+                    if (data[i][2] <= dt && dt < data[i + 1][2]) {
                         inc = i;
                         break;
                     }
                 }
-                if (inc < 0){
+                if (inc < 0) {
                     brakeRobot();
                     break;
                 }
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
                 // find the left and right speed by interpolation from data file
-                refLeftSpeed  = ((data[inc+1][0] - data[inc][0]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][0];
-                refRightSpeed = ((data[inc+1][1] - data[inc][1]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][1];
+                refLeftSpeed = ((data[inc + 1][0] - data[inc][0]) / (data[inc + 1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][0];
+                refRightSpeed = ((data[inc + 1][1] - data[inc][1]) / (data[inc + 1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][1];
 
                 // find the left and right distance by interpolation from data file
-                refLeftDistance = ((data[inc+1][4] - data[inc][4]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
-                refRightDistance = ((data[inc+1][5] - data[inc][5]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
+                refLeftDistance = ((data[inc + 1][4] - data[inc][4]) / (data[inc + 1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
+                refRightDistance = ((data[inc + 1][5] - data[inc][5]) / (data[inc + 1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][5];
 
                 // find the heading by interpolation from data file
-                refHeading =((data[inc+1][6] - data[inc][6]) / (data[inc+1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][6] + startHeading;
+                refHeading = ((data[inc + 1][6] - data[inc][6]) / (data[inc + 1][2] - data[inc][2])) * (dt - data[inc][2]) + data[inc][6] + startHeading;
 
                 // find the left and right encoder values and convert them to distance traveled in inches
                 leftDistance = fLeft.getCurrentPosition() * encoderToInches;
@@ -377,7 +377,7 @@ public class Robot {
                 heading = angles.firstAngle;
 
                 // find power
-                leftPower  = refLeftSpeed;
+                leftPower = refLeftSpeed;
                 rightPower = refRightSpeed;
 
                 // set power
@@ -390,7 +390,6 @@ public class Robot {
                 break;
             }
         }
-
     }
 
 //    public void odometryUsingCircles() {
@@ -423,36 +422,38 @@ public class Robot {
 //        bRightOLD = bRightNEW;
 //    }
 
-    //OPTIMAL ANGLE WILL BE 90 ON MOST CASES BECAUSE THE OPTIMAL ANGLE IS FORWARD
+        //OPTIMAL ANGLE WILL BE 90 ON MOST CASES BECAUSE THE OPTIMAL ANGLE IS FORWARD
     public void goToPoint(double x, double y, double speedRatio, double turnSpeed, double optimalAngle){
 
         double xPos = this.xPos;
         double yPos = this.yPos;
         double anglePos = this.anglePos;
 
-        while(linearOpMode.opModeIsActive()){
-            double distanceToTarget = Math.hypot(x-xPos, y-yPos);
+        while (linearOpMode.opModeIsActive()) {
+            double distanceToTarget = Math.hypot(x - xPos, y - yPos);
             double absoluteAngleToTarget = Math.atan2(y - yPos, x - xPos);
 
-            double relativeAngleToPoint = MathFunctions.AngleWrap(absoluteAngleToTarget - (Math.toRadians(anglePos))-Math.toRadians(90));
+            double relativeAngleToPoint = MathFunctions.AngleWrap(absoluteAngleToTarget - (Math.toRadians(anglePos)) - Math.toRadians(90));
             double relativeXToPoint = Math.cos(relativeAngleToPoint) * distanceToTarget;
             double relativeYToPoint = Math.sin(relativeAngleToPoint) * distanceToTarget;
-            double relativeTurnAngle = relativeAngleToPoint - Math.toRadians(180) + Math.toRadians(90);
+            double relativeTurnAngle = relativeAngleToPoint - Math.toRadians(180) + Math.toRadians(optimalAngle);
 
             double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
             double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
 
             double xMovement = xPower * speedRatio;
             double yMovement = yPower * speedRatio;
-            double turnMovement = Range.clip(relativeTurnAngle/Math.toRadians(30), -1, 1) * turnSpeed;
+            double turnMovement = Range.clip(relativeTurnAngle / Math.toRadians(30), -1, 1) * turnSpeed;
 
-            if(distanceToTarget < 10) { turnMovement = 0; }
+            if (distanceToTarget < 10) {
+                turnMovement = 0;
+            }
 
             //the signs need tweaking
-            double fLeftPower = (-yMovement-turnMovement+xMovement*1.414);
-            double bLeftPower = (-yMovement-turnMovement-xMovement*1.414);
-            double bRightPower = (-yMovement-turnMovement-xMovement*1.414);
-            double fRightPower = (-yMovement-turnMovement+xMovement*1.414);
+            double fLeftPower = (-yMovement + turnMovement + xMovement * 1.414);
+            double bLeftPower = (yMovement + turnMovement + xMovement * 1.414);
+            double fRightPower = (yMovement - turnMovement + xMovement * 1.414);
+            double bRightPower = (-yMovement - turnMovement + xMovement * 1.414);
 
             // op scaling
             // try this later: use true maximum speed by finding the largest of each motor's powers and generalizing that to 1

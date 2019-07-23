@@ -4,10 +4,7 @@ import java.util.Vector;
 
 public class MathFunctions {
 
-    public static double AngleWrap (double angle) {
-        while (angle > Math.PI) { angle -= 2 * Math.PI; }
-        while (angle < Math.PI) { angle += 2 * Math.PI; }
-        return angle;
+    public static double AngleWrap (double angle) {return angle % (2 * Math.PI );
     }
 
     public static Vector<Double> getArrayOfRow(double[][] matrix, int row){

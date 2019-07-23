@@ -6,9 +6,8 @@ import android.os.Looper;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.Skystone.MathFunctions;
 import org.firstinspires.ftc.teamcode.Skystone.Robot;
-
-import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.AngleWrap;
 
 public class Position2D{
     FtcRobotControllerActivity activity;
@@ -18,8 +17,8 @@ public class Position2D{
     }
 
     public void startOdometry(){
-        Odometry v = new Odometry(robot);
-        LongRunningTask longRunningTask = new LongRunningTask(robot,v);
+        Odometry o = new Odometry(robot);
+        LongRunningTask longRunningTask = new LongRunningTask(robot,o);
         longRunningTask.execute();
     }
 }
@@ -30,17 +29,14 @@ class LongRunningTask extends AsyncTask<Void, Boolean, Boolean> {
         this.robot = robot;
         this.o = o;
     }
+
     @Override
     protected Boolean doInBackground(Void... params) {
         while(robot.linearOpMode.opModeIsActive()) {
             o.constantVelocityOdometry();
-            robot.yPos = o.xPosGlobal;
-            robot.xPos = o.yPosGlobal;
+            robot.xPos = o.xPosGlobal;
+            robot.yPos = o.yPosGlobal;
             robot.anglePos = o.angleGlobal;
-//            robot.telemetry.addLine("XPOS: " + robot.xPos);
-//            robot.telemetry.addLine("YPOS: " + robot.yPos);
-//            robot.telemetry.addLine("ANGPOS: " + robot.anglePos);
-//            robot.telemetry.update();
         }
         return true;
     }
@@ -62,9 +58,9 @@ class Odometry{
     double yPosGlobal = 0;
     double angleGlobal = 0;
 
-    private double angleDeltaRobot;
-    private double xDeltaRobot;
-    private double yDeltaRobot;
+    public double angleDeltaRobot;
+    public double xDeltaRobot;
+    public double yDeltaRobot;
 
     private double fLeftNEW = 0;
     private double fRightNEW = 0;
@@ -80,6 +76,10 @@ class Odometry{
     private double fr;
     private double bl;
     private double br;
+
+    private double moveScale = 0.03116659378;
+    private double turnScale = 1;
+    private double strafeScale = 0.03116659378;
 
     public Odometry(Robot robot){
         this.robot = robot;
@@ -97,26 +97,28 @@ class Odometry{
         bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / robot.encoderPerRevolution;
         br = 2 * Math.PI * (bRightNEW - bRightOLD) / robot.encoderPerRevolution;
 
-        xDeltaRobot = robot.wheelRadius /4 * (fl + bl + br + fr);
-        yDeltaRobot = robot.wheelRadius /4 * (-fl + bl - br + fr);
-
-        angleDeltaRobot = robot.wheelRadius /4 *(-fl/(robot.l+robot.w) - bl/(robot.l+robot.w) + br/(robot.l+robot.w) + fr/(robot.l+robot.w));
+        xDeltaRobot = robot.wheelRadius/4 * (fl + bl + br + fr);
+        yDeltaRobot = robot.wheelRadius/4 * (-fl + bl - br + fr);
+        angleDeltaRobot = robot.wheelRadius/4 *(-fl/(robot.l+robot.w) - bl/(robot.l+robot.w) + br/(robot.l+robot.w) + fr/(robot.l+robot.w));
 
         //converting to global frame
         if (angleDeltaRobot == 0){
             xPosGlobal += xDeltaRobot * Math.cos(angleGlobal) - yDeltaRobot * Math.sin(angleGlobal);
             yPosGlobal += xDeltaRobot * Math.sin(angleGlobal) + yDeltaRobot * Math.cos(angleGlobal);
-
         } else {
             xPosGlobal += (Math.cos(angleGlobal) * Math.sin(angleDeltaRobot) - (Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal)) * xDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) - Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot;
             yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
         }
 
-        angleGlobal  = (robot.wheelCircumference * (fLeftNEW)/robot.encoderPerRevolution - robot.wheelCircumference * (fRightNEW)/robot.encoderPerRevolution) / 14 * 0.51428571428;
+        angleGlobal = MathFunctions.AngleWrap((robot.wheelCircumference * (fLeftNEW)/robot.encoderPerRevolution - robot.wheelCircumference * (fRightNEW)/robot.encoderPerRevolution) / 14 * 0.51428571428);
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;
         bLeftOLD = bLeftNEW;
         bRightOLD = bRightNEW;
+        robot.telemetry.addLine("XPOS: " + xPosGlobal);
+        robot.telemetry.addLine("YPOS: " + yPosGlobal);
+        robot.telemetry.addLine("ANGPOS: " + Math.toDegrees(angleGlobal));
+        robot.telemetry.update();
     }
 }
