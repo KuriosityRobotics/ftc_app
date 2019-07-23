@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
-
+@Deprecated
 public class AutoBase extends LinearOpMode {
 
     public TensorFlowMineralDetection tensorFlowMineralDetection;

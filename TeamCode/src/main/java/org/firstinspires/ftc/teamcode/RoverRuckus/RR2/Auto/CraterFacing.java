@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name="Crater Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
+@Deprecated
 public class CraterFacing extends AutoBase
 {
     @Override

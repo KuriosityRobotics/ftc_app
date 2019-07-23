@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
+@Deprecated
 public class TensorFlowMineralDetection {
     public enum Location{
         CENTER,LEFT,RIGHT,UNKNOWN;

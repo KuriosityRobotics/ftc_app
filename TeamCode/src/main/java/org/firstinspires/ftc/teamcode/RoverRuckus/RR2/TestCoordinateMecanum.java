@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Auto.AutoBase;
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
-
+@Deprecated
 @Autonomous(name="TestCoordinateMecanum", group="Linear Opmode")
 public class TestCoordinateMecanum extends AutoBase {
         RR2 robot;

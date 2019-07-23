@@ -25,7 +25,7 @@ import java.util.Timer;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.CM;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
-
+@Deprecated
 public class RR2 {
     //Drive Motors
     public DcMotor fLeft;

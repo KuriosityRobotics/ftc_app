@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
 
 @Autonomous(name="ImuInches", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 @Disabled
+@Deprecated
 public class ImuInches extends AutoBase {
     @Override
     public void runOpMode(){

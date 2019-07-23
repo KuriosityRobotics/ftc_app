@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Auto.AutoBase;
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Auto.TensorFlowMineralDetection;
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
-
+@Deprecated
 @Autonomous
 public class drive extends AutoBase {
     public DcMotor fLeft;

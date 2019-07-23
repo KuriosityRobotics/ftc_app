@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
-
+@Deprecated
 @TeleOp(name="Template Teleop", group="Linear Opmode")
 @Disabled //COMMENT OUT TO MAKE PROGRAM APPEAR ON PHONE
 public class TemplateTeleop extends LinearOpMode {

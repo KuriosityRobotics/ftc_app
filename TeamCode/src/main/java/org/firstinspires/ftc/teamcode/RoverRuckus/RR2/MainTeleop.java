@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
+@Deprecated
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
 public class MainTeleop extends LinearOpMode {
     RR2 robot;

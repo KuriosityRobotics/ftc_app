@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name="Depot Facing 65 Point", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
+@Deprecated
 public class DepotFacing65Point extends AutoBase
 {
 

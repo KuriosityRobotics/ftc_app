@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
-
+@Deprecated
 @Autonomous
 public class tensorFlow extends LinearOpMode {
     protected String goldPosition;
