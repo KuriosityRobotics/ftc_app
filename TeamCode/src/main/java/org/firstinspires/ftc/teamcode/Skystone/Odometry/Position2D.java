@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Skystone.Odometry;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Looper;
+import android.support.annotation.MainThread;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
@@ -77,10 +78,6 @@ class Odometry{
     private double bl;
     private double br;
 
-    private double moveScale = 0.03116659378;
-    private double turnScale = 1;
-    private double strafeScale = 0.03116659378;
-
     public Odometry(Robot robot){
         this.robot = robot;
     }
@@ -116,5 +113,10 @@ class Odometry{
         fRightOLD = fRightNEW;
         bLeftOLD = bLeftNEW;
         bRightOLD = bRightNEW;
+
+        robot.telemetry.addLine("XPOS: " + xPosGlobal);
+        robot.telemetry.addLine("YPOS: " + yPosGlobal);
+        robot.telemetry.addLine("ANGPOS: " + Math.toDegrees(Math.toDegrees(angleGlobal)));
+        robot.telemetry.update();
     }
 }
