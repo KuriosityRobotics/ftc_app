@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.Skystone.Odometry;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.os.Looper;
-import android.support.annotation.MainThread;
 
 import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.Skystone.MathFunctions;
 import org.firstinspires.ftc.teamcode.Skystone.Robot;
 
@@ -19,14 +15,14 @@ public class Position2D{
 
     public void startOdometry(){
         Odometry o = new Odometry(robot);
-        LongRunningTask longRunningTask = new LongRunningTask(robot,o);
-        longRunningTask.execute();
+        NewThread newThread = new NewThread(robot,o);
+        newThread.execute();
     }
 }
-class LongRunningTask extends AsyncTask<Void, Boolean, Boolean> {
+class NewThread extends AsyncTask<Void, Boolean, Boolean> {
     Robot robot;
     Odometry o;
-    public LongRunningTask(Robot robot, Odometry o){
+    public NewThread(Robot robot, Odometry o){
         this.robot = robot;
         this.o = o;
     }
@@ -107,7 +103,7 @@ class Odometry{
             yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
         }
 
-        angleGlobal = MathFunctions.AngleWrap((robot.wheelCircumference * (fLeftNEW)/robot.encoderPerRevolution - robot.wheelCircumference * (fRightNEW)/robot.encoderPerRevolution) / 14 * 0.51428571428);
+        angleGlobal = MathFunctions.angleWrap((robot.wheelCircumference * (fLeftNEW)/robot.encoderPerRevolution - robot.wheelCircumference * (fRightNEW)/robot.encoderPerRevolution) / 14 * 0.51428571428);
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;

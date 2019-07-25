@@ -93,7 +93,7 @@ public class MainTeleop extends LinearOpMode {
 //            telemetry.addData("Driving Mode","Normal");
         }
         if(gamepad1.left_bumper && !changedSlowDrive){
-            powerScaleFactor = (onSlowDrive) ? 0.9 : 0.5;
+            powerScaleFactor = (onSlowDrive) ? 0.9 : 0.3;
             onSlowDrive = !onSlowDrive;
             changedSlowDrive = true;
         }else if(!gamepad1.left_bumper){

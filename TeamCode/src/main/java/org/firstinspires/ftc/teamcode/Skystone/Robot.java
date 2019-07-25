@@ -4,7 +4,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -14,6 +13,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+import java.util.Vector;
+
+import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.lineCircleIntersection;
+
 public class Robot {
     //Drive Motors
     public DcMotor fLeft;
@@ -39,6 +43,12 @@ public class Robot {
     public final double l = 7;
     public final double w = 6.5;
     //PID (concept only)
+
+    public double xMovement;
+    public double yMovement;
+    public double turnMovement;
+    public double deaccelerationScaleFactor;
+
     public Robot(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode){
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
@@ -361,63 +371,104 @@ public class Robot {
 //        bLeftOLD = bLeftNEW;
 //        bRightOLD = bRightNEW;
 //    }
-    //OPTIMAL ANGLE WILL BE 90 ON MOST CASES BECAUSE THE OPTIMAL ANGLE IS FORWARD
-    public void goToPoint(double x, double y, double moveSpeed, double turnSpeed, double optimalAngle){
-        double xStart = this.xPos;
-        double yStart = this.yPos;
-        double distanceTotal = Math.hypot(x-xStart,y-yStart);
-        while (linearOpMode.opModeIsActive()) {
-            double xPos = this.xPos;
-            double yPos = this.yPos;
-            double anglePos = this.anglePos;
-            double distanceToTarget = Math.hypot(x - xPos, y - yPos);
-            double absoluteAngleToTarget = Math.atan2(y - yPos, x - xPos);
-            double relativeAngleToPoint = MathFunctions.AngleWrap(absoluteAngleToTarget - anglePos);
-            double relativeXToPoint = Math.cos(relativeAngleToPoint) * distanceToTarget;
-            double relativeYToPoint = Math.sin(relativeAngleToPoint) * distanceToTarget;
-            double relativeTurnAngle = relativeAngleToPoint + optimalAngle;
-            double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
-            double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
-            double xMovement = xPower * moveSpeed;
-            double yMovement = yPower * moveSpeed;
-            double turnMovement = Range.clip(relativeTurnAngle / Math.toRadians(30), -1, 1) * turnSpeed;
-            double fLeftPower = (yMovement + turnMovement + xMovement * 1.414);
-            double fRightPower = (-yMovement - turnMovement + xMovement * 1.414);
-            double bLeftPower = (-yMovement + turnMovement + xMovement * 1.414);
-            double bRightPower = (yMovement - turnMovement + xMovement * 1.414);
-            telemetry.addLine("XPOS: " + xPos);
-            telemetry.addLine("YPOS: " + yPos);
-            telemetry.addLine("ANGPOS: " + Math.toDegrees(anglePos));
-            telemetry.update();
-            //op scaling
-            double maxPower = Math.abs(fLeftPower);
-            if(Math.abs(bLeftPower) > maxPower){ maxPower = Math.abs(bLeftPower);}
-            if(Math.abs(bRightPower) > maxPower){ maxPower = Math.abs(bRightPower);}
-            if(Math.abs(fRightPower) > maxPower){ maxPower = Math.abs(fRightPower);}
-            fLeftPower *= Range.clip(distanceToTarget/distanceTotal,-1,1);
-            fRightPower *= Range.clip(distanceToTarget/distanceTotal,-1,1);
-            bLeftPower *= Range.clip(distanceToTarget/distanceTotal,-1,1);
-            bRightPower *= Range.clip(distanceToTarget/distanceTotal,-1,1);
-            double scaleDownAmount = 1.0;
-            if(maxPower > 1.0){
-                scaleDownAmount = 1.0/maxPower;
+    public void followCurve(Vector<CurvePoint> allPoints, double followAngle){
+        CurvePoint followMe = getFollowPointPath(allPoints, new Point(xPos,yPos), allPoints.get(0).followDistance);
+
+        goToPoint(followMe.x, followMe.y, followMe.moveSpeed, followMe.turnSpeed, followAngle);
+        applyMove();
+
+    }
+
+//    public void moveFollowCurve(Vector<CurvePoint> points){
+//        while(linearOpMode.opModeIsActive()) {
+//            followCurve(points, Math.toRadians(0));
+//        }
+//    }
+
+    public CurvePoint getFollowPointPath (Vector<CurvePoint> pathPoints, Point robotLocation, double followRadius){
+        CurvePoint followMe = new CurvePoint(pathPoints.get(0));
+
+        for (int i = 0; i < pathPoints.size() - 1; i++){
+
+            CurvePoint startLine = pathPoints.get(i);
+            CurvePoint endLine = pathPoints.get(i+1);
+
+            Vector<Point> intersections = lineCircleIntersection(robotLocation, followRadius, startLine.toPoint(), endLine.toPoint());
+
+
+            double closestAngle = Double.MAX_VALUE;
+
+            for(Point intersectionPoint : intersections){
+                double angle = Math.atan2(intersectionPoint.y - yPos, intersectionPoint.x - xPos);
+                double deltaAngle = Math.abs(MathFunctions.angleWrap(angle-anglePos));
+
+                if(deltaAngle < closestAngle){
+                    closestAngle = deltaAngle;
+                    followMe.setPoint(intersectionPoint);
+                }
             }
-            fLeftPower *= scaleDownAmount;
-            fRightPower *= scaleDownAmount;
-            bLeftPower *= scaleDownAmount;
-            bRightPower *= scaleDownAmount;
-            if (fLeftPower < 0.1 && fRightPower < 0.1 && bLeftPower < 0.1 && bRightPower < 0.1){
-                brakeRobot();
-                return;
-            }
-            if (distanceToTarget < 0.75) {
-                brakeRobot();
-                return;
-            }
-            fLeft.setPower(fLeftPower);
-            fRight.setPower(fRightPower);
-            bLeft.setPower(bLeftPower);
-            bRight.setPower(bRightPower);
         }
+        return followMe;
+    }
+
+    //OPTIMAL ANGLE WILL BE 0 ON MOST CASES BECAUSE THE OPTIMAL ANGLE IS FORWARD
+    public void goToPoint(double x, double y, double moveSpeed, double turnSpeed, double optimalAngle){
+
+        double xStart = xPos;
+        double yStart = yPos;
+        double distanceTotal = Math.hypot(x-xStart,y-yStart);
+
+        double distanceToTarget = Math.hypot(x - xPos, y - yPos);
+        double absoluteAngleToTarget = Math.atan2(y - yPos, x - xPos);
+
+        double relativeAngleToPoint = MathFunctions.angleWrap(absoluteAngleToTarget - anglePos);
+        double relativeXToPoint = Math.cos(relativeAngleToPoint) * distanceToTarget;
+        double relativeYToPoint = Math.sin(relativeAngleToPoint) * distanceToTarget;
+        double relativeTurnAngle = relativeAngleToPoint + optimalAngle;
+
+        double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
+        double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
+
+        deaccelerationScaleFactor = Range.clip(distanceToTarget/distanceTotal,-1,1);
+
+        xMovement = xPower * moveSpeed;
+        yMovement = yPower * moveSpeed;
+        turnMovement = Range.clip(relativeTurnAngle / Math.toRadians(30), -1, 1) * turnSpeed;
+    }
+
+    public void applyMove() {
+
+        double fLeftPower = (yMovement + turnMovement + xMovement * 1.414);
+        double fRightPower = (-yMovement - turnMovement + xMovement * 1.414);
+        double bLeftPower = (-yMovement + turnMovement + xMovement * 1.414);
+        double bRightPower = (yMovement - turnMovement + xMovement * 1.414);
+
+        double maxPower = Math.abs(fLeftPower);
+        if(Math.abs(bLeftPower) > maxPower){ maxPower = Math.abs(bLeftPower);}
+        if(Math.abs(bRightPower) > maxPower){ maxPower = Math.abs(bRightPower);}
+        if(Math.abs(fRightPower) > maxPower){ maxPower = Math.abs(fRightPower);}
+
+        fLeftPower *= deaccelerationScaleFactor;
+        fRightPower *= deaccelerationScaleFactor;
+        bLeftPower *= deaccelerationScaleFactor;
+        bRightPower *= deaccelerationScaleFactor;
+
+        double scaleDownAmount = 1.0;
+        if(maxPower > 1.0){ scaleDownAmount = 1.0/maxPower; }
+
+        fLeftPower *= scaleDownAmount;
+        fRightPower *= scaleDownAmount;
+        bLeftPower *= scaleDownAmount;
+        bRightPower *= scaleDownAmount;
+
+        if (fLeftPower < 0.1 && fRightPower < 0.1 && bLeftPower < 0.1 && bRightPower < 0.1){
+            brakeRobot();
+            return;
+        }
+
+        fLeft.setPower(fLeftPower);
+        fRight.setPower(fRightPower);
+        bLeft.setPower(bLeftPower);
+        bRight.setPower(bRightPower);
     }
 }
