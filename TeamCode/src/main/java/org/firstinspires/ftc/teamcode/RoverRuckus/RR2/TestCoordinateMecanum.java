@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.RoverRuckus.RR2;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Auto.AutoBase;
 import org.firstinspires.ftc.teamcode.RoverRuckus.RR2.RR2;
 @Deprecated
+@Disabled
 @Autonomous(name="TestCoordinateMecanum", group="Linear Opmode")
 public class TestCoordinateMecanum extends AutoBase {
         RR2 robot;

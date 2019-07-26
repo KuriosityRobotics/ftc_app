@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.RoverRuckus.RR2.Auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name="Depot Facing", group="Linear Opmode") //name of your program on the phone and defines if it is teleop or auto
 @Deprecated
+@Disabled
 public class DepotFacing extends AutoBase
 {
     double distanceToDepot = 77;

@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.RoverRuckus.RR2;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Deprecated
+@Disabled
 @TeleOp(name="MainTeleOp", group="Linear Opmode")
 public class MainTeleop extends LinearOpMode {
     RR2 robot;
