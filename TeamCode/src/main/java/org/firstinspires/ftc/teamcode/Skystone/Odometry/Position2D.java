@@ -2,12 +2,11 @@ package org.firstinspires.ftc.teamcode.Skystone.Odometry;
 
 import android.os.AsyncTask;
 
-import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.teamcode.Skystone.MathFunctions;
 import org.firstinspires.ftc.teamcode.Skystone.Robot;
 
 public class Position2D{
-    Robot robot;
+    private Robot robot;
     public Position2D(Robot robot) {
         this.robot = robot;
     }
@@ -19,8 +18,8 @@ public class Position2D{
     }
 }
 class NewThread extends AsyncTask<Void, Boolean, Boolean> {
-    Robot robot;
-    Odometry o;
+    private Robot robot;
+    private Odometry o;
     public NewThread(Robot robot, Odometry o){
         this.robot = robot;
         this.o = o;
@@ -52,9 +51,9 @@ class Odometry{
     double yPosGlobal = 0;
     double angleGlobal = 0;
 
-    public double angleDeltaRobot;
-    public double xDeltaRobot;
-    public double yDeltaRobot;
+    private double angleDeltaRobot;
+    private double xDeltaRobot;
+    private double yDeltaRobot;
 
     private double fLeftNEW = 0;
     private double fRightNEW = 0;

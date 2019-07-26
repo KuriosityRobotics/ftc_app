@@ -4,11 +4,11 @@ import java.util.Vector;
 
 public class PathPoints {
     public Vector<CurvePoint> targetPoints = new Vector<>();
-    final double moveSpeed = 1;
-    final double turnSpeed = 1;
-    final double followDistance = 4;
-    final double followRadius = Math.toRadians(50);
-    final double slowDownTurnAmount = 1;
+    private final double moveSpeed = 1;
+    private final double turnSpeed = 1;
+    private final double followDistance = 4;
+    private final double followRadius = Math.toRadians(50);
+    private final double slowDownTurnAmount = 1;
 
     public PathPoints(double[][] points){
         for(int i = 0;i<points.length;i++){

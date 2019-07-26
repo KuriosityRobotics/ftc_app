@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.Skystone;
 
 import org.firstinspires.ftc.teamcode.Skystone.MotionProfiler.Point;
-
 import java.util.Vector;
-
 import static java.lang.Math.*;
 
 public class MathFunctions {

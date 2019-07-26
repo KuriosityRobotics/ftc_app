@@ -1,18 +1,17 @@
-package org.firstinspires.ftc.teamcode.Skystone.Test;
+package org.firstinspires.ftc.teamcode.Skystone.Templates;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Skystone.Auto.AutoBase;
-import org.firstinspires.ftc.teamcode.Skystone.Odometry.Position2D;
 import org.firstinspires.ftc.teamcode.Skystone.MotionProfiler.PathPoints;
-import org.firstinspires.ftc.teamcode.Skystone.Robot;
+
 @Disabled
 @Autonomous(name="AutoTemplate ", group="Linear Opmode")
 public class AutoTemplate extends AutoBase
 {
-    public static double[][] testPoints = {{0,-20},{-30,-65},{0,-35}};
-    public static double[][] testPoints2 = {{0,-20},{-30,-65},{0,-35}};
+    private static double[][] testPoints = {{0,-20},{-30,-65},{0,-35}};
+    private static double[][] testPoints2 = {{0,-20},{-30,-65},{0,-35}};
+
     @Override
     public void runOpMode(){
         initLogic();

@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.Skystone.MotionProfiler;
 
 import java.util.Vector;
 
-import org.firstinspires.ftc.teamcode.Skystone.MathFunctions;
-
 import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.getArrayOfRow;
 import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.normalize;
 import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.subtractVectors;
