@@ -7,7 +7,6 @@ import org.firstinspires.ftc.teamcode.Skystone.MathFunctions;
 import org.firstinspires.ftc.teamcode.Skystone.Robot;
 
 public class Position2D{
-    FtcRobotControllerActivity activity;
     Robot robot;
     public Position2D(Robot robot) {
         this.robot = robot;
@@ -31,9 +30,9 @@ class NewThread extends AsyncTask<Void, Boolean, Boolean> {
     protected Boolean doInBackground(Void... params) {
         while(robot.linearOpMode.opModeIsActive()) {
             o.constantVelocityOdometry();
-            robot.xPos = o.xPosGlobal;
-            robot.yPos = o.yPosGlobal;
             robot.anglePos = o.angleGlobal;
+            robot.robotPos.x = o.xPosGlobal;
+            robot.robotPos.y = o.yPosGlobal;
         }
         return true;
     }
@@ -44,11 +43,9 @@ class NewThread extends AsyncTask<Void, Boolean, Boolean> {
             robot.telemetry.update();
         }
     }
-
 }
 
 class Odometry{
-
     public Robot robot;
 
     double xPosGlobal = 0;

@@ -26,32 +26,35 @@ public class Robot {
     public DcMotor fRight;
     public DcMotor bLeft;
     public DcMotor bRight;
-    //positions
-    public double xPos;
-    public double yPos;
+
+    //robots position
+    public Point robotPos;
     public double anglePos;
+
     //imu
     private BNO055IMU imu;
     private Orientation angles;
     private Position position;
+
     //Inherited classes from Op Mode
     public Telemetry telemetry;
     public HardwareMap hardwareMap;
     public LinearOpMode linearOpMode;
+
     //dimensions
     public double wheelRadius = 2;
     public final double wheelCircumference = 4 * Math.PI;
     public final double encoderPerRevolution = 806.4;
     public final double l = 7;
     public final double w = 6.5;
-    //PID (concept only)
 
+    //PID (concept only)
     public double xMovement;
     public double yMovement;
     public double turnMovement;
-    public double deaccelerationScaleFactor;
+    public double decelerationScaleFactor;
 
-    public double clippedDistToEnd;
+    public double distanceToEnd;
 
     public Robot(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode) {
         this.telemetry = telemetry;
@@ -336,24 +339,23 @@ public class Robot {
 //    }
 
     public boolean followCurve(Vector<CurvePoint> allPoints, double followAngle) {
-
         Vector<CurvePoint> pathExtended = (Vector<CurvePoint>) allPoints.clone();
 
-        pointWithIndex clippedToPath = clipToPath(allPoints,xPos,yPos);
-        int currFollowIndex = clippedToPath.index+1;
+        pointWithIndex distanceAlongPath = distanceAlongPath(allPoints,robotPos);
+        int currFollowIndex = distanceAlongPath.index+1;
 
-        CurvePoint followMe = getFollowPointPath(pathExtended,new Point(xPos, yPos), allPoints.get(currFollowIndex).followDistance);
+        CurvePoint followMe = getFollowPointPath(pathExtended,robotPos, allPoints.get(currFollowIndex).followDistance);
 
         pathExtended.set(pathExtended.size()-1, extendLine(allPoints.get(allPoints.size()-2),allPoints.get(allPoints.size()-1), allPoints.get(allPoints.size()-1).pointLength * 1.5));
 
-        clippedDistToEnd = Math.hypot(clippedToPath.x-allPoints.get(allPoints.size()-1).x, clippedToPath.y-allPoints.get(allPoints.size()-1).y);
+        distanceToEnd = Math.hypot(distanceAlongPath.x-allPoints.get(allPoints.size()-1).x, distanceAlongPath.y-allPoints.get(allPoints.size()-1).y);
 
-        if(clippedDistToEnd <= followMe.followDistance + 15 || Math.hypot(xPos-allPoints.get(allPoints.size()-1).x, yPos-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 15){
+        if(distanceToEnd <= followMe.followDistance + 15 || Math.hypot(robotPos.x-allPoints.get(allPoints.size()-1).x, robotPos.y-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 15){
             followMe.setPoint(allPoints.get(allPoints.size()-1).toPoint());
         }
 
         goToPoint(followMe.x, followMe.y, followMe.moveSpeed, followMe.turnSpeed, followAngle);
-        if((clippedDistToEnd<1)) {
+        if((distanceToEnd <1)) {
             brakeRobot();
             return false;
         }
@@ -381,50 +383,48 @@ public class Robot {
         }
     }
 
-    public static pointWithIndex clipToPath(Vector<CurvePoint> pathPoints, double xPos, double yPos){
-        double closestClippedDistance = 10000000;
+    public static pointWithIndex distanceAlongPath(Vector<CurvePoint> pathPoints, Point robot){
+        double closestDistance = 10000000;
 
-        int closestClippedIndex = 0;
+        int closestDistanceIndex = 0;
 
-
-        Point clippedToLine = new Point();
+        Point distanceAlongLine = new Point();
 
         for(int i = 0; i < pathPoints.size()-1; i ++){
             CurvePoint firstPoint = pathPoints.get(i);
             CurvePoint secondPoint = pathPoints.get(i+1);
 
-            Point currClippedToLine = clipToLine(firstPoint.x,firstPoint.y, secondPoint.x,secondPoint.y, xPos,yPos);
+            Point currentDistanceAlongLine = distanceAlongLine(firstPoint, secondPoint, robot);
 
-            double distanceToClip = Math.hypot(xPos-currClippedToLine.x,yPos-currClippedToLine.y);
+            double distanceToClip = Math.hypot(robot.x-currentDistanceAlongLine.x, robot.y-currentDistanceAlongLine.y);
 
-            if(distanceToClip < closestClippedDistance){
-                closestClippedDistance = distanceToClip;
-                closestClippedIndex = i;
-                clippedToLine = currClippedToLine;
+            if(distanceToClip < closestDistance){
+                closestDistance = distanceToClip;
+                closestDistanceIndex = i;
+                distanceAlongLine = currentDistanceAlongLine;
             }
         }
         //return the three things
-        return new pointWithIndex(clippedToLine.x,clippedToLine.y,closestClippedIndex);//now return the closestClippedIndex
+        return new pointWithIndex(distanceAlongLine.x,distanceAlongLine.y,closestDistanceIndex);//now return the closestDistanceIndex
     }
 
-    public static Point clipToLine(double lineX1, double lineY1, double lineX2, double lineY2,
-                                   double robotX, double robotY){
-        if(lineX1 == lineX2){
-            lineX1 = lineX2 + 0.01;
+    public static Point distanceAlongLine(CurvePoint line1, CurvePoint line2, Point robot){
+        if(line1.x == line2.x){
+            line1.x = line2.x + 0.01;
         }
-        if(lineY1 == lineY2){
-            lineY1 = lineY2 + 0.01;
+        if(line1.y == line2.y){
+            line1.y = line2.y + 0.01;
         }
 
         //calculate the slope of the line
-        double m1 = (lineY2 - lineY1)/(lineX2 - lineX1);
+        double m1 = (line2.y - line1.y)/(line2.x - line1.x);
         //calculate the slope perpendicular to this line
-        double m2 = (lineX1 - lineX2)/(lineY2 - lineY1);
+        double m2 = (line1.x - line2.x)/(line2.y - line1.y);
 
         //clip the robot's position to be on the line
-        double xClipedToLine = ((-m2*robotX) + robotY + (m1 * lineX1) - lineY1)/(m1-m2);
-        double yClipedToLine = (m1 * (xClipedToLine - lineX1)) + lineY1;
-        return new Point(xClipedToLine,yClipedToLine);
+        double xAlongLine = ((-m2*robot.x) + robot.y + (m1 * line1.x) - line1.y)/(m1-m2);
+        double yAlongLine = (m1 * (xAlongLine - line1.x)) + line1.y;
+        return new Point(xAlongLine,yAlongLine);
     }
 
     public CurvePoint extendLine(CurvePoint firstPoint, CurvePoint secondPoint, double distance) {
@@ -452,7 +452,7 @@ public class Robot {
             double closestAngle = Double.MAX_VALUE;
 
             for (Point intersectionPoint : intersections) {
-                double angle = Math.atan2(intersectionPoint.y - yPos, intersectionPoint.x - xPos);
+                double angle = Math.atan2(intersectionPoint.y - robotPos.y, intersectionPoint.x - robotPos.x);
                 double deltaAngle = Math.abs(MathFunctions.angleWrap(angle - anglePos));
 
                 if (deltaAngle < closestAngle) {
@@ -464,15 +464,14 @@ public class Robot {
         return followMe;
     }
 
-    //OPTIMAL ANGLE WILL BE 0 ON MOST CASES BECAUSE THE OPTIMAL ANGLE IS FORWARD
     public void goToPoint ( double x, double y, double moveSpeed, double turnSpeed, double optimalAngle){
 
-        double xStart = xPos;
-        double yStart = yPos;
+        double xStart = robotPos.x;
+        double yStart = robotPos.y;
         double distanceTotal = Math.hypot(x - xStart, y - yStart);
 
-        double distanceToTarget = Math.hypot(x - xPos, y - yPos);
-        double absoluteAngleToTarget = Math.atan2(y - yPos, x - xPos);
+        double distanceToTarget = Math.hypot(x - robotPos.x, y - robotPos.y);
+        double absoluteAngleToTarget = Math.atan2(y - robotPos.y, x - robotPos.x);
 
         double relativeAngleToPoint = MathFunctions.angleWrap(absoluteAngleToTarget - anglePos);
         double relativeXToPoint = Math.cos(relativeAngleToPoint) * distanceToTarget;
@@ -482,7 +481,7 @@ public class Robot {
         double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
         double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
 
-        deaccelerationScaleFactor = Range.clip(distanceToTarget / distanceTotal, -1, 1);
+        decelerationScaleFactor = Range.clip(distanceToTarget / distanceTotal, -1, 1);
 
         xMovement = xPower * moveSpeed;
         yMovement = yPower * moveSpeed;
@@ -507,10 +506,10 @@ public class Robot {
             maxPower = Math.abs(fRightPower);
         }
 
-        fLeftPower *= deaccelerationScaleFactor;
-        fRightPower *= deaccelerationScaleFactor;
-        bLeftPower *= deaccelerationScaleFactor;
-        bRightPower *= deaccelerationScaleFactor;
+        fLeftPower *= decelerationScaleFactor;
+        fRightPower *= decelerationScaleFactor;
+        bLeftPower *= decelerationScaleFactor;
+        bRightPower *= decelerationScaleFactor;
 
         double scaleDownAmount = 1.0;
         if (maxPower > 1.0) {
