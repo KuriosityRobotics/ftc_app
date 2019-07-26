@@ -22,17 +22,23 @@ public class PathPoints {
         }
     }
 
-    public void setNewPoints(double[][] points){
+    public PathPoints(){
+
+    }
+
+    public Vector<CurvePoint> newPoints(double[][] points){
         targetPoints.clear();
         for(int i = 0;i<points.length;i++){
             targetPoints.add(new CurvePoint(points[i][0],points[i][1],moveSpeed,turnSpeed,followDistance,followRadius,slowDownTurnAmount));
         }
+        return targetPoints;
     }
 
-    public void setNewPoints(double[][] points, double moveSpeed, double turnSpeed, double followDistance, double followRadius, double slowDownTurnAmount){
+    public Vector<CurvePoint> newPoints(double[][] points, double moveSpeed, double turnSpeed, double followDistance, double followRadius, double slowDownTurnAmount){
         targetPoints.clear();
         for(int i = 0;i<points.length;i++){
             targetPoints.add(new CurvePoint(points[i][0], points[i][1], moveSpeed, turnSpeed, followDistance, Math.toRadians(followRadius), slowDownTurnAmount));
         }
+        return targetPoints;
     }
 }
