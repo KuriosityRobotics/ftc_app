@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Skystone;
+package org.firstinspires.ftc.teamcode.Skystone.MotionProfiler;
 
 public class CurvePoint {
     public double x;

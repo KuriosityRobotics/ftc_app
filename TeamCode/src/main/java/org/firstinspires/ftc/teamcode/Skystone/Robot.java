@@ -13,6 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.teamcode.Skystone.MotionProfiler.CurvePoint;
+import org.firstinspires.ftc.teamcode.Skystone.MotionProfiler.Point;
 
 import java.util.Vector;
 
@@ -49,7 +51,9 @@ public class Robot {
     public double turnMovement;
     public double deaccelerationScaleFactor;
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode){
+    public double clippedDistToEnd;
+
+    public Robot(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode) {
         this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
         this.linearOpMode = linearOpMode;
@@ -65,71 +69,77 @@ public class Robot {
         bLeft.setDirection(DcMotor.Direction.FORWARD);
         bRight.setDirection(DcMotor.Direction.REVERSE);
     }
-    public void intializeIMU(){
+
+    public void intializeIMU() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
     }
-    public void resetEncoders(){
+
+    public void resetEncoders() {
         fLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-    public void changeRunModeToUsingEncoder(){
+
+    public void changeRunModeToUsingEncoder() {
         fLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    public void setMotorMode(DcMotor.RunMode runMode){
+
+    public void setMotorMode(DcMotor.RunMode runMode) {
         fLeft.setMode(runMode);
         fRight.setMode(runMode);
         bLeft.setMode(runMode);
         bRight.setMode(runMode);
     }
+
     //normal use method default 10 second kill time
-    public void finalTurn(double targetHeading){
+    public void finalTurn(double targetHeading) {
         finalTurn(targetHeading, 2000);
     }
-    public void finalTurn(double targetHeading, long timeInMilli){
+
+    public void finalTurn(double targetHeading, long timeInMilli) {
         targetHeading = Range.clip(targetHeading, -179, 179);
         long startTime = SystemClock.elapsedRealtime();
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         position = imu.getPosition();
-        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double startHeading = angles.firstAngle;
         double maxAngle = startHeading - targetHeading;
         maxAngle = Math.abs(maxAngle);
         int sign = 0;
-        if(targetHeading > startHeading){
+        if (targetHeading > startHeading) {
             sign = 1;
-        }else{
+        } else {
             sign = -1;
         }
-        if(maxAngle == 0){
+        if (maxAngle == 0) {
             return;
         }
-        while(linearOpMode.opModeIsActive()){
+        while (linearOpMode.opModeIsActive()) {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             double currentDeltatAngle = Math.abs(angles.firstAngle - startHeading);
             double scaleFactor = currentDeltatAngle / maxAngle;
-            double absolutePower = 1-scaleFactor;
-            if(absolutePower< 0.1){
+            double absolutePower = 1 - scaleFactor;
+            if (absolutePower < 0.1) {
                 brakeRobot();
                 return;
             }
             double power = absolutePower * sign;
-            if(scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)){
+            if (scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)) {
                 break;
             }
             fLeft.setPower(-power);
@@ -141,43 +151,47 @@ public class Robot {
         linearOpMode.sleep(100);
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-    public void allWheelDrive(double fLpower,double fRpower, double bLpower, double bRpower) {
+
+    public void allWheelDrive(double fLpower, double fRpower, double bLpower, double bRpower) {
         fLeft.setPower(fLpower);
         fRight.setPower(fRpower);
         bLeft.setPower(bLpower);
         bRight.setPower(bRpower);
     }
+
     public void resetMotor(DcMotor motor) {
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
     public void finalMove(double speed, double targetDistance) {
         //move robot function
         //to move backwards make targetDistance negative
         double rotations = 0;
-        if (targetDistance>0) {
+        if (targetDistance > 0) {
             rotations = targetDistance / 0.0168;
         } else {
             rotations = targetDistance / 0.0156;
         }
-        moveRobot(speed,(int)(rotations));
+        moveRobot(speed, (int) (rotations));
         brakeRobot();
         linearOpMode.sleep(100);
     }
-    public void moveRobot(double speed, int targetPostition){
+
+    public void moveRobot(double speed, int targetPostition) {
         //called by final move - bare bones move function
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
         double newSpeed = speed;
-        if(targetPostition<0){
+        if (targetPostition < 0) {
             newSpeed = newSpeed * -1;
             fLeft.setPower(newSpeed);
             fRight.setPower(newSpeed);
             bLeft.setPower(newSpeed);
             bRight.setPower(newSpeed);
-        }else{
+        } else {
             fLeft.setPower(newSpeed);
             fRight.setPower(newSpeed);
             bLeft.setPower(newSpeed);
@@ -187,14 +201,15 @@ public class Robot {
         fRight.setTargetPosition(targetPostition);
         bLeft.setTargetPosition(targetPostition);
         bRight.setTargetPosition(targetPostition);
-        while(fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
-                && linearOpMode.opModeIsActive()){
+        while (fLeft.isBusy() && fRight.isBusy() && bLeft.isBusy() && bRight.isBusy()
+                && linearOpMode.opModeIsActive()) {
         }
         brakeRobot();
         telemetry.addLine("finished sleeping");
         this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         this.setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
     public void driveMotorsBreakZeroBehavior() {
         //sets drive motors to brake mode
         fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -202,6 +217,7 @@ public class Robot {
         fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
+
     public void brakeRobot() {
         //brakes robot
         driveMotorsBreakZeroBehavior();
@@ -209,71 +225,16 @@ public class Robot {
         fRight.setPower(0);
         bRight.setPower(0);
         bLeft.setPower(0);
+        linearOpMode.sleep(250);
     }
-    public void wallFollow(double speed, double distance){
-        //experimental - don't use
-        //follows wall
-        boolean notTimeLimit = true;
-        this.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        this.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        this.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fLeft.setPower(speed);
-        fRight.setPower(speed);
-        bLeft.setPower(speed);
-        bRight.setPower(speed);
-        fLeft.setTargetPosition((int)(distance/0.028));
-        fRight.setTargetPosition((int)(distance/0.028));
-        bLeft.setTargetPosition((int)(distance/0.028));
-        bRight.setTargetPosition((int)(distance/0.028));
-        while(fLeft.isBusy() && linearOpMode.opModeIsActive()){
-//            double leftPower = speed+normalizedDelta(frontRightDistance.getDistance(MM),70)/1000;
-//            double rightPower = speed+normalizedDelta(backRightDistance.getDistance(MM),70)/1000;
-//
-//            fLeft.setPower(leftPower);
-//            bLeft.setPower(leftPower);
-//            fRight.setPower(rightPower);
-//            bRight.setPower(rightPower);
-//
-//            telemetry.addData("frontRightDistance",frontRightDistance.getDistance(MM));
-//            telemetry.addData("backRightDistance",backRightDistance.getDistance(MM));
-//            telemetry.update();
-//            if(frontDistance.getDistance(MM)<200 || frontFacingLeft.getDistance(MM)<200){
-//                fLeft.setPower(0);
-//                fRight.setPower(0);
-//                bLeft.setPower(0);
-//                bRight.setPower(0);
-//                long startTime = SystemClock.elapsedRealtime();
-//                while (((SystemClock.elapsedRealtime() - startTime) < 3000)){
-//                    if(frontDistance.getDistance(MM)>200 && frontFacingLeft.getDistance(MM)>200){
-//                        notTimeLimit = false;
-//                        break;
-//                    }else{
-//                        notTimeLimit = true;
-//                    }
-//                }
-//                if(notTimeLimit){
-//                    finalTurn(0);
-//                    wallFollow(0.7,-fLeft.getCurrentPosition()*0.028);
-//                    brakeRobot();
-//                }
-//            }
-        }
-        brakeRobot();
-    }
-    private double normalizedDelta(double distance, double constant){
-        //called in wallFollow
-        double delta = distance-constant;
-        if(delta>-50 && delta<50){
-            delta = 0;
-        }
-        return delta;
-    }
-    public void setBrakeModeDriveMotors(){
+
+    public void setBrakeModeDriveMotors() {
         fLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
+
     public void splineMove(double[][] data) {
         resetEncoders();
         setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -342,6 +303,8 @@ public class Robot {
             }
         }
     }
+
+    //odometryUsingCircles
     //    public void odometryUsingCircles() {
 //        double fLeftNEW = fLeft.getCurrentPosition();
 //        double fRightNEW = fRight.getCurrentPosition();
@@ -371,38 +334,128 @@ public class Robot {
 //        bLeftOLD = bLeftNEW;
 //        bRightOLD = bRightNEW;
 //    }
-    public void followCurve(Vector<CurvePoint> allPoints, double followAngle){
-        CurvePoint followMe = getFollowPointPath(allPoints, new Point(xPos,yPos), allPoints.get(0).followDistance);
+
+    public boolean followCurve(Vector<CurvePoint> allPoints, double followAngle) {
+
+        Vector<CurvePoint> pathExtended = (Vector<CurvePoint>) allPoints.clone();
+
+        pointWithIndex clippedToPath = clipToPath(allPoints,xPos,yPos);
+        int currFollowIndex = clippedToPath.index+1;
+
+        CurvePoint followMe = getFollowPointPath(pathExtended,new Point(xPos, yPos), allPoints.get(currFollowIndex).followDistance);
+
+        pathExtended.set(pathExtended.size()-1, extendLine(allPoints.get(allPoints.size()-2),allPoints.get(allPoints.size()-1), allPoints.get(allPoints.size()-1).pointLength * 1.5));
+
+        clippedDistToEnd = Math.hypot(clippedToPath.x-allPoints.get(allPoints.size()-1).x, clippedToPath.y-allPoints.get(allPoints.size()-1).y);
+
+        if(clippedDistToEnd <= followMe.followDistance + 15 || Math.hypot(xPos-allPoints.get(allPoints.size()-1).x, yPos-allPoints.get(allPoints.size()-1).y) < followMe.followDistance + 15){
+            followMe.setPoint(allPoints.get(allPoints.size()-1).toPoint());
+        }
 
         goToPoint(followMe.x, followMe.y, followMe.moveSpeed, followMe.turnSpeed, followAngle);
+        if((clippedDistToEnd<1)) {
+            brakeRobot();
+            return false;
+        }
         applyMove();
-
+        return true;
     }
 
-//    public void moveFollowCurve(Vector<CurvePoint> points){
-//        while(linearOpMode.opModeIsActive()) {
-//            followCurve(points, Math.toRadians(0));
-//        }
-//    }
+    public void moveFollowCurve(Vector<CurvePoint> points){
+        while(linearOpMode.opModeIsActive()) {
+            if(!followCurve(points, Math.toRadians(0))){
+                return;
+            }
+        }
+    }
 
-    public CurvePoint getFollowPointPath (Vector<CurvePoint> pathPoints, Point robotLocation, double followRadius){
+    public static class pointWithIndex{
+        private double x;
+        private double y;
+        private int index;
+
+        public pointWithIndex(double xPos, double yPos, int index){
+            this.x = xPos;
+            this.y = yPos;
+            this.index = index;
+        }
+    }
+
+    public static pointWithIndex clipToPath(Vector<CurvePoint> pathPoints, double xPos, double yPos){
+        double closestClippedDistance = 10000000;
+
+        int closestClippedIndex = 0;
+
+
+        Point clippedToLine = new Point();
+
+        for(int i = 0; i < pathPoints.size()-1; i ++){
+            CurvePoint firstPoint = pathPoints.get(i);
+            CurvePoint secondPoint = pathPoints.get(i+1);
+
+            Point currClippedToLine = clipToLine(firstPoint.x,firstPoint.y, secondPoint.x,secondPoint.y, xPos,yPos);
+
+            double distanceToClip = Math.hypot(xPos-currClippedToLine.x,yPos-currClippedToLine.y);
+
+            if(distanceToClip < closestClippedDistance){
+                closestClippedDistance = distanceToClip;
+                closestClippedIndex = i;
+                clippedToLine = currClippedToLine;
+            }
+        }
+        //return the three things
+        return new pointWithIndex(clippedToLine.x,clippedToLine.y,closestClippedIndex);//now return the closestClippedIndex
+    }
+
+    public static Point clipToLine(double lineX1, double lineY1, double lineX2, double lineY2,
+                                   double robotX, double robotY){
+        if(lineX1 == lineX2){
+            lineX1 = lineX2 + 0.01;
+        }
+        if(lineY1 == lineY2){
+            lineY1 = lineY2 + 0.01;
+        }
+
+        //calculate the slope of the line
+        double m1 = (lineY2 - lineY1)/(lineX2 - lineX1);
+        //calculate the slope perpendicular to this line
+        double m2 = (lineX1 - lineX2)/(lineY2 - lineY1);
+
+        //clip the robot's position to be on the line
+        double xClipedToLine = ((-m2*robotX) + robotY + (m1 * lineX1) - lineY1)/(m1-m2);
+        double yClipedToLine = (m1 * (xClipedToLine - lineX1)) + lineY1;
+        return new Point(xClipedToLine,yClipedToLine);
+    }
+
+    public CurvePoint extendLine(CurvePoint firstPoint, CurvePoint secondPoint, double distance) {
+        double lineAngle = Math.atan2(secondPoint.y - firstPoint.y,secondPoint.x - firstPoint.x);
+        double lineLength = Math.hypot(secondPoint.x - firstPoint.x,secondPoint.y - firstPoint.y);
+        //extend the line by 1.5 pointLengths
+        double extendedLineLength = lineLength + distance;
+
+        CurvePoint extended = new CurvePoint(secondPoint);
+        extended.x = Math.cos(lineAngle) * extendedLineLength + firstPoint.x;
+        extended.y = Math.sin(lineAngle) * extendedLineLength + firstPoint.y;
+        return extended;
+    }
+
+    public CurvePoint getFollowPointPath(Vector<CurvePoint> pathPoints, Point robotLocation, double followRadius) {
         CurvePoint followMe = new CurvePoint(pathPoints.get(0));
 
-        for (int i = 0; i < pathPoints.size() - 1; i++){
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
 
             CurvePoint startLine = pathPoints.get(i);
-            CurvePoint endLine = pathPoints.get(i+1);
+            CurvePoint endLine = pathPoints.get(i + 1);
 
             Vector<Point> intersections = lineCircleIntersection(robotLocation, followRadius, startLine.toPoint(), endLine.toPoint());
 
-
             double closestAngle = Double.MAX_VALUE;
 
-            for(Point intersectionPoint : intersections){
+            for (Point intersectionPoint : intersections) {
                 double angle = Math.atan2(intersectionPoint.y - yPos, intersectionPoint.x - xPos);
-                double deltaAngle = Math.abs(MathFunctions.angleWrap(angle-anglePos));
+                double deltaAngle = Math.abs(MathFunctions.angleWrap(angle - anglePos));
 
-                if(deltaAngle < closestAngle){
+                if (deltaAngle < closestAngle) {
                     closestAngle = deltaAngle;
                     followMe.setPoint(intersectionPoint);
                 }
@@ -412,11 +465,11 @@ public class Robot {
     }
 
     //OPTIMAL ANGLE WILL BE 0 ON MOST CASES BECAUSE THE OPTIMAL ANGLE IS FORWARD
-    public void goToPoint(double x, double y, double moveSpeed, double turnSpeed, double optimalAngle){
+    public void goToPoint ( double x, double y, double moveSpeed, double turnSpeed, double optimalAngle){
 
         double xStart = xPos;
         double yStart = yPos;
-        double distanceTotal = Math.hypot(x-xStart,y-yStart);
+        double distanceTotal = Math.hypot(x - xStart, y - yStart);
 
         double distanceToTarget = Math.hypot(x - xPos, y - yPos);
         double absoluteAngleToTarget = Math.atan2(y - yPos, x - xPos);
@@ -429,14 +482,14 @@ public class Robot {
         double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
         double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
 
-        deaccelerationScaleFactor = Range.clip(distanceToTarget/distanceTotal,-1,1);
+        deaccelerationScaleFactor = Range.clip(distanceToTarget / distanceTotal, -1, 1);
 
         xMovement = xPower * moveSpeed;
         yMovement = yPower * moveSpeed;
         turnMovement = Range.clip(relativeTurnAngle / Math.toRadians(30), -1, 1) * turnSpeed;
     }
 
-    public void applyMove() {
+    public void applyMove () {
 
         double fLeftPower = (yMovement + turnMovement + xMovement * 1.414);
         double fRightPower = (-yMovement - turnMovement + xMovement * 1.414);
@@ -444,9 +497,15 @@ public class Robot {
         double bRightPower = (yMovement - turnMovement + xMovement * 1.414);
 
         double maxPower = Math.abs(fLeftPower);
-        if(Math.abs(bLeftPower) > maxPower){ maxPower = Math.abs(bLeftPower);}
-        if(Math.abs(bRightPower) > maxPower){ maxPower = Math.abs(bRightPower);}
-        if(Math.abs(fRightPower) > maxPower){ maxPower = Math.abs(fRightPower);}
+        if (Math.abs(bLeftPower) > maxPower) {
+            maxPower = Math.abs(bLeftPower);
+        }
+        if (Math.abs(bRightPower) > maxPower) {
+            maxPower = Math.abs(bRightPower);
+        }
+        if (Math.abs(fRightPower) > maxPower) {
+            maxPower = Math.abs(fRightPower);
+        }
 
         fLeftPower *= deaccelerationScaleFactor;
         fRightPower *= deaccelerationScaleFactor;
@@ -454,14 +513,16 @@ public class Robot {
         bRightPower *= deaccelerationScaleFactor;
 
         double scaleDownAmount = 1.0;
-        if(maxPower > 1.0){ scaleDownAmount = 1.0/maxPower; }
+        if (maxPower > 1.0) {
+            scaleDownAmount = 1.0 / maxPower;
+        }
 
         fLeftPower *= scaleDownAmount;
         fRightPower *= scaleDownAmount;
         bLeftPower *= scaleDownAmount;
         bRightPower *= scaleDownAmount;
 
-        if (fLeftPower < 0.1 && fRightPower < 0.1 && bLeftPower < 0.1 && bRightPower < 0.1){
+        if (fLeftPower < 0.1 && fRightPower < 0.1 && bLeftPower < 0.1 && bRightPower < 0.1) {
             brakeRobot();
             return;
         }
