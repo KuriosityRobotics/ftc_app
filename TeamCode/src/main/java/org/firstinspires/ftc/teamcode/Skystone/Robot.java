@@ -29,13 +29,13 @@ public class Robot {
     public DcMotor bRight;
 
     //robots position
-    public Point robotPos;
+    public Point robotPos = new Point();
     public double anglePos;
 
     //imu
-    private BNO055IMU imu;
-    private Orientation angles;
-    private Position position;
+    public BNO055IMU imu;
+    public Orientation angles;
+    public Position position;
 
     //Inherited classes from Op Mode
     public Telemetry telemetry;

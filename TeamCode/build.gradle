@@ -11,7 +11,7 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 android {
-    compileSdkVersion 23
+    compileSdkVersion 28
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7

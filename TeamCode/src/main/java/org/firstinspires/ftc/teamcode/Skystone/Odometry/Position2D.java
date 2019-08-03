@@ -2,11 +2,15 @@ package org.firstinspires.ftc.teamcode.Skystone.Odometry;
 
 import android.os.AsyncTask;
 
+import org.firstinspires.ftc.robotcontroller.internal.FtcRobotControllerActivity;
 import org.firstinspires.ftc.teamcode.Skystone.MathFunctions;
 import org.firstinspires.ftc.teamcode.Skystone.Robot;
 
+import static org.firstinspires.ftc.teamcode.Skystone.MathFunctions.angleWrap;
+
 public class Position2D{
-    private Robot robot;
+    FtcRobotControllerActivity activity;
+    Robot robot;
     public Position2D(Robot robot) {
         this.robot = robot;
     }
@@ -14,12 +18,13 @@ public class Position2D{
     public void startOdometry(){
         Odometry o = new Odometry(robot);
         NewThread newThread = new NewThread(robot,o);
+
         newThread.execute();
     }
 }
 class NewThread extends AsyncTask<Void, Boolean, Boolean> {
-    private Robot robot;
-    private Odometry o;
+    Robot robot;
+    Odometry o;
     public NewThread(Robot robot, Odometry o){
         this.robot = robot;
         this.o = o;
@@ -29,9 +34,9 @@ class NewThread extends AsyncTask<Void, Boolean, Boolean> {
     protected Boolean doInBackground(Void... params) {
         while(robot.linearOpMode.opModeIsActive()) {
             o.constantVelocityOdometry();
-            robot.anglePos = o.angleGlobal;
             robot.robotPos.x = o.xPosGlobal;
             robot.robotPos.y = o.yPosGlobal;
+            robot.anglePos = o.angleGlobal;
         }
         return true;
     }
@@ -42,18 +47,20 @@ class NewThread extends AsyncTask<Void, Boolean, Boolean> {
             robot.telemetry.update();
         }
     }
+
 }
 
 class Odometry{
+
     public Robot robot;
 
     double xPosGlobal = 0;
     double yPosGlobal = 0;
     double angleGlobal = 0;
 
-    private double angleDeltaRobot;
-    private double xDeltaRobot;
-    private double yDeltaRobot;
+    public double angleDeltaRobot;
+    public double xDeltaRobot;
+    public double yDeltaRobot;
 
     private double fLeftNEW = 0;
     private double fRightNEW = 0;
@@ -70,9 +77,54 @@ class Odometry{
     private double bl;
     private double br;
 
+    //circular odometry stuff
+    double yPodOld;
+    double rightPodOld;
+    double leftPodOld;
+
+    //test scale factors to tweak TUNE THESE VALUES NOT IN THE FUNCTION THING
+    //basically to tune first turn 90 degrees and print out the global angle to get angle calibrated
+    //then move forward an amount of inches to get move scale factor calibrated
+    //finally mecanum a certain amount of inches to get strafe scale factor calibrated
+    //then just do strafe prediction scale factor to touch stuff up
+
+    double moveScaleFactor; // basically is a encoder to inch
+    double turnScaleFactor;
+    double strafeScaleFactor; // basically is moveScaleFactor * 1.414
+    double strafePredictionScaleFactor;
+
     public Odometry(Robot robot){
         this.robot = robot;
+        robot.intializeIMU();
     }
+
+    public void circularOdometry () {
+        double leftPodNew = robot.fLeft.getCurrentPosition(); // fix this for new odo config
+        double rightPodNew = robot.fRight.getCurrentPosition(); //fix this for new odo config
+        double yPodNew = robot.bLeft.getCurrentPosition(); // fix this for new odo config
+
+        double leftIncrement = (leftPodNew-leftPodOld) * moveScaleFactor;
+        double rightIncrement = (rightPodNew - rightPodOld) * moveScaleFactor;
+        double yIncrement = (yPodNew - yPodOld) * strafeScaleFactor;
+        double angleIncrement = (leftIncrement * rightIncrement) * turnScaleFactor;
+
+        if (Math.abs(angleIncrement) > 0){
+            double radiusOfMovement = (rightIncrement + leftIncrement)/(2 * angleIncrement);
+            double radiusOfStrafe = (yIncrement - (angleIncrement* strafePredictionScaleFactor))/angleIncrement;
+
+            xDeltaRobot = radiusOfMovement * (1 - Math.cos(angleIncrement)) + radiusOfStrafe * Math.sin(angleIncrement);
+            yDeltaRobot = radiusOfMovement * Math.sin(angleIncrement) - radiusOfStrafe * (1-Math.cos(angleIncrement)); // maybe try + if doesnt work
+        }
+
+        xPosGlobal += yDeltaRobot * Math.cos(angleGlobal) + xDeltaRobot * Math.sin(angleGlobal);
+        yPosGlobal += yDeltaRobot * Math.sin(angleGlobal) - xDeltaRobot * Math.cos(angleGlobal);
+        angleGlobal  = angleWrap((leftPodNew - rightPodNew)  * turnScaleFactor);
+
+        leftPodOld =leftPodNew;
+        rightPodOld = rightPodNew;
+        yPodOld = yPodNew;
+    }
+
     public void constantVelocityOdometry() {
 
         fLeftNEW = robot.fLeft.getCurrentPosition();
@@ -99,7 +151,7 @@ class Odometry{
             yPosGlobal += ((Math.cos(angleDeltaRobot) - 1) * Math.sin(angleGlobal) + (Math.cos(angleGlobal)) * Math.sin(angleDeltaRobot)) * yDeltaRobot / angleDeltaRobot + (Math.cos(angleGlobal) * (Math.cos(angleDeltaRobot) - 1) + Math.sin(angleGlobal) * Math.sin(angleDeltaRobot)) * xDeltaRobot / angleDeltaRobot;
         }
 
-        angleGlobal = MathFunctions.angleWrap((robot.wheelCircumference * (fLeftNEW)/robot.encoderPerRevolution - robot.wheelCircumference * (fRightNEW)/robot.encoderPerRevolution) / 14 * 0.51428571428);
+        angleGlobal = angleWrap((robot.wheelCircumference * (fLeftNEW)/robot.encoderPerRevolution - robot.wheelCircumference * (fRightNEW)/robot.encoderPerRevolution) / 14 * 0.51428571428);
 
         fLeftOLD = fLeftNEW;
         fRightOLD = fRightNEW;
