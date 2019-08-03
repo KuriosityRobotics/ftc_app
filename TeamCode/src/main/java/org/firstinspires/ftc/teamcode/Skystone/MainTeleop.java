@@ -97,7 +97,6 @@ public class MainTeleop extends LinearOpMode {
         }else if(!gamepad1.left_bumper){
             changedSlowDrive = false;
         }
-        telemetry.update();
     }
 }
 

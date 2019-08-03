@@ -33,10 +33,14 @@ class NewThread extends AsyncTask<Void, Boolean, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         while(robot.linearOpMode.opModeIsActive()) {
-            o.constantVelocityOdometry();
-            robot.robotPos.x = o.xPosGlobal;
-            robot.robotPos.y = o.yPosGlobal;
-            robot.anglePos = o.angleGlobal;
+            //o.constantVelocityOdometry();
+            o.circularOdometry();
+//            robot.robotPos.x = o.xPosGlobal;
+//            robot.robotPos.y = o.yPosGlobal;
+//            robot.anglePos = o.angleGlobal;
+            robot.robotPos.x = o.worldX;
+            robot.robotPos.y = o.worldY;
+            robot.anglePos = o.worldAngle;
         }
         return true;
     }
@@ -54,44 +58,30 @@ class Odometry{
 
     public Robot robot;
 
+    //for constant velo
+
     double xPosGlobal = 0;
     double yPosGlobal = 0;
     double angleGlobal = 0;
-
-    public double angleDeltaRobot;
-    public double xDeltaRobot;
-    public double yDeltaRobot;
-
-    private double fLeftNEW = 0;
-    private double fRightNEW = 0;
-    private double bLeftNEW = 0;
-    private double bRightNEW = 0;
 
     private double fLeftOLD = 0;
     private double fRightOLD = 0;
     private double bLeftOLD = 0;
     private double bRightOLD = 0;
 
-    private double fl;
-    private double fr;
-    private double bl;
-    private double br;
-
     //circular odometry stuff
-    double yPodOld;
+    double mecanumPodOld;
     double rightPodOld;
     double leftPodOld;
 
-    //test scale factors to tweak TUNE THESE VALUES NOT IN THE FUNCTION THING
-    //basically to tune first turn 90 degrees and print out the global angle to get angle calibrated
-    //then move forward an amount of inches to get move scale factor calibrated
-    //finally mecanum a certain amount of inches to get strafe scale factor calibrated
-    //then just do strafe prediction scale factor to touch stuff up
+    double worldX;
+    double worldY;
+    double worldAngle;
 
-    double moveScaleFactor; // basically is a encoder to inch
-    double turnScaleFactor;
-    double strafeScaleFactor; // basically is moveScaleFactor * 1.414
-    double strafePredictionScaleFactor;
+    double moveScaleFactor = 0.00437516512;
+    double turnScaleFactor = 0.00030885662;
+    double strafeScaleFactor = 0.00408585365;
+    double strafePredictionScalingFactor = 0.93;
 
     public Odometry(Robot robot){
         this.robot = robot;
@@ -99,48 +89,62 @@ class Odometry{
     }
 
     public void circularOdometry () {
-        double leftPodNew = robot.fLeft.getCurrentPosition(); // fix this for new odo config
-        double rightPodNew = robot.fRight.getCurrentPosition(); //fix this for new odo config
-        double yPodNew = robot.bLeft.getCurrentPosition(); // fix this for new odo config
+        double leftPodNew = -1 * robot.fLeft.getCurrentPosition(); // fix this for new odo config
+        double rightPodNew = -1 * robot.fRight.getCurrentPosition(); //fix this for new odo config
+        double mecanumPodNew = robot.bLeft.getCurrentPosition(); // fix this for new odo config
 
         double leftIncrement = (leftPodNew-leftPodOld) * moveScaleFactor;
         double rightIncrement = (rightPodNew - rightPodOld) * moveScaleFactor;
-        double yIncrement = (yPodNew - yPodOld) * strafeScaleFactor;
-        double angleIncrement = (leftIncrement * rightIncrement) * turnScaleFactor;
+        double mecanumIncrement = (mecanumPodNew - mecanumPodOld) * strafeScaleFactor;
+        double angleIncrement = (leftIncrement - rightIncrement) * turnScaleFactor;
+        double mecanumIncrementPrediction = Math.toDegrees(angleIncrement)*(strafePredictionScalingFactor/10.0);
 
-        if (Math.abs(angleIncrement) > 0){
+        double actualRealKindaMecanumDistance = mecanumIncrement -  mecanumIncrementPrediction;
+
+        double relativeX = actualRealKindaMecanumDistance;
+        double relativeY = (leftIncrement - rightIncrement)/2;
+
+        if (angleIncrement != 0.0){
             double radiusOfMovement = (rightIncrement + leftIncrement)/(2 * angleIncrement);
-            double radiusOfStrafe = (yIncrement - (angleIncrement* strafePredictionScaleFactor))/angleIncrement;
+            double radiusOfStrafe = actualRealKindaMecanumDistance/angleIncrement;
 
-            xDeltaRobot = radiusOfMovement * (1 - Math.cos(angleIncrement)) + radiusOfStrafe * Math.sin(angleIncrement);
-            yDeltaRobot = radiusOfMovement * Math.sin(angleIncrement) - radiusOfStrafe * (1-Math.cos(angleIncrement)); // maybe try + if doesnt work
+            relativeX = radiusOfMovement * (1 - Math.cos(angleIncrement)) + radiusOfStrafe * Math.sin(angleIncrement);
+            relativeY = radiusOfMovement * Math.sin(angleIncrement) - radiusOfStrafe * (1-Math.cos(angleIncrement)); // maybe try + if doesnt work
         }
 
-        xPosGlobal += yDeltaRobot * Math.cos(angleGlobal) + xDeltaRobot * Math.sin(angleGlobal);
-        yPosGlobal += yDeltaRobot * Math.sin(angleGlobal) - xDeltaRobot * Math.cos(angleGlobal);
-        angleGlobal  = angleWrap((leftPodNew - rightPodNew)  * turnScaleFactor);
+        worldX += relativeY * Math.cos(worldAngle) + relativeX * Math.sin(worldAngle);
+        worldY += relativeY * Math.sin(worldAngle) - relativeX * Math.cos(worldAngle);
+        worldAngle  = (leftPodNew - rightPodNew)  * turnScaleFactor;
 
         leftPodOld =leftPodNew;
         rightPodOld = rightPodNew;
-        yPodOld = yPodNew;
+        mecanumPodOld = mecanumPodNew;
+
+        robot.telemetry.addLine("left x odo " + leftPodNew);
+        robot.telemetry.addLine("right x odo " + rightPodNew);
+        robot.telemetry.addLine("mecanum odo " + mecanumPodNew);
+        robot.telemetry.addLine("XPOS: " + robot.robotPos.x);
+        robot.telemetry.addLine("YPOS: " + robot.robotPos.y);
+        robot.telemetry.addLine("ANGPOS: " + Math.toDegrees(robot.anglePos));
+        robot.telemetry.update();
     }
 
     public void constantVelocityOdometry() {
 
-        fLeftNEW = robot.fLeft.getCurrentPosition();
-        fRightNEW = robot.fRight.getCurrentPosition();
-        bLeftNEW = robot.bLeft.getCurrentPosition();
-        bRightNEW = robot.bRight.getCurrentPosition();
+        double fLeftNEW = robot.fLeft.getCurrentPosition();
+        double fRightNEW = robot.fRight.getCurrentPosition();
+        double bLeftNEW = robot.bLeft.getCurrentPosition();
+        double bRightNEW = robot.bRight.getCurrentPosition();
 
         // find robot position
-        fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / robot.encoderPerRevolution;
-        fr = 2 * Math.PI * (fRightNEW - fRightOLD) / robot.encoderPerRevolution;
-        bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / robot.encoderPerRevolution;
-        br = 2 * Math.PI * (bRightNEW - bRightOLD) / robot.encoderPerRevolution;
+        double fl = 2 * Math.PI * (fLeftNEW - fLeftOLD) / robot.encoderPerRevolution;
+        double fr = 2 * Math.PI * (fRightNEW - fRightOLD) / robot.encoderPerRevolution;
+        double bl = 2 * Math.PI * (bLeftNEW - bLeftOLD) / robot.encoderPerRevolution;
+        double br = 2 * Math.PI * (bRightNEW - bRightOLD) / robot.encoderPerRevolution;
 
-        xDeltaRobot = robot.wheelRadius/4 * (fl + bl + br + fr);
-        yDeltaRobot = robot.wheelRadius/4 * (-fl + bl - br + fr);
-        angleDeltaRobot = robot.wheelRadius/4 *(-fl/(robot.l+robot.w) - bl/(robot.l+robot.w) + br/(robot.l+robot.w) + fr/(robot.l+robot.w));
+        double xDeltaRobot = robot.wheelRadius/4 * (fl + bl + br + fr);
+        double yDeltaRobot = robot.wheelRadius/4 * (-fl + bl - br + fr);
+        double angleDeltaRobot = robot.wheelRadius/4 *(-fl/(robot.l+robot.w) - bl/(robot.l+robot.w) + br/(robot.l+robot.w) + fr/(robot.l+robot.w));
 
         //converting to global frame
         if (angleDeltaRobot == 0){

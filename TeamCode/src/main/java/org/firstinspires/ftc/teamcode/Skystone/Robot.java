@@ -142,7 +142,7 @@ public class Robot {
                 brakeRobot();
                 return;
             }
-            double power = absolutePower * sign;
+            double power = 0.5 * absolutePower * sign;
             if (scaleFactor > 1 || ((SystemClock.elapsedRealtime() - startTime) > timeInMilli)) {
                 break;
             }
