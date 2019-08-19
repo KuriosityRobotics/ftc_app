@@ -6,7 +6,7 @@ public class PathPoints {
     public Vector<CurvePoint> targetPoints = new Vector<>();
     private final double moveSpeed = 1;
     private final double turnSpeed = 1;
-    private final double followDistance = 4;
+    public double followDistance = 4;
     private final double followRadius = Math.toRadians(50);
     private final double slowDownTurnAmount = 1;
 

@@ -357,7 +357,6 @@ public class Robot {
 
         goToPoint(followMe.x, followMe.y, followMe.moveSpeed, followMe.turnSpeed, followAngle);
         if((distanceToEnd <1)) {
-            brakeRobot();
             return false;
         }
         applyMove();
@@ -366,7 +365,12 @@ public class Robot {
 
     public void moveFollowCurve(Vector<CurvePoint> points){
         while(linearOpMode.opModeIsActive()) {
+
+            // if followCurve returns false then it is ready to stop
+            // else, it moves
+
             if(!followCurve(points, Math.toRadians(0))){
+                brakeRobot();
                 return;
             }
         }
@@ -385,7 +389,7 @@ public class Robot {
     }
 
     public static pointWithIndex distanceAlongPath(Vector<CurvePoint> pathPoints, Point robot){
-        double closestDistance = 10000000;
+        double closestDistance = Integer.MAX_VALUE;
 
         int closestDistanceIndex = 0;
 
@@ -491,10 +495,10 @@ public class Robot {
 
     public void applyMove () {
 
-        double fLeftPower = (yMovement + turnMovement + xMovement * 1.414);
-        double fRightPower = (-yMovement - turnMovement + xMovement * 1.414);
-        double bLeftPower = (-yMovement + turnMovement + xMovement * 1.414);
-        double bRightPower = (yMovement - turnMovement + xMovement * 1.414);
+        double fLeftPower = (yMovement * 1.414 + turnMovement + xMovement);
+        double fRightPower = (-yMovement * 1.414 - turnMovement + xMovement);
+        double bLeftPower = (-yMovement * 1.414 + turnMovement + xMovement);
+        double bRightPower = (yMovement * 1.414 - turnMovement + xMovement);
 
         double maxPower = Math.abs(fLeftPower);
         if (Math.abs(bLeftPower) > maxPower) {
