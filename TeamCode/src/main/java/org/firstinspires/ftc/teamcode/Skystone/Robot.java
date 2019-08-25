@@ -531,9 +531,9 @@ public class Robot {
             return;
         }
 
-        fLeft.setPower(fLeftPower);
-        fRight.setPower(fRightPower);
-        bLeft.setPower(bLeftPower);
-        bRight.setPower(bRightPower);
+        fLeft.setPower(fLeftPower/1.5);
+        fRight.setPower(fRightPower/1.5);
+        bLeft.setPower(bLeftPower/1.5);
+        bRight.setPower(bRightPower/1.5);
     }
 }

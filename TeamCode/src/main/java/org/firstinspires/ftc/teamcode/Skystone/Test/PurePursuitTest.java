@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Skystone.Robot;
 @Autonomous(name="PurePursuitTest ", group="Linear Opmode")
 public class PurePursuitTest  extends LinearOpMode
 {
-    public static double[][] testPoints = {{0,20},{20,-20}, {}};
+    public static double[][] testPoints = {{0,20},{20,-20}};
 
     @Override
     public void runOpMode(){
