@@ -16,6 +16,12 @@ public class PathPoints {
         }
     }
 
+    public PathPoints(double[][] points, double followDistance){
+        for(int i = 0;i<points.length;i++){
+            targetPoints.add(new CurvePoint(points[i][0],points[i][1],moveSpeed,turnSpeed,followDistance,followRadius,slowDownTurnAmount));
+        }
+    }
+
     public PathPoints(double[][] points, double moveSpeed, double turnSpeed, double followDistance, double followRadius, double slowDownTurnAmount) {
         for (int i = 0; i < points.length; i++) {
             targetPoints.add(new CurvePoint(points[i][0], points[i][1], moveSpeed, turnSpeed, followDistance, Math.toRadians(followRadius), slowDownTurnAmount));

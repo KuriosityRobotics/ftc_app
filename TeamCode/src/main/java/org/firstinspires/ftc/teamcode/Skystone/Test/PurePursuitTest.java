@@ -40,7 +40,7 @@ public class PurePursuitTest  extends LinearOpMode
 //            robot.followCurve(testPath.targetPoints,Math.toRadians(0));
         Position2D position2D = new Position2D(robot);
         position2D.startOdometry();
-        PathPoints testPath = new PathPoints(testPoints);
+        PathPoints testPath = new PathPoints(testPoints, 9);
 
         while (opModeIsActive()){
 //            robot.followCurve(testPath.targetPoints,Math.toRadians(0));

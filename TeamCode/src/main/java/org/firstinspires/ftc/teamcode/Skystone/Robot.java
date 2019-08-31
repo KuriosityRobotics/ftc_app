@@ -28,6 +28,8 @@ public class Robot {
     public DcMotor bLeft;
     public DcMotor bRight;
 
+    double i = 1;
+
     //robots position
     public Point robotPos = new Point();
     public double anglePos;
@@ -54,6 +56,8 @@ public class Robot {
     public double yMovement;
     public double turnMovement;
     public double decelerationScaleFactor;
+
+    public double pathDistance;
 
     public double distanceToEnd;
 
@@ -359,11 +363,16 @@ public class Robot {
         if((distanceToEnd <1)) {
             return false;
         }
+        if(distanceToEnd<5){
+            i+=0.1;
+        }
+        i = Range.clip(i,1,2);
         applyMove();
         return true;
     }
 
     public void moveFollowCurve(Vector<CurvePoint> points){
+        pathDistance = Math.hypot((points.get(0).x-points.get(points.size()-1).x),(points.get(0).y-points.get(points.size()-1).y));
         while(linearOpMode.opModeIsActive()) {
 
             // if followCurve returns false then it is ready to stop
@@ -486,7 +495,7 @@ public class Robot {
         double xPower = relativeXToPoint / (Math.abs(relativeXToPoint) + Math.abs(relativeYToPoint));
         double yPower = relativeYToPoint / (Math.abs(relativeYToPoint) + Math.abs(relativeXToPoint));
 
-        decelerationScaleFactor = Range.clip(distanceToTarget / distanceTotal, -1, 1);
+//        decelerationScaleFactor = Range.clip(distanceToTarget / distanceTotal, -1, 1);
 
         xMovement = xPower * moveSpeed;
         yMovement = yPower * moveSpeed;
@@ -494,7 +503,6 @@ public class Robot {
     }
 
     public void applyMove () {
-
         double fLeftPower = (yMovement * 1.414 + turnMovement + xMovement);
         double fRightPower = (-yMovement * 1.414 - turnMovement + xMovement);
         double bLeftPower = (-yMovement * 1.414 + turnMovement + xMovement);
@@ -511,10 +519,12 @@ public class Robot {
             maxPower = Math.abs(fRightPower);
         }
 
-        fLeftPower *= decelerationScaleFactor;
-        fRightPower *= decelerationScaleFactor;
-        bLeftPower *= decelerationScaleFactor;
-        bRightPower *= decelerationScaleFactor;
+        double scaler = (distanceToEnd/pathDistance)*1.5;
+        scaler = Range.clip(scaler,0.5,Integer.MAX_VALUE);
+        fLeftPower *= scaler;
+        fRightPower *= scaler;
+        bLeftPower *= scaler;
+        bRightPower *= scaler;
 
         double scaleDownAmount = 1.0;
         if (maxPower > 1.0) {
@@ -526,14 +536,19 @@ public class Robot {
         bLeftPower *= scaleDownAmount;
         bRightPower *= scaleDownAmount;
 
-        if (fLeftPower < 0.1 && fRightPower < 0.1 && bLeftPower < 0.1 && bRightPower < 0.1) {
-            brakeRobot();
-            return;
-        }
+        fLeftPower *= scaler;
+        fRightPower *= scaler;
+        bLeftPower *= scaler;
+        bRightPower *= scaler;
 
-        fLeft.setPower(fLeftPower/1.5);
-        fRight.setPower(fRightPower/1.5);
-        bLeft.setPower(bLeftPower/1.5);
-        bRight.setPower(bRightPower/1.5);
+        fLeft.setPower(fLeftPower);
+        fRight.setPower(fRightPower);
+        bLeft.setPower(bLeftPower);
+        bRight.setPower(bRightPower);
+
+        telemetry.addLine("power " + fLeftPower);
+        telemetry.addLine("i " + i);
+        telemetry.addLine("scaler " + scaler);
+        telemetry.addLine("distance " + distanceToEnd);
     }
 }
