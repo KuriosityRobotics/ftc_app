@@ -520,7 +520,8 @@ public class Robot {
         }
 
         double scaler = (distanceToEnd/pathDistance)*1.5;
-        scaler = Range.clip(scaler,0.5,Integer.MAX_VALUE);
+        scaler = Range.clip(scaler,0.43,Integer.MAX_VALUE);
+
         fLeftPower *= scaler;
         fRightPower *= scaler;
         bLeftPower *= scaler;
@@ -545,10 +546,5 @@ public class Robot {
         fRight.setPower(fRightPower);
         bLeft.setPower(bLeftPower);
         bRight.setPower(bRightPower);
-
-        telemetry.addLine("power " + fLeftPower);
-        telemetry.addLine("i " + i);
-        telemetry.addLine("scaler " + scaler);
-        telemetry.addLine("distance " + distanceToEnd);
     }
 }
