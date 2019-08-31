@@ -23,7 +23,7 @@ public class MathFunctions {
         }
         return one;
     }
-
+//test
     public static Vector<Point> lineCircleIntersection(Point circleCenter, double radius, Point linePoint1, Point linePoint2){
         //make sure the points don't exactly line up so the slopes work
         if(Math.abs(linePoint1.y- linePoint2.y) < 0.003){
