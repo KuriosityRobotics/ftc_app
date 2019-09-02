@@ -372,7 +372,7 @@ public class Robot {
     }
 
     public void moveFollowCurve(Vector<CurvePoint> points){
-        pathDistance = Math.hypot((points.get(0).x-points.get(points.size()-1).x),(points.get(0).y-points.get(points.size()-1).y));
+        pathDistance = Math.hypot(points.get(points.size()-1).x,-points.get(points.size()-1).y);
         while(linearOpMode.opModeIsActive()) {
 
             // if followCurve returns false then it is ready to stop
